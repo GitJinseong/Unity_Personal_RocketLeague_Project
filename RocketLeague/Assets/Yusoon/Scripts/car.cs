@@ -20,6 +20,7 @@ public class car : MonoBehaviour
             {
                 axleInfo.leftWheel.steerAngle = steering;
                 axleInfo.rightWheel.steerAngle = steering;
+                
             }
             if (axleInfo.motor)
             {
@@ -28,12 +29,26 @@ public class car : MonoBehaviour
             }
         }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Rigidbody rigidBody=collision.gameObject.GetComponent<Rigidbody>();
+        if (rigidBody != null) 
+        {
+            Vector3 dir = (collision.transform.position-transform.position).normalized;
+            rigidBody.AddForce(dir*50, ForceMode.Impulse);
+        }
+    }
 }
+
+
 [System.Serializable]
 public class AxleInfo
 {
     public WheelCollider leftWheel;
     public WheelCollider rightWheel;
+    public GameObject leftWheelObj;
+    public GameObject rightWheelObj;
     public bool motor; // is this wheel attached to motor?
     public bool steering; // does this wheel apply steer angle?
 }
