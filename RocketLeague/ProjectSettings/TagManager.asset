@@ -4,12 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
+  - field
   - Floor
-<<<<<<< HEAD
-=======
-  - Ball
->>>>>>> origin/LGM
-  - Car
   layers:
   - Default
   - TransparentFX
@@ -17,7 +13,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Field
   - 
   - 
   - 

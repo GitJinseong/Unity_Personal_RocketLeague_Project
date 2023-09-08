@@ -28,7 +28,7 @@ public class Goal2 : MonoBehaviour
             TestManager.instance.isGoal = true;   // TestManager isGoal 값을 true 로 변경해 골을 넣은 상태로 바꿈
             TestManager.instance.GoalTeam1();   // TestManager 의 score 를 더해주는 함수를 실행
 
-            // 콜라이더에 들어온 축구공 위치값 Vector3 저장
+               // 콜라이더에 들어온 축구공 위치값 Vector3 저장
             ballPosition = new Vector3(collision.transform.position.x, collision.transform.position.y,
                 collision.transform.position.z);
 
