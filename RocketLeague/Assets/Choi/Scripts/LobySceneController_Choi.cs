@@ -6,10 +6,11 @@ using UnityEngine.UI;
 
 public class LobySceneController_Choi : MonoBehaviour
 {
-    [Header("LobyEffect")]
+    #region 선언부
     public GameObject[] objs; // 아래와 같은 오브젝트를 인덱스에 설정
-                              // [0] = Txt_StartMsg, [1] = Btn_Start, [2] = Img_GameLogo, [3] = Img_BlackBg
+                              // [0] = Txt_StartMsg, [1] = Btn_Start, [2] = Img_GameLogo
     private bool isStart = false;
+    #endregion
 
     void Start()
     {
@@ -18,18 +19,15 @@ public class LobySceneController_Choi : MonoBehaviour
         StartCoroutine(DOActionStartMsg(actionTimesForStartMsg));
 
         // 타이틀 게임 로고 액션 함수 호출
-        float[] actionTimesForGameLogo = {4f};
-        StartCoroutine(DOActionGameLogo(actionTimesForGameLogo));
+        //float[] actionTimesForGameLogo = {1f, 3f};
+        //StartCoroutine(DOActionGameLogo(actionTimesForGameLogo));
     }
 
     // 시작 버튼 액션 코루틴 함수
     private IEnumerator DOActionStartMsg(float[] times)
     {
         yield return new WaitForSeconds(times[0]);
-        objs[1].SetActive(true); // 시작 버튼 활성화
-
-        Image blackBg = objs[3].GetComponent<Image>();
-        blackBg.DOFade(0f, 1f).SetDelay(2f); // 2초간 검은 배경 페이드 아웃
+        objs[0].SetActive(true); // 시작 버튼 활성화
 
         TMP_Text startMsg = objs[0].GetComponent<TMP_Text>();
         startMsg.DOFade(1f, 1f).SetDelay(2f); // 2초간 시작 텍스트 페이드인
@@ -61,16 +59,14 @@ public class LobySceneController_Choi : MonoBehaviour
         }
     }
 
-    // 게임 로고 액션 코루틴 함수
+    // 타이틀 배경 액션 코루틴 함수
     private IEnumerator DOActionGameLogo(float[] times)
     {
         yield return new WaitForSeconds(times[0]);
-        objs[2].SetActive(true); // 게임 로고 활성화
+        objs[0].SetActive(true); // 타이틀 게임 로고 활성화
 
-        Image gameLogo = objs[2].GetComponent<Image>();
-        gameLogo.DOFade(1f, 1f).SetDelay(1f); // 1초간 페이드 인
-
-        RectTransform gameLogoRectTramsform = gameLogo.GetComponent<RectTransform>();
-        gameLogoRectTramsform.DOAnchorPos(new Vector3(0f, -380f, 0f), 2f); // 2초간 아래로 이동
+        yield return new WaitForSeconds(times[1]);
+        Image titleBg = objs[0].GetComponent<Image>();
+        titleBg.DOFade(0f, 1f).SetDelay(1f); // 1초간 페이드 아웃
     }
 }

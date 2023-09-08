@@ -21,13 +21,11 @@ public class BoostUI_Yoo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 이미지의 fillAmount를 부스트값의 65퍼센트로 초기화
         boostImage.fillAmount = 0.65f * (boost / 100);
         boostString = boost.ToString();
         boostText.text = boostString;
     }
 
-    // 부스터 게이지값을 설정하는 함수
     public void SetBoostGauge(float gauge)
     {
         boost = gauge;

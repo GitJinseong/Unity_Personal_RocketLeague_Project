@@ -41,8 +41,7 @@ public class SmallBoost_Yoo : MonoBehaviour
         // 자동차와 부딪힐 경우 부딪힌 자동차의 스크립트를 불러와서 부스터 게이지 증가함수를 발동시킴
         if (collision.CompareTag("Car"))
         {
-            //Debug.Log("여기는 들어옴?");
-            carBooster = collision.gameObject.transform.parent.gameObject.GetComponentInParent<CarBooster_Yoo>();
+            carBooster = collision.gameObject.GetComponentInParent<CarBooster_Yoo>();
 
             carBooster.AddBoost(12);
 
