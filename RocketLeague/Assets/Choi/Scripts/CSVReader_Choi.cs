@@ -51,7 +51,8 @@ public class CSVReader_Choi : MonoBehaviour
 
                     foreach (string header in headers)
                     {
-                        dataDictionary.Add(header, new List<string>()); // dataDictionary에 행 이름을 키 값으로 리스트 추가
+                        // dataDictionary에 행 이름을 키 값으로 리스트 추가
+                        dataDictionary.Add(header, new List<string>());
                     }
 
                     // 첫번째 행[0]을 헤더로 사용하고 두 번째[1] 부터 데이터 행으로 사용하기 위해
@@ -73,7 +74,16 @@ public class CSVReader_Choi : MonoBehaviour
             isCSVReadSuccessful = true;
         }
 
-        Debug.Log($"CSV 파일 찾기 : {isCSVReadSuccessful}");
+        if (isCSVReadSuccessful)
+        {
+            Debug.Log($"ReadCSVFile(): ▶ 경로 {csvFileName} ▶ CSV 파일 로드 성공");
+        }
+        else
+        {
+            Debug.Log($"ReadCSVFile(): ▶ 경로 {csvFileName} ▶ CSV 파일 로드 실패 ▶ " +
+                $"일치하는 CSV 파일이 없습니다. ▶ 스크립트: CSVReader_Choi");
+        }
+
         return dataDictionary;
     }
 

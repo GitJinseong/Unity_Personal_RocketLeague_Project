@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 5281925788688188237}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,6 +118,10 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 50
+  fieldMask:
+    serializedVersion: 2
+    m_Bits: 0
+  currentSpeed: 0
   sphere: {fileID: 5281925789982568884}
 --- !u!1 &5281925789982568886
 GameObject:
