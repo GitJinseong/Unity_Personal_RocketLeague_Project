@@ -22,6 +22,7 @@ public class CarMove : MonoBehaviour
     [SerializeField] private Transform frontRightWheelTransform;
     [SerializeField] private Transform backLeftWheelTransform;
     [SerializeField] private Transform backRightWheelTransform;
+
     private void FixedUpdate()
     {
         GetInput();
@@ -29,23 +30,27 @@ public class CarMove : MonoBehaviour
         HandleSteering();
         UpdateWheels();
     }
+
     private void HandleMotor()
     {
         frontLeftWheelCollider.motorTorque=verticalInput*motorForce;
         frontRightWheelCollider.motorTorque=verticalInput*motorForce;
     }
+
     private void GetInput()
     {
         horizontalInput=Input.GetAxis(HORIZONTAL);
         verticalInput=Input.GetAxis(VERTICAL);
 
     }
+
     private void HandleSteering()
     {
         currentSteeringAngle=maxSteeringAngle*horizontalInput;
         frontLeftWheelCollider.steerAngle=currentSteeringAngle;
         frontRightWheelCollider.steerAngle=currentSteeringAngle;
     }
+
     private void UpdateWheels()
     {
         UpdateSingleWheel(frontLeftWheelCollider, frontLeftWheelTransform);
@@ -53,6 +58,7 @@ public class CarMove : MonoBehaviour
         UpdateSingleWheel(backLeftWheelCollider, backLeftWheelTransform);
         UpdateSingleWheel(backRightWheelCollider, backRightWheelTransform);
     }
+
     private void UpdateSingleWheel(WheelCollider wheelCollider, Transform wheelTransform)
     {
         Vector3 pos;
@@ -62,5 +68,4 @@ public class CarMove : MonoBehaviour
         wheelTransform.rotation = rot*desiredRotation;
         wheelTransform.position = pos;
     }
-
 }

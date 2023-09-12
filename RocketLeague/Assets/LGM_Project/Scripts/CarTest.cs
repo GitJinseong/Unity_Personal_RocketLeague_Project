@@ -21,6 +21,6 @@ public class CarTest : MonoBehaviour
         pushVector = pushVector.normalized;   // 계산된 위치값을 1 의 값으로 변경해준다
         pushVector += Vector3.up * 5;   // 계산된 위치값에 5 만큼 점프력을 증가시킨다
         pushVector += Vector3.forward * 5;   // 계산된 위치값에 5 만큼 직진값을 증가시킨다.
-        carRb.AddForce(pushVector * 5, ForceMode.Impulse);   // 골인 효과 범위내에 있는 RC 카들을 AddForce 로 힘을 줘 밀어낸다
+        carRb.AddForce(pushVector * 30, ForceMode.Impulse);   // 골인 효과 범위내에 있는 RC 카들을 AddForce 로 힘을 줘 밀어낸다
     }
 }
