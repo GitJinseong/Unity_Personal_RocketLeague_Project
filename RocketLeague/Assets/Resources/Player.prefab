@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &107163819
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 107163820}
+  m_Layer: 2
+  m_Name: CarFrames
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &107163820
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 107163819}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5560808065037951614}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5281925788586521842
 GameObject:
   m_ObjectHideFlags: 0
@@ -76,7 +107,7 @@ GameObject:
   - component: {fileID: 5281925789046558726}
   - component: {fileID: 5281925789046558725}
   m_Layer: 2
-  m_Name: Car
+  m_Name: Kart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -195,7 +226,12 @@ PrefabInstance:
     - target: {fileID: 4028133681936199282, guid: 80a4583f248564d4c9cc4f77c559cefb,
         type: 3}
       propertyPath: m_Name
-      value: CarFrames
+      value: Car
+      objectReference: {fileID: 0}
+    - target: {fileID: 4028133681936199282, guid: 80a4583f248564d4c9cc4f77c559cefb,
+        type: 3}
+      propertyPath: m_TagString
+      value: Car
       objectReference: {fileID: 0}
     - target: {fileID: 4372184423398356168, guid: 80a4583f248564d4c9cc4f77c559cefb,
         type: 3}
