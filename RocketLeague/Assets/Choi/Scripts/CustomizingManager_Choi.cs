@@ -10,535 +10,565 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class CustomizingManager_Choi : MonoBehaviour
 {
-    #region [½Ì±ÛÅæ & º¯¼ö ¼±¾ğºÎ]
+    #region [ì‹±ê¸€í†¤ & ë³€ìˆ˜ ì„ ì–¸ë¶€]
     // ##################################################################################################
-    // ¢º[½Ì±ÛÅæ & º¯¼ö ¼±¾ğºÎ]
+    // â–¶[ì‹±ê¸€í†¤ & ë³€ìˆ˜ ì„ ì–¸ë¶€]
     // ##################################################################################################
-        // ½Ì±ÛÅæ ¼±¾ğ
-        private static CustomizingManager_Choi m_instance; // ½Ì±ÛÅæÀÌ ÇÒ´çµÉ static º¯¼ö
-        public static CustomizingManager_Choi instance
+    // ì‹±ê¸€í†¤ ì„ ì–¸
+    private static CustomizingManager_Choi m_instance; // ì‹±ê¸€í†¤ì´ í• ë‹¹ë  static ë³€ìˆ˜
+    public static CustomizingManager_Choi instance
+    {
+        get
         {
-            get
+            // ë§Œì•½ ì‹±ê¸€í†¤ ì˜¤ë¸Œì íŠ¸ì— í• ë‹¹ì´ ë˜ì§€ ì•Šì•˜ë‹¤ë©´
+            if (m_instance == null)
             {
-                // ¸¸¾à ½Ì±ÛÅæ ¿ÀºêÁ§Æ®¿¡ ÇÒ´çÀÌ µÇÁö ¾Ê¾Ò´Ù¸é
-                if (m_instance == null)
-                {
-                    // ¾À¿¡¼­ ¿ÀºêÁ§Æ®¸¦ Ã£¾Æ ÇÒ´ç
-                    m_instance  = FindObjectOfType<CustomizingManager_Choi>();
-                }
-            
-                // ½Ì±ÛÅæ ¿ÀºêÁ§Æ®¸¦ ¹İÈ¯
-                return m_instance;
+                // ì”¬ì—ì„œ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì•„ í• ë‹¹
+                m_instance = FindObjectOfType<CustomizingManager_Choi>();
             }
+
+            // ì‹±ê¸€í†¤ ì˜¤ë¸Œì íŠ¸ë¥¼ ë°˜í™˜
+            return m_instance;
         }
+    }
 
-        private delegate void CustomizingFunc(); // µ¨¸®°ÔÀÌÆ® Á¤ÀÇ
+    private delegate void CustomizingFunc(); // ë¸ë¦¬ê²Œì´íŠ¸ ì •ì˜
 
-        [Header("CSVFileReader")]
-        private string defaultDirectory = "CSVFiles/"; // ±âº» µğ·ºÅä¸® °æ·Î
-        private string[] csvFileList =
-        {
-            "CarFrameList", "ColorList", "FlagList", "MarkList", 
+    [Header("CSVFileReader")]
+    private string defaultDirectory = "CSVFiles/"; // ê¸°ë³¸ ë””ë ‰í† ë¦¬ ê²½ë¡œ
+    private string[] csvFileList =
+    {
+            "CarFrameList", //"FlagList", "MarkList",
             "WheelList_FL", "WheelList_FR", "WheelList_BL", "WheelList_BR"
-        }; // CSV ÆÄÀÏ¸í ¸®½ºÆ®
-        private string[] categoryList =
-        {
-            "CarFrames", "Colors", "Flags", "Marks",
+        }; // CSV íŒŒì¼ëª… ë¦¬ìŠ¤íŠ¸
+    private string[] categoryList =
+    {
+            "CarFrames", //"Flags", "Marks",
             "Wheels_FL", "Wheels_FR", "Wheels_BL", "Wheels_BR"
         };
-        private Dictionary<string, List<string>> temp_DataDictionary; // CSV ÆÄÀÏ ÀÓ½Ã ÀúÀå¿ë µñ¼Å³Ê¸®
-        private Dictionary<string, Dictionary<string, List<string>>> dataDictionary; // CSV ÆÄÀÏµéÀ» °ü¸®
+    private Dictionary<string, List<string>> temp_DataDictionary; // CSV íŒŒì¼ ì„ì‹œ ì €ì¥ìš© ë”•ì…”ë„ˆë¦¬
+    private Dictionary<string, Dictionary<string, List<string>>> dataDictionary; // CSV íŒŒì¼ë“¤ì„ ê´€ë¦¬
 
-        [Header("Delegate")]
-        private static Dictionary<string, CustomizingFunc> customizingFuncs = 
-            new Dictionary<string, CustomizingFunc>(); // Å° °ªÀ¸·Î ÇÔ¼ö¿¡ Á¢±ÙÇÏ±â À§ÇØ µñ¼Å³Ê¸® ¼±¾ğ
+    [Header("Delegate")]
+    private static Dictionary<string, CustomizingFunc> customizingFuncs =
+        new Dictionary<string, CustomizingFunc>(); // í‚¤ ê°’ìœ¼ë¡œ í•¨ìˆ˜ì— ì ‘ê·¼í•˜ê¸° ìœ„í•´ ë”•ì…”ë„ˆë¦¬ ì„ ì–¸
 
-        [Header("Parents")]
-        private List<GameObject> parents; // ºÎ¸ğµéÀ» °ü¸®ÇÏ´Â ¸®½ºÆ®
+    [Header("Parents")]
+    private List<GameObject> parents; // ë¶€ëª¨ë“¤ì„ ê´€ë¦¬í•˜ëŠ” ë¦¬ìŠ¤íŠ¸
 
-        [Header("PlayerPrefab")]
-        private string[] CarTypes = {"BlueCar", "OrangeCar"}; // CreateObjectWithCustomizing()¿¡¼­ ÇÃ·¹ÀÌ¾î
-                                                              // ¿ÀºêÁ§Æ®¸¦ »ı¼ºÇÒ ¶§ È£ÃâµÇ´Â ¹è¿­ 
-                                                              // Resource Æú´õ¿¡ °°Àº ÀÌ¸§ÀÇ ÇÁ¸®ÆÕ »ı¼ºÇØ¾ßÇÔ
-        private Dictionary<string, int> 
-        temp_IndexDictionary = new Dictionary<string, int>(); // ÀÎµ¦½º¸¦ ÀúÀåÇÏ´Â µñ¼Å³Ê¸®(ÇÃ·¹ÀÌ¾î ÇÁ¸®ÆÕ ÀúÀå ¸ñÀû)
-                                                              // Ä«Å×°í¸®¸¦ Å° °ªÀ¸·Î Á¢±ÙÇÑ´Ù.
+    [Header("PlayerPrefab")]
+    private string[] CarTypes = { "BlueCar", "OrangeCar" }; // CreateObjectWithCustomizing()ì—ì„œ í”Œë ˆì´ì–´
+                                                            // ì˜¤ë¸Œì íŠ¸ë¥¼ ìƒì„±í•  ë•Œ í˜¸ì¶œë˜ëŠ” ë°°ì—´ 
+                                                            // Resource í´ë”ì— ê°™ì€ ì´ë¦„ì˜ í”„ë¦¬íŒ¹ ìƒì„±í•´ì•¼í•¨
+    private Dictionary<string, int>
+    temp_IndexDictionary = new Dictionary<string, int>(); // ì¸ë±ìŠ¤ë¥¼ ì €ì¥í•˜ëŠ” ë”•ì…”ë„ˆë¦¬(í”Œë ˆì´ì–´ í”„ë¦¬íŒ¹ ì €ì¥ ëª©ì )
+                                                          // ì¹´í…Œê³ ë¦¬ë¥¼ í‚¤ ê°’ìœ¼ë¡œ ì ‘ê·¼í•œë‹¤.
     #endregion
 
-    #region [¶óÀÌÇÁ »çÀÌÅ¬ ¸Ş¼­µå]
+    #region [ë¼ì´í”„ ì‚¬ì´í´ ë©”ì„œë“œ]
     // ##################################################################################################
-    // ¢º[¶óÀÌÇÁ »çÀÌÅ¬ ¸Ş¼­µå]
+    // â–¶[ë¼ì´í”„ ì‚¬ì´í´ ë©”ì„œë“œ]
     // ##################################################################################################
-        private void Awake()
-        {
-            // csvFileList¿¡ ÀÖ´Â ¸ğµç CSV ÆÄÀÏ ·Îµå
-            ReadCSVFileAndSave();
+    private void Awake()
+    {
+        // csvFileListì— ìˆëŠ” ëª¨ë“  CSV íŒŒì¼ ë¡œë“œ
+        ReadCSVFileAndSave();
 
-            // parents ¸®½ºÆ®¿¡ GameObject ºÎ¸ğµéÀ» Ãß°¡
-            InputParents();
+        // parents ë¦¬ìŠ¤íŠ¸ì— GameObject ë¶€ëª¨ë“¤ì„ ì¶”ê°€
+        InputParents();
 
-            // ¿ÀºêÁ§Æ® Ç®¸µÀ» À§ÇÑ ¿ÀºêÁ§Æ® »ı¼º
-            CreateObjectPools();
+        // ì˜¤ë¸Œì íŠ¸ í’€ë§ì„ ìœ„í•œ ì˜¤ë¸Œì íŠ¸ ìƒì„±
+        CreateObjectPools();
 
-            // ¿øÇÏ´Â ¿ÀºêÁ§Æ® °¡Á®¿À±â
-            // ¸Å°³º¯¼ö·Î (Ä«Å×°í¸® / Ã£À» ÆÄÃ÷ ¿ÀºêÁ§Æ®¸í) Áà¾ßÇÔ
-            Debug.Log($"°¡Á®¿Â ¿ÀºêÁ§Æ® ÆÄÃ÷¸í: {FindTargetObject("Wheels_FR", "DefaultWheel_FR").name}");
+        // ì›í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ê°€ì ¸ì˜¤ê¸°
+        // ë§¤ê°œë³€ìˆ˜ë¡œ (ì¹´í…Œê³ ë¦¬ / ì°¾ì„ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ëª…) ì¤˜ì•¼í•¨
+        Debug.Log($"ê°€ì ¸ì˜¨ ì˜¤ë¸Œì íŠ¸ íŒŒì¸ ëª…: {FindTargetObject("Wheels_FR", "DefaultWheel_FR").name}");
 
-            // ÇöÀç ÆÄÃ÷ °¡Á®¿À±â
-            Debug.Log($"CarFramesÀÇ ÇöÀç ÆÄÃ÷ °¡Á®¿À±â : {GetCurrentObject("CarFrames").name}");
+        // í˜„ì¬ íŒŒì¸  ê°€ì ¸ì˜¤ê¸°
+        Debug.Log($"CarFramesì˜ í˜„ì¬ íŒŒì¸  ê°€ì ¸ì˜¤ê¸° : {GetCurrentObject("CarFrames").name}");
 
-            // ÇöÀç ÀÎµ¦½º ÀúÀå
-            SaveDataForPlayerPrefab();
+        // í”Œë ˆì´ì–´ì˜ í˜„ì¬ ëª¨ë“  íŒŒì¸ ë¥¼ temp_IndexDictionaryì— ì €ì¥
+        SaveAllPlayerPartsToTempIndexDictionary();
 
-            // PlayerPrefab¿¡ ÀúÀåµÇ¾î ÀÖ´Â Index °¡Á®¿À±â
-            GetDataForPlayerPrefab("CarFrames");
+        // í˜„ì¬ ì¸ë±ìŠ¤ ì €ì¥
+        SaveDataForPlayerPrefab();
 
-            // PlayerPrefab¿¡ ÀúÀåµÇ¾î ÀÖ´Â Index µéÀ» °¡Á®¿Í¼­ Â÷·® ¿ÀºêÁ§Æ® »ı¼º ÈÄ ÆÄÃ÷ ºÎÂøÇÏ±â 
-            CreateObjectWithCustomizing(0,0);
-        } // Awake()
+        // PlayerPrefabì— ì €ì¥ë˜ì–´ ìˆëŠ” Index ê°€ì ¸ì˜¤ê¸°
+        GetDataForPlayerPrefab("CarFrames");
+
+        // PlayerPrefabì— ì €ì¥ë˜ì–´ ìˆëŠ” Index ë“¤ì„ ê°€ì ¸ì™€ì„œ ì°¨ëŸ‰ ì˜¤ë¸Œì íŠ¸ ìƒì„± í›„ íŒŒì¸  ë¶€ì°©í•˜ê¸° 
+        CreateObjectWithCustomizing(0, 0);
+    } // Awake()
     #endregion
 
-    #region [ÀÎ½ºÅÏ½º È£Ãâ ¸Ş¼­µå]
+    #region [ì¸ìŠ¤í„´ìŠ¤ í˜¸ì¶œ ë©”ì„œë“œ]
     // ##################################################################################################
-    // ¢º[ÀÎ½ºÅÏ½º È£Ãâ ¸Ş¼­µå]
+    // â–¶[ì¸ìŠ¤í„´ìŠ¤ í˜¸ì¶œ ë©”ì„œë“œ]
     // ##################################################################################################
-    // csvFileList¿¡ ÀÖ´Â ¸ğµç CSV ÆÄÀÏÀ» ÀĞ¾î¼­ dataDictionary¿¡ ÀúÀåÇÏ´Â ÇÔ¼ö
-    // ÂüÁ¶ÇÏ´Â ½ºÅ©¸³Æ® ÀÎ½ºÅÏ½º: CSVReader_Choi
-        private void ReadCSVFileAndSave()
-            {
-                // µ¥ÀÌÅÍ µñ¼Å³Ê¸® ÃÊ±âÈ­
-                dataDictionary = new Dictionary<string, Dictionary<string, List<string>>>();
-                // csvFileList¿¡ ÀÖ´Â ¸ğµç CSV ÆÄÀÏµéÀ» dataDictionary¿¡ ÀúÀå
-                for (int i = 0; i < csvFileList.Length; i++)
-                {
-                    temp_DataDictionary = 
-                    CSVReader_Choi.instance.ReadCSVFile(defaultDirectory + csvFileList[i]);
-                    dataDictionary.Add(csvFileList[i], temp_DataDictionary);
-                }
-            } // ReadCSVFileAndSave()
-
-        // temp_IndexDictionary¿¡ ÀúÀåµÈ Á¤º¸¸¦ PlayerPrefab¿¡ ÀúÀåÇÏ´Â ÇÔ¼ö
-        // ÂüÁ¶ÇÏ´Â ½ºÅ©¸³Æ® ÀÎ½ºÅÏ½º: PlayerDataManager_Choi
-        public void SaveDataForPlayerPrefab()
+    // csvFileListì— ìˆëŠ” ëª¨ë“  CSV íŒŒì¼ì„ ì½ì–´ì„œ dataDictionaryì— ì €ì¥í•˜ëŠ” í•¨ìˆ˜
+    // ì°¸ì¡°í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸ ì¸ìŠ¤í„´ìŠ¤: CSVReader_Choi
+    private void ReadCSVFileAndSave()
+    {
+        // ë°ì´í„° ë”•ì…”ë„ˆë¦¬ ì´ˆê¸°í™”
+        dataDictionary = new Dictionary<string, Dictionary<string, List<string>>>();
+        // csvFileListì— ìˆëŠ” ëª¨ë“  CSV íŒŒì¼ë“¤ì„ dataDictionaryì— ì €ì¥
+        // í‚¤ ê°’ì€ ì¹´í…Œê³ ë¦¬
+        for (int i = 0; i < csvFileList.Length; i++)
         {
-            // ÀÎ½ºÅÏ½º¸¦ È£ÃâÇÑ ÈÄ temp_IndexDictionary¿¡ ÀÖ´Â Á¤º¸¸¦ PlayerPrefab¿¡ ÀúÀå
-            PlayerDataManager_Choi.instance.SetPlayerPrefForIndex();
-        } // SaveDataForPlayerPrefab()
+            temp_DataDictionary =
+            CSVReader_Choi.instance.ReadCSVFile(defaultDirectory + csvFileList[i]);
+            dataDictionary.Add(categoryList[i], temp_DataDictionary);
+        }
+    } // ReadCSVFileAndSave()
 
-        // PlayerPrefab¿¡ ÀúÀåµÈ ÀÎµ¦½º¸¦ È£ÃâÇÏ´Â ÇÔ¼ö
-        // ÂüÁ¶ÇÏ´Â ½ºÅ©¸³Æ® ÀÎ½ºÅÏ½º: PlayerDataManager_Choi
-        public int GetDataForPlayerPrefab(string key)
-        {
-            // PlayerPrefab¿¡ ÀúÀåµÈ ÀÎµ¦½º¸¦ Å°°ªÀ¸·Î È£Ãâ
-            int temp_Index = PlayerDataManager_Choi.instance.GetPlayerPrefForIndex(key);
-            
-            // È£ÃâÇÑ Index °ª ¹İÈ¯
-            return temp_Index;
-        } // GetDataForPlayerPrefab()
+    // temp_IndexDictionaryì— ì €ì¥ëœ ì •ë³´ë¥¼ PlayerPrefabì— ì €ì¥í•˜ëŠ” í•¨ìˆ˜
+    // ì°¸ì¡°í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸ ì¸ìŠ¤í„´ìŠ¤: PlayerDataManager_Choi
+    public void SaveDataForPlayerPrefab()
+    {
+        // ì¸ìŠ¤í„´ìŠ¤ë¥¼ í˜¸ì¶œí•œ í›„ temp_IndexDictionaryì— ìˆëŠ” ì •ë³´ë¥¼ PlayerPrefabì— ì €ì¥
+        PlayerDataManager_Choi.instance.SetPlayerPrefForIndex();
+    } // SaveDataForPlayerPrefab()
+
+    // PlayerPrefabì— ì €ì¥ëœ ì¸ë±ìŠ¤ë¥¼ í˜¸ì¶œí•˜ëŠ” í•¨ìˆ˜
+    // ì°¸ì¡°í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸ ì¸ìŠ¤í„´ìŠ¤: PlayerDataManager_Choi
+    public int GetDataForPlayerPrefab(string key)
+    {
+        // PlayerPrefabì— ì €ì¥ëœ ì¸ë±ìŠ¤ë¥¼ í‚¤ê°’ìœ¼ë¡œ í˜¸ì¶œ
+        int temp_Index = PlayerDataManager_Choi.instance.GetPlayerPrefForIndex(key);
+
+        // í˜¸ì¶œí•œ Index ê°’ ë°˜í™˜
+        return temp_Index;
+    } // GetDataForPlayerPrefab()
     #endregion
 
-    #region [¿ÀºêÁ§Æ® »ı¼º ¸Ş¼­µå]
+    #region [ì˜¤ë¸Œì íŠ¸ ìƒì„± ë©”ì„œë“œ]
     // ##################################################################################################
-    // ¢º[¿ÀºêÁ§Æ® »ı¼º ¸Ş¼­µå]
+    // â–¶[ì˜¤ë¸Œì íŠ¸ ìƒì„± ë©”ì„œë“œ]
     // ##################################################################################################
-        // ¿ÀºêÁ§Æ® Ç®¸µÀ» À§ÇÑ ¿ÀºêÁ§Æ® »ı¼º ÇÔ¼ö
-        private void CreateObjectPools()
+    // ì˜¤ë¸Œì íŠ¸ í’€ë§ì„ ìœ„í•œ ì˜¤ë¸Œì íŠ¸ ìƒì„± í•¨ìˆ˜
+    private void CreateObjectPools()
+    {
+        // ì¹´í…Œê³ ë¦¬ ì„ì‹œ ë³€ìˆ˜ ìƒì„±
+        GameObject temp_CategoryObj;
+        // ì„ì‹œ ë³€ìˆ˜ì— í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ í• ë‹¹
+        GameObject temp_PlayerObj = GetPlayerObject(0);
+        string temp_Category = "";
+        string temp_DataDictionaryKey = "";
+        // CSV íŒŒì¼ ê°¯ìˆ˜ ë§Œí¼ forë¬¸ ë°˜ë³µ
+        for (int i = 0; i < csvFileList.Length; i++)
         {
-            // ÀÓ½Ã º¯¼ö »ı¼º
-            GameObject temp_parent = new GameObject();
-            string temp_Category = "";
-            string temp_DataDictionaryKey = "";
-
-            // CSV ÆÄÀÏ °¹¼ö ¸¸Å­ for¹® ¹İº¹
-            for (int i = 0; i < csvFileList.Length; i++)
+            // ì„ì‹œ temp ë³€ìˆ˜ì— ê°’ í• ë‹¹
+            temp_Category = categoryList[i]; // ì¹´í…Œê³ ë¦¬ í• ë‹¹
+                                             // í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ ë‚´ì— ìˆëŠ” ì¹´í…Œê³ ë¦¬ ì˜¤ë¸Œì íŠ¸ë¥¼ ì¬ê·€ í•¨ìˆ˜ë¡œ ì°¾ì•„ì„œ í• ë‹¹
+            temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, temp_Category).gameObject;
+            // ì ‘ê·¼ í‚¤ í• ë‹¹
+            temp_DataDictionaryKey = GetKeyForDataDictionary(temp_Category);
+            // dataDictionary[í‚¤ ê°’]ì— ìˆëŠ” ì •ë³´ë¥¼ ë°”íƒ•ìœ¼ë¡œ ì˜¤ë¸Œì íŠ¸ ìƒì„±
+            for (int j = 0; j < dataDictionary[temp_Category][temp_DataDictionaryKey].Count; j++)
             {
-                // ÀÓ½Ã temp º¯¼ö¿¡ °ª ÇÒ´ç
-                temp_parent = parents[i]; // ºÎ¸ğ ÇÒ´ç
-                temp_Category = csvFileList[i]; // Ä«Å×°í¸® ÇÒ´ç
-                temp_DataDictionaryKey = GetKeyForDataDictionary(temp_Category); // Á¢±Ù Å° ÇÒ´ç
-                // dataDictionary[Å° °ª]¿¡ ÀÖ´Â Á¤º¸¸¦ ¹ÙÅÁÀ¸·Î ¿ÀºêÁ§Æ® »ı¼º
-                for (int j = 0; j < dataDictionary[temp_Category][temp_DataDictionaryKey].Count; j++)
-                {
-                    // ¿ÀºêÁ§Æ® ÀÎ½ºÅÏ½º »ı¼º ÇÔ¼ö È£Ãâ
-                    CreateInstantiate(temp_Category, temp_DataDictionaryKey, j, temp_parent);
-                }
+                // ì˜¤ë¸Œì íŠ¸ ì¸ìŠ¤í„´ìŠ¤ ìƒì„± í•¨ìˆ˜ í˜¸ì¶œ
+                CreateInstantiate(temp_Category, temp_DataDictionaryKey, j, temp_CategoryObj);
             }
-        } // CreateObjectPools()
+        }
+    } // CreateObjectPools()
 
-        // ¿ÀºêÁ§Æ® ÀÎ½ºÅÏ½º »ı¼º ÇÔ¼ö
-        private void CreateInstantiate(string category, string key, int index, GameObject parent)
+    // ì˜¤ë¸Œì íŠ¸ ì¸ìŠ¤í„´ìŠ¤ ìƒì„± í•¨ìˆ˜
+    private void CreateInstantiate(string category, string key, int index, GameObject parent)
+    {
+        // í”„ë¦¬íŒ¹ ì¸ìŠ¤í„´ìŠ¤ ì˜¤ë¸Œì íŠ¸ ìƒì„±
+        GameObject temp_Prefab = GetPrefab(category, key, index);
+
+        // ì¸ìŠ¤í„´ìŠ¤ ìƒì„± ì„±ê³µì‹œ
+        if (temp_Prefab != null)
         {
-            // ÇÁ¸®ÆÕ ÀÎ½ºÅÏ½º ¿ÀºêÁ§Æ® »ı¼º
-            GameObject temp_Prefab = GetPrefab(category, key, index);
+            // ì˜¤ë¸Œì íŠ¸ ìƒì„± & í¬ì§€ì…˜ ë³´ì •
+            GameObject temp_Obj = Instantiate(temp_Prefab, AdjustChildPosition(parent, temp_Prefab),
+                temp_Prefab.transform.rotation, parent.transform);
+            // ì˜¤ë¸Œì íŠ¸ ì´ë¦„ ì„¤ì •
+            temp_Obj.name = temp_Prefab.name;
+            // ì˜¤ë¸Œì íŠ¸ ë¹„í™œì„±í™”
+            temp_Obj.SetActive(true);
 
-            // ÀÎ½ºÅÏ½º »ı¼º ¼º°ø½Ã
-            if (temp_Prefab != null)
-            {
-                // ¿ÀºêÁ§Æ® »ı¼º & Æ÷Áö¼Ç º¸Á¤
-                GameObject temp_Obj = Instantiate(temp_Prefab, AdjustChildPosition(parent, temp_Prefab), 
-                    temp_Prefab.transform.rotation, parent.transform);
-                // ¿ÀºêÁ§Æ® ÀÌ¸§ ¼³Á¤
-                temp_Obj.name = temp_Prefab.name;
-                // ¿ÀºêÁ§Æ® ºñÈ°¼ºÈ­
-                temp_Obj.SetActive(true);
+            Debug.Log("CreateInstantiate(): â–¶ ì˜¤ë¸Œì íŠ¸ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±ì— ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤.");
+        }
 
-                Debug.Log("CreateInstantiate(): ¢º ¿ÀºêÁ§Æ® ÀÎ½ºÅÏ½º »ı¼º¿¡ ¼º°øÇÏ¿´½À´Ï´Ù.");
-            }
+        // ì¸ìŠ¤í„´ìŠ¤ ìƒì„± ì‹¤íŒ¨ì‹œ
+        else
+        {
+            // ë””ë²„ê·¸ ë©”ì„¸ì§€ ì¶œë ¥
+            Debug.Log("CreateInstantiate(): â–¶ ì˜¤ë¸Œì íŠ¸ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤. â–¶ " +
+                "Prefabì„ ê°€ì ¸ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. â–¶ ìŠ¤í¬ë¦½íŠ¸: CustomizingManager_Choi");
+            // ì¢…ë£Œ
+            return;
+        }
+    } // CreateInstantiate()
 
-            // ÀÎ½ºÅÏ½º »ı¼º ½ÇÆĞ½Ã
-            else
-            {
-                // µğ¹ö±× ¸Ş¼¼Áö Ãâ·Â
-                Debug.Log("CreateInstantiate(): ¢º ¿ÀºêÁ§Æ® ÀÎ½ºÅÏ½º »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù. ¢º " +
-                    "PrefabÀ» °¡Á®¿Ã ¼ö ¾ø½À´Ï´Ù. ¢º ½ºÅ©¸³Æ®: CustomizingManager_Choi");
-                // Á¾·á
-                return;
-            }
-        } // CreateInstantiate()
-        
-    // PlayerPrefab¿¡ ÀúÀåµÇ¾î ÀÖ´Â Index¸¦ ¹ÙÅÁÀ¸·Î ¿ÀºêÁ§Æ®¸¦ »ı¼ºÇÏ°í
-    // ºÎÀ§º° ÆÄÃ÷¸¦ ¿ÀºêÁ§Æ®¿¡ ÀåÂøÇÏ´Â ÇÔ¼ö
-    // *teamID: [0]Àº ºí·ç / [1]Àº ¿À·»Áö ÆÀÀÌ´Ù.
+    // PlayerPrefabì— ì €ì¥ë˜ì–´ ìˆëŠ” Indexë¥¼ ë°”íƒ•ìœ¼ë¡œ ì˜¤ë¸Œì íŠ¸ë¥¼ ìƒì„±í•˜ê³ 
+    // ë¶€ìœ„ë³„ íŒŒì¸ ë¥¼ ì˜¤ë¸Œì íŠ¸ì— ì¥ì°©í•˜ëŠ” í•¨ìˆ˜
+    // *teamID: [0]ì€ ë¸”ë£¨ / [1]ì€ ì˜¤ë Œì§€ íŒ€ì´ë‹¤.
     public void CreateObjectWithCustomizing(int pvID, int teamID)
     {
-        // ÀÓ½Ã º¯¼ö ¼±¾ğ
+        Debug.Log("í˜¸ì¶œ");
+        // ì„ì‹œ ë³€ìˆ˜ ì„ ì–¸
+        string temp_CsvList = "";
         string temp_Category = "";
         string temp_DictionaryKey = "";
         int temp_Index = 0;
-        // Resources.Load<GameObject>(string)À¸·Î ÇÁ¸®ÆÕÀ» °Ë»ö ÈÄ °¡Á®¿È
+        // Resources.Load<GameObject>(string)ìœ¼ë¡œ í”„ë¦¬íŒ¹ì„ ê²€ìƒ‰ í›„ ê°€ì ¸ì˜´
         GameObject temp_Prefab = Resources.Load<GameObject>(CarTypes[teamID]);
-        // Pos, Rotation °ªÀ» ±âº»À¸·Î ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ® »ı¼º(ºí·ç/¿À·»Áö)
+        // Pos, Rotation ê°’ì„ ê¸°ë³¸ìœ¼ë¡œ í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ ìƒì„±(ë¸”ë£¨/ì˜¤ë Œì§€)
         GameObject temp_PlayerObj = Instantiate(temp_Prefab, Vector3.zero,
            Quaternion.identity);
-        // ¿ÀºêÁ§Æ® ÀÌ¸§ ¼³Á¤(BlueCar/OrangeCar)
+        // ì„ì‹œë¡œ ì¹´í…Œê³ ë¦¬ë¥¼ ì €ì¥í•  ì˜¤ë¸Œì íŠ¸
+        GameObject temp_CategoryObj;
+        // ì˜¤ë¸Œì íŠ¸ ì´ë¦„ ì„¤ì •(BlueCar/OrangeCar)
         temp_PlayerObj.name = CarTypes[teamID];
-        // categoryList[] ¸¸Å­ ¼øÈ¸ 
+        // categoryList[] ë§Œí¼ ìˆœíšŒ 
         for (int i = 0; i < categoryList.Length; i++)
         {
-            // ÀÓ½Ã º¯¼ö¿¡ Å° & µñ¼Å³Ê¸® Å° ÇÒ´ç
+            // ì„ì‹œ ë³€ìˆ˜ì— í‚¤ & ë”•ì…”ë„ˆë¦¬ í‚¤ í• ë‹¹
             temp_Category = categoryList[i];
-            temp_DictionaryKey = GetKeyForDataDictionary(csvFileList[i]);
-            // ÇÒ´çµÈ Å°·Î PlayerPrefab¿¡ ÀúÀåµÈ Index È£Ãâ
+            temp_DictionaryKey = GetKeyForDataDictionary(temp_Category);
+            // í• ë‹¹ëœ í‚¤ë¡œ PlayerPrefabì— ì €ì¥ëœ Index í˜¸ì¶œ
             temp_Index = GetDataForPlayerPrefab(temp_Category);
-            // ¿ÀºêÁ§Æ® ÀÎ½ºÅÏ½º »ı¼º ÇÔ¼ö È£Ãâ, À§¿¡¼­ »ı¼ºµÈ ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®¸¦ ºÎ¸ğ·Î ¼³Á¤
-            //
-            // ¾Æ·¡ È£Ãâ ºÎºĞ¿¡¼­ µñ¼Å³Ê¸® Å°°ªÀ» Ã£À»¼ö¾ø´Ù´Â ¿À·ù¹ß»ı
-            //Debug.Log("Dictionary Contents: " + dataDictionary[temp_DictionaryKey].Count);
-            //CreateInstantiate(temp_Category, temp_DictionaryKey, temp_Index, temp_PlayerObj);
+            Debug.Log($"ê°€ì ¸ì˜¨ ì¸ë±ìŠ¤ {temp_Index}");
+            // ì˜¤ë¸Œì íŠ¸ ì¸ìŠ¤í„´ìŠ¤ ìƒì„± í•¨ìˆ˜ í˜¸ì¶œ, ìœ„ì—ì„œ ìƒì„±ëœ í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ë¥¼ ë¶€ëª¨ë¡œ ì„¤ì •
+            // ì•„ë˜ í˜¸ì¶œ ë¶€ë¶„ì—ì„œ ë”•ì…”ë„ˆë¦¬ í‚¤ê°’ì„ ì°¾ì„ìˆ˜ì—†ë‹¤ëŠ” ì˜¤ë¥˜ë°œìƒ
+            Debug.Log($"ë°ì´í„° ë”•ì…”ë„ˆë¦¬ ê°œìˆ˜: {dataDictionary.Count}");
+            foreach (var value in dataDictionary)
+            {
+                Debug.Log(value.Key);
+            }
+            // í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ í•˜ìœ„ì˜ ì¹´í…Œê³ ë¦¬ì— ë§ëŠ” ì˜¤ë¸Œì íŠ¸ ê²€ìƒ‰ í›„ ë°˜í™˜ëœ ì˜¤ë¸Œì íŠ¸ ì €ì¥
+            temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, temp_Category).gameObject;
+            // ì¹´í…Œê³ ë¦¬, ë”•ì…”ë„ˆë¦¬í‚¤, ì¸ë±ìŠ¤, ì¹´í…Œê³ ë¦¬ ì˜¤ë¸Œì íŠ¸ë¥¼ ì‚¬ìš©í•˜ì—¬ ì¸ìŠ¤í„´ìŠ¤ë¥¼ ìƒì„±í•œë‹¤.
+            // í•´ë‹¹í•˜ëŠ” ì¹´í…Œê³ ë¦¬ ì˜¤ë¸Œì íŠ¸ì˜ ìì‹ìœ¼ë¡œ íŒŒì¸ ê°€ ìƒì„±ëœë‹¤.
+            CreateInstantiate(temp_Category, temp_DictionaryKey, 0, temp_CategoryObj);
         }
     }
     #endregion
 
-    #region [¿ÀºêÁ§Æ® È£Ãâ ¸Ş¼­µå]
+    #region [ì˜¤ë¸Œì íŠ¸ í˜¸ì¶œ ë©”ì„œë“œ]
     // ##################################################################################################
-    // ¢º[¿ÀºêÁ§Æ® È£Ãâ ¸Ş¼­µå]
+    // â–¶[ì˜¤ë¸Œì íŠ¸ í˜¸ì¶œ ë©”ì„œë“œ]
     // ##################################################################################################
-    // ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®¸¦ °¡Á®¿À´Â ÇÔ¼ö
-    // ÃßÈÄ Æ÷Åæ¼­¹ö ¿¬°á½Ã pv.IsMineÀ¸·Î º¯°æÇØ¾ßÇÔ
-        private GameObject GetPlayerObject(int pvID)
+    // í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜¤ëŠ” í•¨ìˆ˜
+    // ì¶”í›„ í¬í†¤ì„œë²„ ì—°ê²°ì‹œ pv.IsMineìœ¼ë¡œ ë³€ê²½í•´ì•¼í•¨
+    private GameObject GetPlayerObject(int pvID)
+    {
+        // "Player" íƒœê·¸ë¡œ í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ë¥¼ ê²€ìƒ‰
+        GameObject temp_PlayerObject = GameObject.FindGameObjectWithTag("Player");
+        // í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì€ ê²½ìš°
+        if (temp_PlayerObject != null)
         {
-            // "Player" ÅÂ±×·Î ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®¸¦ °Ë»ö
-            GameObject temp_PlayerObject = GameObject.FindGameObjectWithTag("Player");
-            // ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®¸¦ Ã£Àº °æ¿ì
-            if (temp_PlayerObject != null)
-            {
-                Debug.Log($"GetPlayerObject(): ¢º ViewID[{pvID}]: ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ® {temp_PlayerObject.name} È£Ãâ ¿Ï·á ¢º ");
-            }
-
-            // ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®¸¦ Ã£Áö ¸øÇÑ °æ¿ì
-            else
-            {
-                // µğ¹ö±× ¸Ş¼¼Áö Ãâ·Â
-                Debug.Log($"GetPlayerObject(): ¢º ViewID[{pvID}]: ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ® È£Ãâ ½ÇÆĞ ¢º " +
-                    $"'Player' ÅÂ±×¸¦ °¡Áø ¿ÀºêÁ§Æ®¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. ¢º ½ºÅ©¸³Æ®: CustomizingManager_Choi");
-            }
-
-            // Ã£Àº ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®¸¦ ¹İÈ¯
-            return temp_PlayerObject;
-        } // GetPlayerObject()
-
-        // Àç±Í ÇÔ¼ö¸¦ »ç¿ëÇÏ¿© ¿øÇÏ´Â ÇÏÀ§ ÀÚ½Ä ¿ÀºêÁ§Æ®¸¦ Ã£´Â ÇÔ¼ö
-        // ºÎ¸ğ ¿ÀºêÁ§Æ®ÀÇ ¸ğµç °èÃş ±¸Á¶¿¡ ÀÖ´Â ÀÚ½ÄÀ» Å½»öÇÑ´Ù.
-        private Transform FindChildRescursive(Transform parent, string targetName)
-        {
-            // parentÀÇ ¸ğµç ÀÚ½ÄÀ» ¼øÈ¸
-            foreach (Transform child in parent)
-            {
-                // ¿øÇÏ´Â ÀÚ½Ä ¿ÀºêÁ§Æ®¸¦ Ã£Àº °æ¿ì
-                if (child.name == targetName)
-                {
-                    // Ã£Àº ÀÚ½Ä ¿ÀºêÁ§Æ®¸¦ ¹İÈ¯
-                    return child;
-                }
-
-                // Ã£Áö ¸øÇÑ °æ¿ì
-                else
-                {
-                    // ÀÚ½Ä ¿ÀºêÁ§Æ®ÀÇ ÇÏÀ§ ÀÚ½ÄµéÀ» °Ë»öÇÏ±â À§ÇØ Àç±Í È£Ãâ
-                    // FindChildRescursive()ÀÇ ¸Å°³º¯¼ö·Î child¸¦ ³Ö¾î °èÃş ±¸Á¶¸¦ Å½»öÇÑ´Ù
-                    Transform foundChild = FindChildRescursive(child, targetName);
-                    // ¿øÇÏ´Â ÀÚ½Ä ¿ÀºêÁ§Æ®¸¦ Ã£Àº °æ¿ì
-                    if (foundChild != null)
-                    {
-                        // Ã£Àº ÀÚ½Ä ¿ÀºêÁ§Æ® ¹İÈ¯
-                        return foundChild;
-                    }
-                }
-            }
-
-            // targetName°ú ÀÏÄ¡ÇÏ´Â ÀÚ½Ä ¿ÀºêÁ§Æ®¸¦ Ã£Áö ¸øÇÑ °æ¿ì
-            // Àç±Í¸¦ À§ÇØ null ¹İÈ¯
-            return null;
-        } // FindChildRescursive()
-
-        // ÀÚ½Ä ¿ÀºêÁ§Æ®¸¦ °¡Á®¿À´Â ÇÔ¼ö
-        private GameObject GetChildObject(GameObject parentObj, string childName)
-        {
-            Transform temp_ParentTransform = parentObj.transform;
-
-            // Àç±Í ÇÔ¼ö¸¦ »ç¿ëÇÏ¿© ¿øÇÏ´Â ÀÚ½Ä ¿ÀºêÁ§Æ®¸¦ Ã£À½
-            Transform temp_ChildTransform = FindChildRescursive(parentObj.transform, childName);
-
-            // ÀÚ½Ä ¿ÀºêÁ§Æ®ÀÇ Æ®·£½ºÆûÀ» Ã£Àº °æ¿ì
-            if (temp_ChildTransform != null)
-            {
-                Debug.Log($"GetChildObject(): ¢º {parentObj.name} ÀÚ½Ä ¿ÀºêÁ§Æ® Æ®·£½ºÆû " +
-                    $"{childName} È£Ãâ ¿Ï·á");
-            }
-
-            // ÀÚ½Ä ¿ÀºêÁ§Æ® Æ®·£½ºÆûÀ» Ã£Áö ¸øÇÑ °æ¿ì
-            else
-            {
-                // µğ¹ö±× ¸Ş¼¼Áö Ãâ·Â
-                Debug.Log($"GetChildObject(): ¢º {parentObj.name} ÀÚ½Ä ¿ÀºêÁ§Æ® Æ®·£½ºÆû È£Ãâ ½ÇÆĞ ¢º " +
-                    $"ÀÚ½Ä {childName}À» Ã£À» ¼ö ¾ø½À´Ï´Ù. ¢º ½ºÅ©¸³Æ®: CustomizingManager_Choi");
-            }
-
-            // temp_Obj¿¡ Ã£¾Æ³½ ÀÚ½Ä ¿ÀºêÁ§Æ® Ãß°¡
-            GameObject temp_Obj = temp_ChildTransform.gameObject;
-
-            // Ã£Àº ÀÚ½Ä ¿ÀºêÁ§Æ® ¹İÈ¯
-            return temp_Obj;
-        } // GetChildObject()
-
-        // ºÎ¸ğ ¿ÀºêÁ§Æ®ÀÇ È°¼ºÈ­µÈ ÀÚ½Ä ÆÄÃ÷ ¿ÀºêÁ§Æ®¸¦ Ã£¾Æ¼­ ¹İÈ¯ÇÏ´Â ÇÔ¼ö
-        // ÆÄÃ÷ ¿ÀºêÁ§Æ®¸¦ Ã£À» °æ¿ì ÀÎµ¦½º°¡ temp_IndexDictionary¿¡ ÀúÀåµÈ´Ù.
-        private GameObject GetChildForActiveTrue(Transform parent)
-        {
-            int temp_Index = -1;
-            string temp_Key = parent.name; // ÀÎµ¦½º µñ¼Å³Ê¸® ÀúÀå¿ë Å° °ª
-            // parent ¿ÀºêÁ§Æ®ÀÇ ÀÚ½ÄÀ» ÀüºÎ ¼øÈ¸
-            foreach(Transform child in parent)
-            {
-                temp_Index += 1;
-                // ÀÚ½Ä ¿ÀºêÁ§Æ®°¡ È°¼ºÈ­ µÇÀÖÀ» °æ¿ì
-                if (child.gameObject.activeSelf)
-                {
-                    // ÇöÀç ÀÎµ¦½º¸¦ IndexDictionary¿¡ ÀúÀå
-                    temp_IndexDictionary[temp_Key] = temp_Index;
-                    // Ã£Àº ÀÚ½Ä ¿ÀºêÁ§Æ®¸¦ ¹İÈ¯
-                    return child.gameObject;
-                }
-            }
-            // µğ¹ö±× ¸Ş¼¼Áö Ãâ·Â
-            Debug.Log($"GetChildForActiveTrue(): ¢º È°¼ºÈ­µÈ {parent}ÀÇ ÀÚ½Ä ¿ÀºêÁ§Æ® °Ë»ö ½ÇÆĞ ¢º " +
-                $"Ã£´Â ÀÚ½Ä ¿ÀºêÁ§Æ®ÀÇ Active »óÅÂ¸¦ È®ÀÎÇÏ¼¼¿ä. ¢º ½ºÅ©¸³Æ®: CustomizingManager_Choi");
-
-            // Ã£Áö ¸øÇÒ °æ¿ì null ¹İÈ¯
-            return null;
-        } // GetChildForActiveTrue()
-
-        // ÇÃ·¹ÀÌ¾îÀÇ ÇöÀç ÆÄÃ÷ ¿ÀºêÁ§Æ®¸¦ °¡Á®¿À´Â ÇÔ¼ö
-        // ¸Å°³º¯¼ö·Î Ä«Å×°í¸®¸¦ ³ÖÀ¸¸é ÇØ´ç Ä«Å×°í¸®ÀÇ È°¼ºÈ­µÈ ¿ÀºêÁ§Æ®¸¦ ¹İÈ¯
-        private GameObject GetCurrentObject(string category)
-        {
-            // ºÎ¸ğÀÎ ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®¸¦ Ã£À½(ÃßÈÄ Æ÷ÅæID³Ö¾î¾ßÇÔ)
-            GameObject temp_ParentObj = GetPlayerObject(0);
-            // Ä«Å×°í¸®¿¡ ÇØ´çÇÏ´Â ¿ÀºêÁ§Æ® °¡Á®¿À±â
-            GameObject temp_CategoryObj = FindChildRescursive(temp_ParentObj.transform, category).gameObject;
-            // Ä«Å×°í¸®¿¡ ÀÖ´Â È°¼ºÈ­µÈ ÇöÀç ÆÄÃ÷ ¿ÀºêÁ§Æ® °¡Á®¿À±â
-            GameObject temp_Obj = GetChildForActiveTrue(temp_CategoryObj.transform);
-            // ¿ÀºêÁ§Æ®¸¦ ÀüºÎ °¡Á®¿ÔÀ» °æ¿ì
-            if (temp_ParentObj != null && temp_CategoryObj != null && temp_Obj != null)
-            {
-                Debug.Log($"GetCurrentObject(): ¢º {temp_ParentObj.name} ÀÚ½Ä ¿ÀºêÁ§Æ® " +
-                    $"{temp_CategoryObj.name}ÀÇ È°¼ºÈ­µÈ ÇöÀç ÆÄÃ÷ ¿ÀºêÁ§Æ® {temp_Obj.name} È£Ãâ ¿Ï·á");
-            }
-
-            // ÇÏ³ª¶óµµ ¿ÀºêÁ§Æ®¸¦ °¡Á®¿ÀÁö ¸øÇÑ °æ¿ì
-            else
-            {
-                // µğ¹ö±× ¸Ş¼¼Áö Ãâ·Â
-                Debug.Log($"GetCurrentObject(): ¢º {temp_ParentObj.name} ÀÚ½Ä ¿ÀºêÁ§Æ® " +
-                    $"{temp_CategoryObj.name}ÀÇ ¢º È°¼ºÈ­µÈ ÇöÀç ÆÄÃ÷ ¿ÀºêÁ§Æ®¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. " +
-                    $"¢º »óÅÂ: temp_ParentObj = {temp_ParentObj != null}, " +
-                    $"temp_CategoryObj = {temp_CategoryObj != null}, " +
-                    $"temp_Obj = {temp_Obj != null} " +
-                    $"½ºÅ©¸³Æ®: CustomizingManager_Choi");
-            }
-
-            // Ã£Àº ÇöÀç ÆÄÃ÷ ¿ÀºêÁ§Æ® ¹İÈ¯
-            return temp_Obj;
-        } // GetCurrentObject()
-
-        // ¿øÇÏ´Â ÇÃ·¹ÀÌ¾î ÆÄÃ÷ ¿ÀºêÁ§Æ®¸¦ °¡Á®¿À´Â ÇÔ¼ö
-        // ¸Å°³º¯¼ö·Î Ä«Å×°í¸®¿Í ¿øÇÏ´Â ¿ÀºêÁ§Æ® ÀÌ¸§À» ³Ö´Â´Ù
-        // Àç±Í ÇÔ¼ö¸¦ È£ÃâÇÏ¿© ¸ğµç °èÃş±¸Á¶¸¦ Å½»öÇØ¼­ ÇöÀç ÆÄÃ÷¸¦ °¡Á®¿Â´Ù.
-        private GameObject FindTargetObject(string category, string targetObjName)
-        {
-            // ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®¸¦ °¡Á®¿È
-            GameObject temp_PlayerObj = GetPlayerObject(0); // ¸Å°³º¯¼ö¿¡ ÃßÈÄ Æ÷Åæºä ID ³Ö¾î¾ßÇÔ
-
-            // ÇöÀç ÆÄÃ÷¸¦ °¡Á®¿À±â À§ÇØ ÇÃ·¹ÀÌ¾îÀÇ ÀÚ½ÄÀÎ Ä«Å×°í¸® ¿ÀºêÁ§Æ®¸¦ °¡Á®¿È
-            GameObject temp_CategoryObj = GetChildObject(temp_PlayerObj, category);
-
-            // Ä«Å×°í¸® ¿ÀºêÁ§Æ®ÀÇ ÀÚ½ÄÀ¸·Î ÀÖ´Â ÆÄÃ÷ ¿ÀºêÁ§Æ®¸¦ °¡Á®¿È
-            GameObject temp_Obj = GetChildObject(temp_CategoryObj, targetObjName);
-
-            // ÇöÀç ÆÄÃ÷ ¿ÀºêÁ§Æ®¸¦ °¡Á®¿Â °æ¿ì
-            if (temp_PlayerObj != null && temp_CategoryObj != null && temp_Obj != null)
-            {
-                Debug.Log($"FindTargetObject(): ¢º °æ·Î {category}/{targetObjName} ¢º " +
-                    $"ÇöÀç ÆÄÃ÷ {targetObjName} È£Ãâ ¿Ï·á");
-            }
-
-            // ÇöÀç ÆÄÃ÷ ¿ÀºêÁ§Æ®¸¦ °¡Á®¿ÀÁö ¸øÇÑ °æ¿ì
-            else
-            {
-                // µğ¹ö±× ¸Ş¼¼Áö Ãâ·Â
-                Debug.Log($"FindTargetObject(): ¢º °æ·Î {category}/{targetObjName} ¢º " +
-                    $"ÇöÀç ÆÄÃ÷ {targetObjName} È£Ãâ ½ÇÆĞ ¢º {targetObjName}À» °¡Á®¿Ã ¼ö ¾ø½À´Ï´Ù. ¢º " +
-                    $"»óÅÂ: temp_PlayerObj = {temp_PlayerObj != null}, " +
-                    $"temp_CategoryObj = {temp_CategoryObj != null}, temp_Obj = {temp_Obj != null} ¢º " +
-                    $"½ºÅ©¸³Æ®: CustomizingManager_Choi");
-            }
-
-            // ÆÄÃ÷ ¿ÀºêÁ§Æ® ¹İÈ¯
-            return temp_Obj;
-        } // GetCurrentObject()
-
-        // ¿øÇÏ´Â Ä«Å×°í¸®ÀÇ ÇÁ¸®ÆÕÀ» ¹İÈ¯ÇÏ´Â ÇÔ¼ö
-        private GameObject GetPrefab(string category, string Key, int index)
-        {
-            // CSV ÆÄÀÏÀ» º¯È¯ÇÏ´Â °úÁ¤¿¡¼­ °ø¹éÀÌ »ı±â´Â ¹®Á¦¸¦ ÇØ°áÇÏ±â À§ÇØ Trim() ÇÔ¼ö È£Ãâ
-            string temp_Name = dataDictionary[category][Key][index].Trim();
-            GameObject temp_Prefab = Resources.Load<GameObject>(temp_Name);
-
-            // ÇÁ¸®ÆÕ ·Îµå ¼º°ø½Ã
-            if (temp_Prefab != null)
-            {
-                Debug.Log($"GetPrefab(): ¢º °æ·Î {category}/{temp_Name} ¢º ÇÁ¸®ÆÕ ·Îµå ¼º°ø");
-            }
-
-            // ÇÁ¸®ÆÕ ·Îµå ½ÇÆĞ½Ã
-            else
-            {
-                Debug.Log($"GetPrefab(): ¢º °æ·Î {category}/{temp_Name} ¢º ÇÁ¸®ÆÕ ·Îµå ½ÇÆĞ ¢º " +
-                    $"Resources Æú´õ¿¡ ÀÏÄ¡ÇÏ´Â PrefabÀÌ ¾ø½À´Ï´Ù. ¢º ½ºÅ©¸³Æ®: CustomizingManager_Choi");
-            }
-
-            // ÇÁ¸®ÆÕ ¹İÈ¯
-            return temp_Prefab;
-        } //GetPrefab()
-    #endregion
-
-    #region [¿ÀºêÁ§Æ® °ü¸® ¸Ş¼­µå]
-    // ##################################################################################################
-    // ¢º[¿ÀºêÁ§Æ® °ü¸® ¸Ş¼­µå]
-    // ##################################################################################################
-    // ¿ÀºêÁ§Æ® Åä±Û ÇÔ¼ö
-        private void ToggleObject(GameObject currentObj, GameObject newObj)
-        {
-            currentObj.SetActive(false); // ÇöÀç ¿ÀºêÁ§Æ® ºñÈ°¼ºÈ­
-            newObj.SetActive(true); // »õ·Î¿î ¿ÀºêÁ§Æ® È°¼ºÈ­
-
-            // ¾Æ·¡¿¡ category¿Í ¹Ù²ï ¿ÀºêÁ§Æ®¿¡ ´ëÇÑ Á¤º¸¸¦ playerPrefab¿¡ ÀúÀåÇÏ±â
-
-        } //ToggleObject()
-
-        // ºÎ¸ğ¿Í ÀÚ½Ä°£ÀÇ Æ÷Áö¼ÇÀ» º¸Á¤ÇÏ´Â ÇÔ¼ö
-        private Vector3 AdjustChildPosition(GameObject parent, GameObject child)
-        {
-          // Æ®·£½ºÆû È£Ãâ
-            Vector3 parentPos = parent.transform.position;
-            Vector3 childPos = child.transform.position;
-
-            // Æ÷Áö¼Ç º¸Á¤(ºÎ¸ğPos + ÀÚ½ÄPos)
-            childPos = parentPos + childPos;
-
-            // º¸Á¤µÈ Æ÷Áö¼Ç ¹İÈ¯
-            return childPos;
-        } // AdjustChildPosition()
-    #endregion
-
-    #region [º¯¼ö °ü¸® ¸Ş¼­µå]
-    // ##################################################################################################
-    // ¢º[º¯¼ö °ü¸® ¸Ş¼­µå]
-    // ##################################################################################################
-        // Parents ¸®½ºÆ®¿¡ ºÎ¸ğµéÀ» Ãß°¡ÇÏ´Â ÇÔ¼ö
-        private void InputParents()
-        {
-            // ¸®½ºÆ® ÃÊ±âÈ­
-            parents = new List<GameObject>();
-            // ÀÓ½Ã º¯¼ö »ı¼º
-            GameObject temp_Obj = new GameObject();
-            // °¢ Ä«Å×°í¸®¿¡ ÀÖ´Â ºÎ¸ğ ¿ÀºêÁ§Æ®µéÀ» Ã£¾Æ parents¿¡ Ãß°¡
-            for (int i = 0; i < categoryList.Length; i++)
-            {
-                temp_Obj = GameObject.Find(categoryList[i]);
-                if (temp_Obj != null)
-                {
-                    parents.Add(temp_Obj);
-                }
-            }
-        } // InputParents()    
-
-          // dataDictionary Á¢±Ù¿ë Key¸¦ ¹İÈ¯ÇÏ´Â ÇÔ¼ö
-          // "PrefabName"À¸·Î ÇÑ¹ø¿¡ Á¢±ÙÇÏ¸é Á¢±ÙÇÒ ¼ö ¾ø¾î foreach·Î
-          // Key¸¦ Ã£¾Æ¼­ Á¢±ÙÇÑ´Ù.
-        private string GetKeyForDataDictionary(string category)
-        {
-            string temp_DataDictionaryKey = "";
-
-            foreach (KeyValuePair<string, List<string>> value in dataDictionary[category])
-            {
-                // Key °ªÀÌ PrefabNameÀÏ °æ¿ì
-                if (value.Key.Contains("PrefabName"))
-                {
-                    // Å° °ª Ãß°¡
-                    temp_DataDictionaryKey = value.Key;
-
-                    // ÇÑ ¹ø¸¸ µ¿ÀÛÇÏ°í Á¾·á
-                    break;
-                }
-            }
-
-            // Å° ¹İÈ¯
-            return temp_DataDictionaryKey;
-        } // GetKeyForDataDictionary()
-        
-        // PlayerDataManager_Choi¿¡¼­ PlayerPrefabÀ» ÀúÀåÇÏ±â À§ÇØ
-        // °¢ Ä«Å×°í¸®ÀÇ ÆÄÃ÷ ÀÎµ¦½º°¡ ÀúÀåµÈ temp_IndexDictionary¸¦ ¹İÈ¯ÇÏ´Â ÇÔ¼ö
-        public Dictionary<string, int> GetIndexDictionary()
-        {
-            // temp_IndexDictionary¸¦ ¹İÈ¯
-            return temp_IndexDictionary;
+            Debug.Log($"GetPlayerObject(): â–¶ ViewID[{pvID}]: í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ {temp_PlayerObject.name} í˜¸ì¶œ ì™„ë£Œ â–¶ ");
         }
+
+        // í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì§€ ëª»í•œ ê²½ìš°
+        else
+        {
+            // ë””ë²„ê·¸ ë©”ì„¸ì§€ ì¶œë ¥
+            Debug.Log($"GetPlayerObject(): â–¶ ViewID[{pvID}]: í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ í˜¸ì¶œ ì‹¤íŒ¨ â–¶ " +
+                $"'Player' íƒœê·¸ë¥¼ ê°€ì§„ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. â–¶ ìŠ¤í¬ë¦½íŠ¸: CustomizingManager_Choi");
+        }
+
+        // ì°¾ì€ í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ë¥¼ ë°˜í™˜
+        return temp_PlayerObject;
+    } // GetPlayerObject()
+
+    // ì¬ê·€ í•¨ìˆ˜ë¥¼ ì‚¬ìš©í•˜ì—¬ ì›í•˜ëŠ” í•˜ìœ„ ìì‹ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ëŠ” í•¨ìˆ˜
+    // ë¶€ëª¨ ì˜¤ë¸Œì íŠ¸ì˜ ëª¨ë“  ê³„ì¸µ êµ¬ì¡°ì— ìˆëŠ” ìì‹ì„ íƒìƒ‰í•œë‹¤.
+    private Transform FindChildRescursive(Transform parent, string targetName)
+    {
+        // parentì˜ ëª¨ë“  ìì‹ì„ ìˆœíšŒ
+        foreach (Transform child in parent)
+        {
+            // ì›í•˜ëŠ” ìì‹ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì€ ê²½ìš°
+            if (child.name == targetName)
+            {
+                // ì°¾ì€ ìì‹ ì˜¤ë¸Œì íŠ¸ë¥¼ ë°˜í™˜
+                return child;
+            }
+
+            // ì°¾ì§€ ëª»í•œ ê²½ìš°
+            else
+            {
+                // ìì‹ ì˜¤ë¸Œì íŠ¸ì˜ í•˜ìœ„ ìì‹ë“¤ì„ ê²€ìƒ‰í•˜ê¸° ìœ„í•´ ì¬ê·€ í˜¸ì¶œ
+                // FindChildRescursive()ì˜ ë§¤ê°œë³€ìˆ˜ë¡œ childë¥¼ ë„£ì–´ ê³„ì¸µ êµ¬ì¡°ë¥¼ íƒìƒ‰í•œë‹¤
+                Transform foundChild = FindChildRescursive(child, targetName);
+                // ì›í•˜ëŠ” ìì‹ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì€ ê²½ìš°
+                if (foundChild != null)
+                {
+                    // ì°¾ì€ ìì‹ ì˜¤ë¸Œì íŠ¸ ë°˜í™˜
+                    return foundChild;
+                }
+            }
+        }
+
+        // targetNameê³¼ ì¼ì¹˜í•˜ëŠ” ìì‹ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì§€ ëª»í•œ ê²½ìš°
+        // ì¬ê·€ë¥¼ ìœ„í•´ null ë°˜í™˜
+        return null;
+    } // FindChildRescursive()
+
+    // ìì‹ ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜¤ëŠ” í•¨ìˆ˜
+    private GameObject GetChildObject(GameObject parentObj, string childName)
+    {
+        Transform temp_ParentTransform = parentObj.transform;
+
+        // ì¬ê·€ í•¨ìˆ˜ë¥¼ ì‚¬ìš©í•˜ì—¬ ì›í•˜ëŠ” ìì‹ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ìŒ
+        Transform temp_ChildTransform = FindChildRescursive(parentObj.transform, childName);
+
+        // ìì‹ ì˜¤ë¸Œì íŠ¸ì˜ íŠ¸ëœìŠ¤í¼ì„ ì°¾ì€ ê²½ìš°
+        if (temp_ChildTransform != null)
+        {
+            Debug.Log($"GetChildObject(): â–¶ {parentObj.name} ìì‹ ì˜¤ë¸Œì íŠ¸ íŠ¸ëœìŠ¤í¼ " +
+                $"{childName} í˜¸ì¶œ ì™„ë£Œ");
+        }
+
+        // ìì‹ ì˜¤ë¸Œì íŠ¸ íŠ¸ëœìŠ¤í¼ì„ ì°¾ì§€ ëª»í•œ ê²½ìš°
+        else
+        {
+            // ë””ë²„ê·¸ ë©”ì„¸ì§€ ì¶œë ¥
+            Debug.Log($"GetChildObject(): â–¶ {parentObj.name} ìì‹ ì˜¤ë¸Œì íŠ¸ íŠ¸ëœìŠ¤í¼ í˜¸ì¶œ ì‹¤íŒ¨ â–¶ " +
+                $"ìì‹ {childName}ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. â–¶ ìŠ¤í¬ë¦½íŠ¸: CustomizingManager_Choi");
+        }
+
+        // temp_Objì— ì°¾ì•„ë‚¸ ìì‹ ì˜¤ë¸Œì íŠ¸ ì¶”ê°€
+        GameObject temp_Obj = temp_ChildTransform.gameObject;
+
+        // ì°¾ì€ ìì‹ ì˜¤ë¸Œì íŠ¸ ë°˜í™˜
+        return temp_Obj;
+    } // GetChildObject()
+
+    // ë¶€ëª¨ ì˜¤ë¸Œì íŠ¸ì˜ í™œì„±í™”ëœ ìì‹ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì•„ì„œ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
+    // íŒŒì¸  ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì„ ê²½ìš° ì¸ë±ìŠ¤ê°€ temp_IndexDictionaryì— ì €ì¥ëœë‹¤.
+    private GameObject GetChildForActiveTrue(Transform parent)
+    {
+        int temp_Index = -1;
+        string temp_Key = parent.name; // ì¸ë±ìŠ¤ ë”•ì…”ë„ˆë¦¬ ì €ì¥ìš© í‚¤ ê°’
+                                       // parent ì˜¤ë¸Œì íŠ¸ì˜ ìì‹ì„ ì „ë¶€ ìˆœíšŒ
+        foreach (Transform child in parent)
+        {
+            temp_Index += 1;
+            // ìì‹ ì˜¤ë¸Œì íŠ¸ê°€ í™œì„±í™” ë˜ìˆì„ ê²½ìš°
+            if (child.gameObject.activeSelf)
+            {
+                // í˜„ì¬ ì¸ë±ìŠ¤ë¥¼ IndexDictionaryì— ì €ì¥
+                temp_IndexDictionary[temp_Key] = temp_Index;
+
+                // ì°¾ì€ ìì‹ ì˜¤ë¸Œì íŠ¸ë¥¼ ë°˜í™˜
+                return child.gameObject;
+            }
+        }
+        // ë””ë²„ê·¸ ë©”ì„¸ì§€ ì¶œë ¥
+        Debug.Log($"GetChildForActiveTrue(): â–¶ í™œì„±í™”ëœ {parent}ì˜ ìì‹ ì˜¤ë¸Œì íŠ¸ ê²€ìƒ‰ ì‹¤íŒ¨ â–¶ " +
+            $"ì°¾ëŠ” ìì‹ ì˜¤ë¸Œì íŠ¸ì˜ Active ìƒíƒœë¥¼ í™•ì¸í•˜ì„¸ìš”. â–¶ ìŠ¤í¬ë¦½íŠ¸: CustomizingManager_Choi");
+
+        // ì°¾ì§€ ëª»í•  ê²½ìš° null ë°˜í™˜
+        return null;
+    } // GetChildForActiveTrue()
+
+    // í”Œë ˆì´ì–´ì˜ í˜„ì¬ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜¤ëŠ” í•¨ìˆ˜
+    // ë§¤ê°œë³€ìˆ˜ë¡œ ì¹´í…Œê³ ë¦¬ë¥¼ ë„£ìœ¼ë©´ í•´ë‹¹ ì¹´í…Œê³ ë¦¬ì˜ í™œì„±í™”ëœ ì˜¤ë¸Œì íŠ¸ë¥¼ ë°˜í™˜
+    private GameObject GetCurrentObject(string category)
+    {
+        // ë¶€ëª¨ì¸ í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ìŒ(ì¶”í›„ í¬í†¤IDë„£ì–´ì•¼í•¨)
+        GameObject temp_ParentObj = GetPlayerObject(0);
+        // ì¹´í…Œê³ ë¦¬ì— í•´ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ê°€ì ¸ì˜¤ê¸°
+        GameObject temp_CategoryObj = FindChildRescursive(temp_ParentObj.transform, category).gameObject;
+        // ì¹´í…Œê³ ë¦¬ì— ìˆëŠ” í™œì„±í™”ëœ í˜„ì¬ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ ê°€ì ¸ì˜¤ê¸°
+        GameObject temp_Obj = GetChildForActiveTrue(temp_CategoryObj.transform);
+        // ì˜¤ë¸Œì íŠ¸ë¥¼ ì „ë¶€ ê°€ì ¸ì™”ì„ ê²½ìš°
+        if (temp_ParentObj != null && temp_CategoryObj != null && temp_Obj != null)
+        {
+            Debug.Log($"GetCurrentObject(): â–¶ {temp_ParentObj.name} ìì‹ ì˜¤ë¸Œì íŠ¸ " +
+                $"{temp_CategoryObj.name}ì˜ í™œì„±í™”ëœ í˜„ì¬ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ {temp_Obj.name} í˜¸ì¶œ ì™„ë£Œ");
+        }
+
+        // í•˜ë‚˜ë¼ë„ ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜¤ì§€ ëª»í•œ ê²½ìš°
+        else
+        {
+            // ë””ë²„ê·¸ ë©”ì„¸ì§€ ì¶œë ¥
+            Debug.Log($"GetCurrentObject(): â–¶ {temp_ParentObj.name} ìì‹ ì˜¤ë¸Œì íŠ¸ " +
+                $"{temp_CategoryObj.name}ì˜ â–¶ í™œì„±í™”ëœ í˜„ì¬ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. " +
+                $"â–¶ ìƒíƒœ: temp_ParentObj = {temp_ParentObj != null}, " +
+                $"temp_CategoryObj = {temp_CategoryObj != null}, " +
+                $"temp_Obj = {temp_Obj != null} " +
+                $"ìŠ¤í¬ë¦½íŠ¸: CustomizingManager_Choi");
+        }
+
+        // ì°¾ì€ í˜„ì¬ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ ë°˜í™˜
+        return temp_Obj;
+    } // GetCurrentObject()
+
+    // í˜„ì¬ í”Œë ˆì´ì–´ì˜ ëª¨ë“  íŒŒì¸ ë¥¼ ê°€ì ¸ì™€ì„œ temp_IndexDictionaryì— ì €ì¥í•˜ëŠ” í•¨ìˆ˜
+    private void SaveAllPlayerPartsToTempIndexDictionary()
+    {
+        for (int i = 0; i < categoryList.Length; i++)
+        {
+            // íŒŒì¸ ë¥¼ ì°¾ì€ í›„ temp_IndexDictionaryì— Indexë¥¼ ì €ì¥í•¨
+            GetCurrentObject(categoryList[i]);
+        }
+    }
+
+    // ì›í•˜ëŠ” í”Œë ˆì´ì–´ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜¤ëŠ” í•¨ìˆ˜
+    // ë§¤ê°œë³€ìˆ˜ë¡œ ì¹´í…Œê³ ë¦¬ì™€ ì›í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ì´ë¦„ì„ ë„£ëŠ”ë‹¤
+    // ì¬ê·€ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•˜ì—¬ ëª¨ë“  ê³„ì¸µêµ¬ì¡°ë¥¼ íƒìƒ‰í•´ì„œ í˜„ì¬ íŒŒì¸ ë¥¼ ê°€ì ¸ì˜¨ë‹¤.
+    private GameObject FindTargetObject(string category, string targetObjName)
+    {
+        // í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜´
+        GameObject temp_PlayerObj = GetPlayerObject(0); // ë§¤ê°œë³€ìˆ˜ì— ì¶”í›„ í¬í†¤ë·° ID ë„£ì–´ì•¼í•¨
+
+        // í˜„ì¬ íŒŒì¸ ë¥¼ ê°€ì ¸ì˜¤ê¸° ìœ„í•´ í”Œë ˆì´ì–´ì˜ ìì‹ì¸ ì¹´í…Œê³ ë¦¬ ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜´
+        GameObject temp_CategoryObj = GetChildObject(temp_PlayerObj, category);
+
+        // ì¹´í…Œê³ ë¦¬ ì˜¤ë¸Œì íŠ¸ì˜ ìì‹ìœ¼ë¡œ ìˆëŠ” íŒŒì¸  ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜´
+        GameObject temp_Obj = GetChildObject(temp_CategoryObj, targetObjName);
+
+        // í˜„ì¬ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜¨ ê²½ìš°
+        if (temp_PlayerObj != null && temp_CategoryObj != null && temp_Obj != null)
+        {
+            Debug.Log($"FindTargetObject(): â–¶ ê²½ë¡œ {category}/{targetObjName} â–¶ " +
+                $"í˜„ì¬ íŒŒì¸  {targetObjName} í˜¸ì¶œ ì™„ë£Œ");
+        }
+
+        // í˜„ì¬ íŒŒì¸  ì˜¤ë¸Œì íŠ¸ë¥¼ ê°€ì ¸ì˜¤ì§€ ëª»í•œ ê²½ìš°
+        else
+        {
+            // ë””ë²„ê·¸ ë©”ì„¸ì§€ ì¶œë ¥
+            Debug.Log($"FindTargetObject(): â–¶ ê²½ë¡œ {category}/{targetObjName} â–¶ " +
+                $"í˜„ì¬ íŒŒì¸  {targetObjName} í˜¸ì¶œ ì‹¤íŒ¨ â–¶ {targetObjName}ì„ ê°€ì ¸ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. â–¶ " +
+                $"ìƒíƒœ: temp_PlayerObj = {temp_PlayerObj != null}, " +
+                $"temp_CategoryObj = {temp_CategoryObj != null}, temp_Obj = {temp_Obj != null} â–¶ " +
+                $"ìŠ¤í¬ë¦½íŠ¸: CustomizingManager_Choi");
+        }
+
+        // íŒŒì¸  ì˜¤ë¸Œì íŠ¸ ë°˜í™˜
+        return temp_Obj;
+    } // GetCurrentObject()
+
+    // ì›í•˜ëŠ” ì¹´í…Œê³ ë¦¬ì˜ í”„ë¦¬íŒ¹ì„ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
+    private GameObject GetPrefab(string category, string Key, int index)
+    {
+        // CSV íŒŒì¼ì„ ë³€í™˜í•˜ëŠ” ê³¼ì •ì—ì„œ ê³µë°±ì´ ìƒê¸°ëŠ” ë¬¸ì œë¥¼ í•´ê²°í•˜ê¸° ìœ„í•´ Trim() í•¨ìˆ˜ í˜¸ì¶œ
+        string temp_Name = dataDictionary[category][Key][index].Trim();
+        GameObject temp_Prefab = Resources.Load<GameObject>(temp_Name);
+
+        // í”„ë¦¬íŒ¹ ë¡œë“œ ì„±ê³µì‹œ
+        if (temp_Prefab != null)
+        {
+            Debug.Log($"GetPrefab(): â–¶ ê²½ë¡œ {category}/{temp_Name} â–¶ í”„ë¦¬íŒ¹ ë¡œë“œ ì„±ê³µ");
+        }
+
+        // í”„ë¦¬íŒ¹ ë¡œë“œ ì‹¤íŒ¨ì‹œ
+        else
+        {
+            Debug.Log($"GetPrefab(): â–¶ ê²½ë¡œ {category}/{temp_Name} â–¶ í”„ë¦¬íŒ¹ ë¡œë“œ ì‹¤íŒ¨ â–¶ " +
+                $"Resources í´ë”ì— ì¼ì¹˜í•˜ëŠ” Prefabì´ ì—†ìŠµë‹ˆë‹¤. â–¶ ìŠ¤í¬ë¦½íŠ¸: CustomizingManager_Choi");
+        }
+
+        // í”„ë¦¬íŒ¹ ë°˜í™˜
+        return temp_Prefab;
+    } //GetPrefab()
     #endregion
 
-    #region [¹Ì»ç¿ë ¸Ş¼­µå]
+    #region [ì˜¤ë¸Œì íŠ¸ ê´€ë¦¬ ë©”ì„œë“œ]
     // ##################################################################################################
-    // ¢º[¹Ì»ç¿ë ¸Ş¼­µå]
+    // â–¶[ì˜¤ë¸Œì íŠ¸ ê´€ë¦¬ ë©”ì„œë“œ]
     // ##################################################################################################
-    // µ¨¸®°ÔÀÌÆ® È£Ãâ ÇÔ¼ö
-        private void CallDelegateFunc(string funcName)
+    // ì˜¤ë¸Œì íŠ¸ í† ê¸€ í•¨ìˆ˜
+    private void ToggleObject(GameObject currentObj, GameObject newObj)
+    {
+        currentObj.SetActive(false); // í˜„ì¬ ì˜¤ë¸Œì íŠ¸ ë¹„í™œì„±í™”
+        newObj.SetActive(true); // ìƒˆë¡œìš´ ì˜¤ë¸Œì íŠ¸ í™œì„±í™”
+
+        // ì•„ë˜ì— categoryì™€ ë°”ë€ ì˜¤ë¸Œì íŠ¸ì— ëŒ€í•œ ì •ë³´ë¥¼ playerPrefabì— ì €ì¥í•˜ê¸°
+
+    } //ToggleObject()
+
+    // ë¶€ëª¨ì™€ ìì‹ê°„ì˜ í¬ì§€ì…˜ì„ ë³´ì •í•˜ëŠ” í•¨ìˆ˜
+    private Vector3 AdjustChildPosition(GameObject parent, GameObject child)
+    {
+        // íŠ¸ëœìŠ¤í¼ í˜¸ì¶œ
+        Vector3 parentPos = parent.transform.position;
+        Vector3 childPos = child.transform.position;
+
+        // í¬ì§€ì…˜ ë³´ì •(ë¶€ëª¨Pos + ìì‹Pos)
+        childPos = parentPos + childPos;
+
+        // ë³´ì •ëœ í¬ì§€ì…˜ ë°˜í™˜
+        return childPos;
+    } // AdjustChildPosition()
+    #endregion
+
+    #region [ë³€ìˆ˜ ê´€ë¦¬ ë©”ì„œë“œ]
+    // ##################################################################################################
+    // â–¶[ë³€ìˆ˜ ê´€ë¦¬ ë©”ì„œë“œ]
+    // ##################################################################################################
+    // Parents ë¦¬ìŠ¤íŠ¸ì— ë¶€ëª¨ë“¤ì„ ì¶”ê°€í•˜ëŠ” í•¨ìˆ˜
+    private void InputParents()
+    {
+        // ë¦¬ìŠ¤íŠ¸ ì´ˆê¸°í™”
+        parents = new List<GameObject>();
+        // ì„ì‹œ ë³€ìˆ˜ ìƒì„±
+        GameObject temp_Obj;
+        // ê° ì¹´í…Œê³ ë¦¬ì— ìˆëŠ” ë¶€ëª¨ ì˜¤ë¸Œì íŠ¸ë“¤ì„ ì°¾ì•„ parentsì— ì¶”ê°€
+        for (int i = 0; i < categoryList.Length; i++)
         {
-            // µ¨¸®°ÔÀÌÆ® ÇÔ¼ö ¾È¿¡ ÇØ´çÇÏ´Â ÇÔ¼ö¸íÀÌ ÀÖ´ÂÁö È®ÀÎ
-            if (customizingFuncs.ContainsKey(funcName))
+            temp_Obj = GameObject.Find(categoryList[i]);
+            if (temp_Obj != null)
             {
-                CustomizingFunc func = customizingFuncs[funcName];
-                func(); // ÇÔ¼ö È£Ãâ
+                parents.Add(temp_Obj);
             }
-        } // CallDelegateFunc()
+        }
+    } // InputParents()    
+
+    // dataDictionary ì ‘ê·¼ìš© Keyë¥¼ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
+    // "PrefabName"ìœ¼ë¡œ í•œë²ˆì— ì ‘ê·¼í•˜ë©´ ì ‘ê·¼í•  ìˆ˜ ì—†ì–´ foreachë¡œ
+    // Keyë¥¼ ì°¾ì•„ì„œ ì ‘ê·¼í•œë‹¤.
+    private string GetKeyForDataDictionary(string category)
+    {
+        string temp_DataDictionaryKey = "";
+
+        foreach (KeyValuePair<string, List<string>> value in dataDictionary[category])
+        {
+            // Key ê°’ì´ PrefabNameì¼ ê²½ìš°
+            if (value.Key.Contains("PrefabName"))
+            {
+                // í‚¤ ê°’ ì¶”ê°€
+                temp_DataDictionaryKey = value.Key;
+
+                // í•œ ë²ˆë§Œ ë™ì‘í•˜ê³  ì¢…ë£Œ
+                break;
+            }
+        }
+
+        // í‚¤ ë°˜í™˜
+        return temp_DataDictionaryKey;
+    } // GetKeyForDataDictionary()
+
+    // PlayerDataManager_Choiì—ì„œ PlayerPrefabì„ ì €ì¥í•˜ê¸° ìœ„í•´
+    // ê° ì¹´í…Œê³ ë¦¬ì˜ íŒŒì¸  ì¸ë±ìŠ¤ê°€ ì €ì¥ëœ temp_IndexDictionaryë¥¼ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
+    public Dictionary<string, int> GetIndexDictionary()
+    {
+        // temp_IndexDictionaryë¥¼ ë°˜í™˜
+        return temp_IndexDictionary;
+    }
+    #endregion
+
+    #region [ë¯¸ì‚¬ìš© ë©”ì„œë“œ]
+    // ##################################################################################################
+    // â–¶[ë¯¸ì‚¬ìš© ë©”ì„œë“œ]
+    // ##################################################################################################
+    // ë¸ë¦¬ê²Œì´íŠ¸ í˜¸ì¶œ í•¨ìˆ˜
+    private void CallDelegateFunc(string funcName)
+    {
+        // ë¸ë¦¬ê²Œì´íŠ¸ í•¨ìˆ˜ ì•ˆì— í•´ë‹¹í•˜ëŠ” í•¨ìˆ˜ëª…ì´ ìˆëŠ”ì§€ í™•ì¸
+        if (customizingFuncs.ContainsKey(funcName))
+        {
+            CustomizingFunc func = customizingFuncs[funcName];
+            func(); // í•¨ìˆ˜ í˜¸ì¶œ
+        }
+    } // CallDelegateFunc()
     #endregion
 }

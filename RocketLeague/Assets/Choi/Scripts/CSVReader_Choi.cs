@@ -5,58 +5,58 @@ using Rewired.ComponentControls.Data;
 
 public class CSVReader_Choi : MonoBehaviour
 {
-    #region ½Ì±ÛÅæ ¼±¾ğ
-    private static CSVReader_Choi m_instance; // ½Ì±ÛÅæÀÌ ÇÒ´çµÉ static º¯¼ö
+    #region ì‹±ê¸€í†¤ ì„ ì–¸
+    private static CSVReader_Choi m_instance; // ì‹±ê¸€í†¤ì´ í• ë‹¹ë  static ë³€ìˆ˜
     public static CSVReader_Choi instance
     {
         get
         {
-            // ¸¸¾à ½Ì±ÛÅæ º¯¼ö¿¡ ¾ÆÁ÷ ¿ÀºêÁ§Æ®°¡ ÇÒ´çµÇÁö ¾Ê¾Ò´Ù¸é
+            // ë§Œì•½ ì‹±ê¸€í†¤ ë³€ìˆ˜ì— ì•„ì§ ì˜¤ë¸Œì íŠ¸ê°€ í• ë‹¹ë˜ì§€ ì•Šì•˜ë‹¤ë©´
             if (m_instance == null)
             {
-                // ¾À¿¡¼­ CSVReader ¿ÀºêÁ§Æ®¸¦ Ã£¾Æ ÇÒ´ç
+                // ì”¬ì—ì„œ CSVReader ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì•„ í• ë‹¹
                 m_instance = FindObjectOfType<CSVReader_Choi>();
             }
 
-            // ½Ì±ÛÅæ ¿ÀºêÁ§Æ®¸¦ ¹İÈ¯
+            // ì‹±ê¸€í†¤ ì˜¤ë¸Œì íŠ¸ë¥¼ ë°˜í™˜
             return m_instance;
         }
     }
     #endregion
 
-    public const char DELIMITER = ','; // CSV ÆÄÀÏ¿¡¼­ »ç¿ëÇÏ´Â ±¸ºĞÀÚ (±âº»°ªÀº ÄŞ¸¶)
+    public const char DELIMITER = ','; // CSV íŒŒì¼ì—ì„œ ì‚¬ìš©í•˜ëŠ” êµ¬ë¶„ì (ê¸°ë³¸ê°’ì€ ì½¤ë§ˆ)
 
-    // csv ÆÄÀÏÀÇ Á¤º¸¸¦ Çà°ú ¿­·Î ±¸ºĞÇÏ¿© ÀúÀåÇÒ µñ¼Å³Ê¸®
-    // ÇàÀº Å° °ªÀÌ µÇ°í, ¿­Àº Å° °ª ³»ºÎÀÇ °ªÀÌ µÈ´Ù.
+    // csv íŒŒì¼ì˜ ì •ë³´ë¥¼ í–‰ê³¼ ì—´ë¡œ êµ¬ë¶„í•˜ì—¬ ì €ì¥í•  ë”•ì…”ë„ˆë¦¬
+    // í–‰ì€ í‚¤ ê°’ì´ ë˜ê³ , ì—´ì€ í‚¤ ê°’ ë‚´ë¶€ì˜ ê°’ì´ ëœë‹¤.
     public Dictionary<string, List<string>> dataDictionary;
 
-    // CSV ÆÄÀÏÀ» ÀĞ´Â ÇÔ¼ö
-    // csvFileName¿¡ "CSVFiles"¿Í °°Àº Resources ¾È¿¡ ÀÖ´Â µğ·ºÅä¸®¸í°ú
-    // WheelList.csv"°ú °°ÀÌ csv ÆÄÀÏÀÇ ÀÌ¸§À» ÀÔ·ÂÇÑ´Ù.
+    // CSV íŒŒì¼ì„ ì½ëŠ” í•¨ìˆ˜
+    // csvFileNameì— "CSVFiles"ì™€ ê°™ì€ Resources ì•ˆì— ìˆëŠ” ë””ë ‰í† ë¦¬ëª…ê³¼
+    // WheelList.csv"ê³¼ ê°™ì´ csv íŒŒì¼ì˜ ì´ë¦„ì„ ì…ë ¥í•œë‹¤.
     public Dictionary<string, List<string>> ReadCSVFile(string csvFileName)
     {
         dataDictionary = new Dictionary<string, List<string>>();
         TextAsset filePath = Resources.Load<TextAsset>(csvFileName);
-        // µğ¹ö±×¿ë º¯¼ö
+        // ë””ë²„ê·¸ìš© ë³€ìˆ˜
         bool isCSVReadSuccessful = false;
         if (filePath != null)
         {
             {
-                string[] lines = filePath.text.Split('\n'); // ÁÙ ¹Ù²ŞÀ¸·Î Çà ±¸ºĞÀ» À§ÇØ Ãß°¡
+                string[] lines = filePath.text.Split('\n'); // ì¤„ ë°”ê¿ˆìœ¼ë¡œ í–‰ êµ¬ë¶„ì„ ìœ„í•´ ì¶”ê°€
 
-                // linesÀÇ ±æÀÌ°¡ 1 ÀÌ»óÀÏ °æ¿ì
+                // linesì˜ ê¸¸ì´ê°€ 1 ì´ìƒì¼ ê²½ìš°
                 if (lines.Length > 0)
                 {
-                    string[] headers = lines[0].Split(DELIMITER); // ¹®ÀÚ¿­À» ',' ±âÁØÀ¸·Î ÀÚ¸§
+                    string[] headers = lines[0].Split(DELIMITER); // ë¬¸ìì—´ì„ ',' ê¸°ì¤€ìœ¼ë¡œ ìë¦„
 
                     foreach (string header in headers)
                     {
-                        // dataDictionary¿¡ Çà ÀÌ¸§À» Å° °ªÀ¸·Î ¸®½ºÆ® Ãß°¡
+                        // dataDictionaryì— í–‰ ì´ë¦„ì„ í‚¤ ê°’ìœ¼ë¡œ ë¦¬ìŠ¤íŠ¸ ì¶”ê°€
                         dataDictionary.Add(header, new List<string>());
                     }
 
-                    // Ã¹¹øÂ° Çà[0]À» Çì´õ·Î »ç¿ëÇÏ°í µÎ ¹øÂ°[1] ºÎÅÍ µ¥ÀÌÅÍ ÇàÀ¸·Î »ç¿ëÇÏ±â À§ÇØ
-                    // index¸¦ 1 ºÎÅÍ ½ÃÀÛ
+                    // ì²«ë²ˆì§¸ í–‰[0]ì„ í—¤ë”ë¡œ ì‚¬ìš©í•˜ê³  ë‘ ë²ˆì§¸[1] ë¶€í„° ë°ì´í„° í–‰ìœ¼ë¡œ ì‚¬ìš©í•˜ê¸° ìœ„í•´
+                    // indexë¥¼ 1 ë¶€í„° ì‹œì‘
                     for (int i = 1; i < lines.Length; i++)
                     {
                         string line = lines[i];
@@ -64,7 +64,7 @@ public class CSVReader_Choi : MonoBehaviour
 
                         for (int j = 0; j < values.Length; j++) 
                         {
-                            // Çì´õ ¸®½ºÆ®¿¡ °ª Ãß°¡
+                            // í—¤ë” ë¦¬ìŠ¤íŠ¸ì— ê°’ ì¶”ê°€
                             dataDictionary[headers[j]].Add(values[j]);
                         }
                     }
@@ -76,24 +76,24 @@ public class CSVReader_Choi : MonoBehaviour
 
         if (isCSVReadSuccessful)
         {
-            Debug.Log($"ReadCSVFile(): ¢º °æ·Î {csvFileName} ¢º CSV ÆÄÀÏ ·Îµå ¼º°ø");
+            Debug.Log($"ReadCSVFile(): â–¶ ê²½ë¡œ {csvFileName} â–¶ CSV íŒŒì¼ ë¡œë“œ ì„±ê³µ");
         }
         else
         {
-            Debug.Log($"ReadCSVFile(): ¢º °æ·Î {csvFileName} ¢º CSV ÆÄÀÏ ·Îµå ½ÇÆĞ ¢º " +
-                $"ÀÏÄ¡ÇÏ´Â CSV ÆÄÀÏÀÌ ¾ø½À´Ï´Ù. ¢º ½ºÅ©¸³Æ®: CSVReader_Choi");
+            Debug.Log($"ReadCSVFile(): â–¶ ê²½ë¡œ {csvFileName} â–¶ CSV íŒŒì¼ ë¡œë“œ ì‹¤íŒ¨ â–¶ " +
+                $"ì¼ì¹˜í•˜ëŠ” CSV íŒŒì¼ì´ ì—†ìŠµë‹ˆë‹¤. â–¶ ìŠ¤í¬ë¦½íŠ¸: CSVReader_Choi");
         }
 
         return dataDictionary;
     }
 
-    // º¯È¯µÈ csv ÆÄÀÏÀÇ Á¤º¸°¡ ÀúÀåµÈ µñ¼Å³Ê¸® ³»ºÎÀÇ °ªÀ» Ãâ·ÂÇÏ´Â ÇÔ¼ö.
-    // ¸Å°³º¯¼ö·Î csv ÆÄÀÏ¿¡¼­ º¯È¯µÈ µñ¼Å³Ê¸®¸¦ ³Ö¾î¾ß ÇÑ´Ù.
-    // "Çà:¿­1,¿­2,¿­3"°ú °°ÀÌ Ãâ·ÂµÈ´Ù.
-    // ¸Å°³ º¯¼ö·Î ¹ŞÀ» µñ¼Å³Ê¸®ÀÇ ±¸Á¶´Â <string, List<string>> ÀÌ¾î¾ß ÇÑ´Ù.
+    // ë³€í™˜ëœ csv íŒŒì¼ì˜ ì •ë³´ê°€ ì €ì¥ëœ ë”•ì…”ë„ˆë¦¬ ë‚´ë¶€ì˜ ê°’ì„ ì¶œë ¥í•˜ëŠ” í•¨ìˆ˜.
+    // ë§¤ê°œë³€ìˆ˜ë¡œ csv íŒŒì¼ì—ì„œ ë³€í™˜ëœ ë”•ì…”ë„ˆë¦¬ë¥¼ ë„£ì–´ì•¼ í•œë‹¤.
+    // "í–‰:ì—´1,ì—´2,ì—´3"ê³¼ ê°™ì´ ì¶œë ¥ëœë‹¤.
+    // ë§¤ê°œ ë³€ìˆ˜ë¡œ ë°›ì„ ë”•ì…”ë„ˆë¦¬ì˜ êµ¬ì¡°ëŠ” <string, List<string>> ì´ì–´ì•¼ í•œë‹¤.
     public void PrintData(Dictionary<string, List<string>> dictionary)
     {
-        // µñ¼Å³Ê¸®ÀÇ °¢ Ç×¸ñÀ» Ãâ·Â
+        // ë”•ì…”ë„ˆë¦¬ì˜ ê° í•­ëª©ì„ ì¶œë ¥
         foreach (KeyValuePair<string, List<string>> entry in dictionary)
         {
             string category = entry.Key;

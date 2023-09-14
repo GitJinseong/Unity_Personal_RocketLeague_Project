@@ -15,18 +15,18 @@ public class LobyBtnController_Choi : MonoBehaviour, IPointerEnterHandler, IPoin
     {
         button = GetComponent<Button>();
         buttonText = transform.GetChild(0).
-            gameObject.GetComponent<TMP_Text>(); // index 0ÀÎ ÀÚ½Ä ÅØ½ºÆ®¸¦ °¡Á®¿È
-        highlightedColor = new Color(196f/255f, 171f/255f, 96f/255f); // hightlighted ÀÏ ¶§ º¯°æÇÒ »ö»ó
-        defaultColor = Color.white; // ±âº»»ö»ó
+            gameObject.GetComponent<TMP_Text>(); // index 0ì¸ ìì‹ í…ìŠ¤íŠ¸ë¥¼ ê°€ì ¸ì˜´
+        highlightedColor = new Color(196f/255f, 171f/255f, 96f/255f); // hightlighted ì¼ ë•Œ ë³€ê²½í•  ìƒ‰ìƒ
+        defaultColor = Color.white; // ê¸°ë³¸ìƒ‰ìƒ
     }
 
-    // ¹öÆ°ÀÌ HightLightedÀÏ ¶§ »ö»ó º¯°æÇÏ´Â ÇÔ¼ö
+    // ë²„íŠ¼ì´ HightLightedì¼ ë•Œ ìƒ‰ìƒ ë³€ê²½í•˜ëŠ” í•¨ìˆ˜
     public void OnPointerEnter(PointerEventData eventData)
     {
         buttonText.color = highlightedColor;
     }
 
-    // ¹öÆ°ÀÌ UnhightLightedÀÏ ¶§ »ö»ó º¯°æÇÏ´Â ÇÔ¼ö
+    // ë²„íŠ¼ì´ UnhightLightedì¼ ë•Œ ìƒ‰ìƒ ë³€ê²½í•˜ëŠ” í•¨ìˆ˜
     public void OnPointerExit(PointerEventData eventData)
     {
         buttonText.color = defaultColor;

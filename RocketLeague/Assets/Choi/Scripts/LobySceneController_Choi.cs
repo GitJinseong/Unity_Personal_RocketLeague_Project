@@ -7,70 +7,70 @@ using UnityEngine.UI;
 public class LobySceneController_Choi : MonoBehaviour
 {
     [Header("LobyEffect")]
-    public GameObject[] objs; // ¾Æ·¡¿Í °°Àº ¿ÀºêÁ§Æ®¸¦ ÀÎµ¦½º¿¡ ¼³Á¤
+    public GameObject[] objs; // ì•„ë˜ì™€ ê°™ì€ ì˜¤ë¸Œì íŠ¸ë¥¼ ì¸ë±ìŠ¤ì— ì„¤ì •
                               // [0] = Txt_StartMsg, [1] = Btn_Start, [2] = Img_GameLogo, [3] = Img_BlackBg
     private bool isStart = false;
 
     void Start()
     {
-        // ½ÃÀÛ ¹öÆ° ¾×¼Ç ÇÔ¼ö È£Ãâ
+        // ì‹œì‘ ë²„íŠ¼ ì•¡ì…˜ í•¨ìˆ˜ í˜¸ì¶œ
         float[] actionTimesForStartMsg = {1f, 1f, 2f};
         StartCoroutine(DOActionStartMsg(actionTimesForStartMsg));
 
-        // Å¸ÀÌÆ² °ÔÀÓ ·Î°í ¾×¼Ç ÇÔ¼ö È£Ãâ
+        // íƒ€ì´í‹€ ê²Œì„ ë¡œê³  ì•¡ì…˜ í•¨ìˆ˜ í˜¸ì¶œ
         float[] actionTimesForGameLogo = {4f};
         StartCoroutine(DOActionGameLogo(actionTimesForGameLogo));
     }
 
-    // ½ÃÀÛ ¹öÆ° ¾×¼Ç ÄÚ·çÆ¾ ÇÔ¼ö
+    // ì‹œì‘ ë²„íŠ¼ ì•¡ì…˜ ì½”ë£¨í‹´ í•¨ìˆ˜
     private IEnumerator DOActionStartMsg(float[] times)
     {
         yield return new WaitForSeconds(times[0]);
-        objs[1].SetActive(true); // ½ÃÀÛ ¹öÆ° È°¼ºÈ­
+        objs[1].SetActive(true); // ì‹œì‘ ë²„íŠ¼ í™œì„±í™”
 
         Image blackBg = objs[3].GetComponent<Image>();
-        blackBg.DOFade(0f, 1f).SetDelay(2f); // 2ÃÊ°£ °ËÀº ¹è°æ ÆäÀÌµå ¾Æ¿ô
+        blackBg.DOFade(0f, 1f).SetDelay(2f); // 2ì´ˆê°„ ê²€ì€ ë°°ê²½ í˜ì´ë“œ ì•„ì›ƒ
 
         TMP_Text startMsg = objs[0].GetComponent<TMP_Text>();
-        startMsg.DOFade(1f, 1f).SetDelay(2f); // 2ÃÊ°£ ½ÃÀÛ ÅØ½ºÆ® ÆäÀÌµåÀÎ
+        startMsg.DOFade(1f, 1f).SetDelay(2f); // 2ì´ˆê°„ ì‹œì‘ í…ìŠ¤íŠ¸ í˜ì´ë“œì¸
 
         yield return new WaitForSeconds(times[1]);
         RectTransform startMsgRectTransform = startMsg.rectTransform;
-        startMsgRectTransform.DOAnchorPos(new Vector3(0f, 330f, 0f), 2f); // 2ÃÊ°£ ¾ŞÄ¿ PosY 330f·Î ÀÌµ¿
+        startMsgRectTransform.DOAnchorPos(new Vector3(0f, 330f, 0f), 2f); // 2ì´ˆê°„ ì•µì»¤ PosY 330fë¡œ ì´ë™
 
         yield return new WaitForSeconds(times[2]);
 
-        // ½ÃÀÛÇÏ±â Àü±îÁö ·£´ıÇÏ°Ô ½ÃÀÛ ÅØ½ºÆ®ÀÇ »ö»óÀ» º¯°æ 
+        // ì‹œì‘í•˜ê¸° ì „ê¹Œì§€ ëœë¤í•˜ê²Œ ì‹œì‘ í…ìŠ¤íŠ¸ì˜ ìƒ‰ìƒì„ ë³€ê²½ 
         Color randomColor = new Color(0f, 0f, 0f);
 
-        // startMsgÀÇ ¸¶Å×¸®¾ó°ú ½¦ÀÌ´õ¸¦ °¡Á®¿È
+        // startMsgì˜ ë§ˆí…Œë¦¬ì–¼ê³¼ ì‰ì´ë”ë¥¼ ê°€ì ¸ì˜´
         Material startMsgMaterial = startMsg.fontSharedMaterial;
         Shader startMsgShader = startMsgMaterial.shader;
 
-        // Shader¿¡¼­ GlowÀÇ ¾ÆÀÌµğ¸¦ Ã£À½
+        // Shaderì—ì„œ Glowì˜ ì•„ì´ë””ë¥¼ ì°¾ìŒ
         int startMsgGlowId = Shader.PropertyToID("_GlowColor");
 
         float colorChangeTime = 3f;
         while (isStart == false)
         {
             randomColor = new Color(Random.value, 
-                Random.value, Random.value); // Random.value¸¦ »ç¿ëÇÏ¿© 0°ú 1»çÀÌÀÇ ·£´ıÇÑ ¼Ò¼ö °ªÀ» ¾òÀ½
+                Random.value, Random.value); // Random.valueë¥¼ ì‚¬ìš©í•˜ì—¬ 0ê³¼ 1ì‚¬ì´ì˜ ëœë¤í•œ ì†Œìˆ˜ ê°’ì„ ì–»ìŒ
             ChangeGlowColorForDOTween_Choi.DOColor(startMsgMaterial, startMsgGlowId,
-                randomColor, colorChangeTime); //ÁöÁ¤µÈ ½Ã°£ µ¿¾È glowÀÇ »ö»óÀ» endColor·Î º¯°æ 
-            yield return new WaitForSeconds(colorChangeTime); // À§ÀÇ µ¿ÀÛÀÌ ³¡³¯ ¶§ ±îÁö ´ë±â
+                randomColor, colorChangeTime); //ì§€ì •ëœ ì‹œê°„ ë™ì•ˆ glowì˜ ìƒ‰ìƒì„ endColorë¡œ ë³€ê²½ 
+            yield return new WaitForSeconds(colorChangeTime); // ìœ„ì˜ ë™ì‘ì´ ëë‚  ë•Œ ê¹Œì§€ ëŒ€ê¸°
         }
     }
 
-    // °ÔÀÓ ·Î°í ¾×¼Ç ÄÚ·çÆ¾ ÇÔ¼ö
+    // ê²Œì„ ë¡œê³  ì•¡ì…˜ ì½”ë£¨í‹´ í•¨ìˆ˜
     private IEnumerator DOActionGameLogo(float[] times)
     {
         yield return new WaitForSeconds(times[0]);
-        objs[2].SetActive(true); // °ÔÀÓ ·Î°í È°¼ºÈ­
+        objs[2].SetActive(true); // ê²Œì„ ë¡œê³  í™œì„±í™”
 
         Image gameLogo = objs[2].GetComponent<Image>();
-        gameLogo.DOFade(1f, 1f).SetDelay(1f); // 1ÃÊ°£ ÆäÀÌµå ÀÎ
+        gameLogo.DOFade(1f, 1f).SetDelay(1f); // 1ì´ˆê°„ í˜ì´ë“œ ì¸
 
         RectTransform gameLogoRectTramsform = gameLogo.GetComponent<RectTransform>();
-        gameLogoRectTramsform.DOAnchorPos(new Vector3(0f, -380f, 0f), 2f); // 2ÃÊ°£ ¾Æ·¡·Î ÀÌµ¿
+        gameLogoRectTramsform.DOAnchorPos(new Vector3(0f, -380f, 0f), 2f); // 2ì´ˆê°„ ì•„ë˜ë¡œ ì´ë™
     }
 }

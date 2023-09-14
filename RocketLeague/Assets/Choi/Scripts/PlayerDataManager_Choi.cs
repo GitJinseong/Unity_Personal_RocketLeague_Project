@@ -5,33 +5,33 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class PlayerDataManager_Choi : MonoBehaviour
 {
-    #region [½Ì±ÛÅæ & º¯¼ö ¼±¾ğºÎ]
+    #region [ì‹±ê¸€í†¤ & ë³€ìˆ˜ ì„ ì–¸ë¶€]
     // ##################################################################################################
-    // ¢º[½Ì±ÛÅæ & º¯¼ö ¼±¾ğºÎ]
+    // â–¶[ì‹±ê¸€í†¤ & ë³€ìˆ˜ ì„ ì–¸ë¶€]
     // ##################################################################################################
-        private static PlayerDataManager_Choi m_instance; // ½Ì±ÛÅæÀÌ ÇÒ´çµÉ static º¯¼ö
+        private static PlayerDataManager_Choi m_instance; // ì‹±ê¸€í†¤ì´ í• ë‹¹ë  static ë³€ìˆ˜
         public static PlayerDataManager_Choi instance
         {
             get
             {
-                // ¸¸¾à ½Ì±ÛÅæ ¿ÀºêÁ§Æ®¿¡ ÇÒ´çÀÌ µÇÁö ¾Ê¾Ò´Ù¸é
+                // ë§Œì•½ ì‹±ê¸€í†¤ ì˜¤ë¸Œì íŠ¸ì— í• ë‹¹ì´ ë˜ì§€ ì•Šì•˜ë‹¤ë©´
                 if (m_instance == null)
                 {
-                    // ¾À¿¡¼­ ¿ÀºêÁ§Æ®¸¦ Ã£¾Æ ÇÒ´ç
+                    // ì”¬ì—ì„œ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì•„ í• ë‹¹
                     m_instance = FindObjectOfType<PlayerDataManager_Choi>();
                 }
 
-                // ½Ì±ÛÅæ ¿ÀºêÁ§Æ®¸¦ ¹İÈ¯
+                // ì‹±ê¸€í†¤ ì˜¤ë¸Œì íŠ¸ë¥¼ ë°˜í™˜
                 return m_instance;
             }
         }
         [Header("Temps")]
-        private Dictionary<string, int> temp_IndexDictionary; // ÀÓ½Ã·Î ÇÃ·¹ÀÌ¾î ÀÎµ¦½º¸¦ ÀúÀåÇÏ´Â µñ¼Å³Ê¸®
+        private Dictionary<string, int> temp_IndexDictionary; // ì„ì‹œë¡œ í”Œë ˆì´ì–´ ì¸ë±ìŠ¤ë¥¼ ì €ì¥í•˜ëŠ” ë”•ì…”ë„ˆë¦¬
     #endregion
 
-    #region [¶óÀÌÇÁ »çÀÌÅ¬ ¸Ş¼­µå]
+    #region [ë¼ì´í”„ ì‚¬ì´í´ ë©”ì„œë“œ]
     // ##################################################################################################
-    // ¢º[¶óÀÌÇÁ »çÀÌÅ¬ ¸Ş¼­µå]
+    // â–¶[ë¼ì´í”„ ì‚¬ì´í´ ë©”ì„œë“œ]
     // ##################################################################################################
         private void Awake()
         {
@@ -39,54 +39,54 @@ public class PlayerDataManager_Choi : MonoBehaviour
         }
     #endregion
 
-    #region [ÇÃ·¹ÀÌ¾î ÇÁ¸®ÆÕ ¸Ş¼­µå]
+    #region [í”Œë ˆì´ì–´ í”„ë¦¬íŒ¹ ë©”ì„œë“œ]
     // ##################################################################################################
-    // ¢º[ÇÃ·¹ÀÌ¾î ÇÁ¸®ÆÕ ¸Ş¼­µå]
+    // â–¶[í”Œë ˆì´ì–´ í”„ë¦¬íŒ¹ ë©”ì„œë“œ]
     // ##################################################################################################
-    // PlayerCustomizing_Choi¿¡¼­ Ä¿½ºÅÍ¸¶ÀÌÂ¡ ¼³Á¤ ÈÄ Àû¿ë½Ã ÇØ´ç µ¥ÀÌÅÍ¸¦
-    // ¹è¿­·Î ¹Ş¾Æ¼­ PlayerPref¿¡ ÀúÀåÇÏ´Â ÇÔ¼ö
+    // PlayerCustomizing_Choiì—ì„œ ì»¤ìŠ¤í„°ë§ˆì´ì§• ì„¤ì • í›„ ì ìš©ì‹œ í•´ë‹¹ ë°ì´í„°ë¥¼
+    // ë°°ì—´ë¡œ ë°›ì•„ì„œ PlayerPrefì— ì €ì¥í•˜ëŠ” í•¨ìˆ˜
     public void SetPlayerPrefForIndex()
     {
-        // CustomizingManage_Choi¿¡ ÀúÀåµÈ °¢ Ä«Å×°í¸®ÀÇ ÆÄÃ÷ ÀÎµ¦½º ÀüºÎ°¡ ÀúÀåµÈ
-        // µñ¼Å³Ê¸®¸¦ È£Ãâ
+        // CustomizingManage_Choiì— ì €ì¥ëœ ê° ì¹´í…Œê³ ë¦¬ì˜ íŒŒì¸  ì¸ë±ìŠ¤ ì „ë¶€ê°€ ì €ì¥ëœ
+        // ë”•ì…”ë„ˆë¦¬ë¥¼ í˜¸ì¶œ
         temp_IndexDictionary = CustomizingManager_Choi.instance.GetIndexDictionary();
             
-        // µñ¼Å³Ê¸®¿¡ ÀúÀåµÇ¾î ÀÖ´Â °ªµéÀ» foreach·Î ¼øÈ¸ÇÑ ÈÄ
-        // PlayerPref¿¡ ÀúÀåÇÑ´Ù. ex) 
+        // ë”•ì…”ë„ˆë¦¬ì— ì €ì¥ë˜ì–´ ìˆëŠ” ê°’ë“¤ì„ foreachë¡œ ìˆœíšŒí•œ í›„
+        // PlayerPrefì— ì €ì¥í•œë‹¤. ex) 
         foreach (KeyValuePair<string, int> value in temp_IndexDictionary)
         {
-            PlayerPrefs.SetInt(value.Key, value.Value); // CarFrames, 0 °ú °°Àº ÇüÅÂ·Î ÀÔ·ÂÈÄ ÀúÀå
-            // µğ¹ö±× ¸Ş¼¼Áö Ãâ·Â
-            Debug.Log($"SaveDataForIndex(): ¢º PlayerPrefs ÀúÀå ¼º°ø ¢º " +
-                $"Å°: {value.Key}, °ª: {value.Value}");
+            PlayerPrefs.SetInt(value.Key, value.Value); // CarFrames, 0 ê³¼ ê°™ì€ í˜•íƒœë¡œ ì…ë ¥í›„ ì €ì¥
+            // ë””ë²„ê·¸ ë©”ì„¸ì§€ ì¶œë ¥
+            Debug.Log($"SaveDataForIndex(): â–¶ PlayerPrefs ì €ì¥ ì„±ê³µ â–¶ " +
+                $"í‚¤: {value.Key}, ê°’: {value.Value}");
         }
 
-        // ÇÑ ¹ø´õ PlayerPrefs ÀúÀå
+        // í•œ ë²ˆë” PlayerPrefs ì €ì¥
         PlayerPrefs.Save();
     } // SaveData()
 
     public int GetPlayerPrefForIndex(string key)
     {
-        // PlayerPrefs¿¡ ÀúÀåµÈ Index¸¦ °¡Á®¿È
-        // ¿À¹ö·Îµå¸¦ ÇØ¼­ ½ÇÆĞÇßÀ» ¶§ -1À» ¹İÈ¯
+        // PlayerPrefsì— ì €ì¥ëœ Indexë¥¼ ê°€ì ¸ì˜´
+        // ì˜¤ë²„ë¡œë“œë¥¼ í•´ì„œ ì‹¤íŒ¨í–ˆì„ ë•Œ -1ì„ ë°˜í™˜
         int temp_Value = PlayerPrefs.GetInt(key, -1);
-        // PlayerPrefs¿¡ ÀúÀåµÈ Index¸¦ °¡Á®¿À´Âµ¥ ¼º°øÇßÀ» °æ¿ì
+        // PlayerPrefsì— ì €ì¥ëœ Indexë¥¼ ê°€ì ¸ì˜¤ëŠ”ë° ì„±ê³µí–ˆì„ ê²½ìš°
         if (temp_Value != -1)
         {
-            // µğ¹ö±× ¸Ş¼¼Áö Ãâ·Â
-            Debug.Log($"GetPlayerPrefForIndex(): ¢º PlayerPrefs ·Îµå ¼º°ø ¢º " +
-                $"Å°: {key}, °ª: {temp_Value}");
+            // ë””ë²„ê·¸ ë©”ì„¸ì§€ ì¶œë ¥
+            Debug.Log($"GetPlayerPrefForIndex(): â–¶ PlayerPrefs ë¡œë“œ ì„±ê³µ â–¶ " +
+                $"í‚¤: {key}, ê°’: {temp_Value}");
         }
 
-        // PlayerPrefs¿¡ ÀúÀåµÈ Index¸¦ °¡Á®¿ÀÁö ¸øÇßÀ» °æ¿ì
+        // PlayerPrefsì— ì €ì¥ëœ Indexë¥¼ ê°€ì ¸ì˜¤ì§€ ëª»í–ˆì„ ê²½ìš°
         else
         {
-            // µğ¹ö±× ¸Ş¼¼Áö Ãâ·Â
-            Debug.Log($"GetPlayerPrefForIndex(): ¢º PlayerPrefs ·Îµå ½ÇÆĞ ¢º " +
-                $"Å°: {key} ¢º Å°°¡ ¿Ã¹Ù¸¥Áö È®ÀÎÇØÁÖ¼¼¿ä ¢º ½ºÅ©¸³Æ®: PlayerDataManager_Choi");
+            // ë””ë²„ê·¸ ë©”ì„¸ì§€ ì¶œë ¥
+            Debug.Log($"GetPlayerPrefForIndex(): â–¶ PlayerPrefs ë¡œë“œ ì‹¤íŒ¨ â–¶ " +
+                $"í‚¤: {key} â–¶ í‚¤ê°€ ì˜¬ë°”ë¥¸ì§€ í™•ì¸í•´ì£¼ì„¸ìš” â–¶ ìŠ¤í¬ë¦½íŠ¸: PlayerDataManager_Choi");
         }
 
-        // Ã£Àº Index ¹İÈ¯
+        // ì°¾ì€ Index ë°˜í™˜
         return temp_Value;
     } // GetPlayerPrefForIndex()
 

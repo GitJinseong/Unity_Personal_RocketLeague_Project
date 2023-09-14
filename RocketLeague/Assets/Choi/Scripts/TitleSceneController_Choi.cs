@@ -7,49 +7,49 @@ using UnityEngine.UI;
 public class TitleSceneController_Choi : MonoBehaviour
 {
     [Header("TitleEffect")]
-    public GameObject[] objs; // ¾Æ·¡¿Í °°Àº ¿ÀºêÁ§Æ®¸¦ ÀÎµ¦½º¿¡ ¼³Á¤
+    public GameObject[] objs; // ì•„ë˜ì™€ ê°™ì€ ì˜¤ë¸Œì íŠ¸ë¥¼ ì¸ë±ìŠ¤ì— ì„¤ì •
                               // [0] = Img_TitleBg, [1] = Img_TitleCompanyLogo
 
 
     void Start()
     {
-        // Å¸ÀÌÆ² ¹è°æ ¾×¼Ç ÇÔ¼ö È£Ãâ
+        // íƒ€ì´í‹€ ë°°ê²½ ì•¡ì…˜ í•¨ìˆ˜ í˜¸ì¶œ
         float[] actionTimesForTitleBg = {1f, 3f};
         StartCoroutine(DOActionTitleBg(actionTimesForTitleBg));
 
-        // È¸»ç ·Î°í ¾×¼Ç ÇÔ¼ö È£Ãâ
+        // íšŒì‚¬ ë¡œê³  ì•¡ì…˜ í•¨ìˆ˜ í˜¸ì¶œ
         float[] actionTimesForCompanyLogo = {7f, 2f, 1f, 4f, 1f};
         StartCoroutine(DOActionCompanyLogo(actionTimesForCompanyLogo));
     }
 
-    // Å¸ÀÌÆ² ¹è°æ ¾×¼Ç ÄÚ·çÆ¾ ÇÔ¼ö
+    // íƒ€ì´í‹€ ë°°ê²½ ì•¡ì…˜ ì½”ë£¨í‹´ í•¨ìˆ˜
     private IEnumerator DOActionTitleBg(float[] times)
     {
         yield return new WaitForSeconds(times[0]);
-        objs[0].SetActive(true); // ¹è°æ È°¼ºÈ­
+        objs[0].SetActive(true); // ë°°ê²½ í™œì„±í™”
 
         yield return new WaitForSeconds(times[1]);
         Image titleBg = objs[0].GetComponent<Image>();
-        titleBg.DOFade(0f, 1f).SetDelay(1f); // 1ÃÊ°£ ÆäÀÌµå ¾Æ¿ô
+        titleBg.DOFade(0f, 1f).SetDelay(1f); // 1ì´ˆê°„ í˜ì´ë“œ ì•„ì›ƒ
     }
 
-    // È¸»ç ·Î°í ¾×¼Ç ÄÚ·çÆ¾ ÇÔ¼ö
+    // íšŒì‚¬ ë¡œê³  ì•¡ì…˜ ì½”ë£¨í‹´ í•¨ìˆ˜
     private IEnumerator DOActionCompanyLogo(float[] times)
     {
         yield return new WaitForSeconds(times[0]);
-        objs[1].SetActive(true); // ·Î°í È°¼ºÈ­
+        objs[1].SetActive(true); // ë¡œê³  í™œì„±í™”
 
         Image companyLogo = objs[1].GetComponent<Image>();
-        companyLogo.DOColor(Color.white, 2f); // 2ÃÊ°£ ÆäÀÌµå ÀÎ / DOFade·Î ÆäÀÌµåÀÎ½Ã ½ÇÁ¦·Î´Â µ¿ÀÛÇÏ³ª
-                                              // Á¦´ë·Î º¸ÀÌÁö ¾Ê´Â Çö»óÀ¸·Î DOColor·Î µ¿ÀÛÇÏ°Ô º¯°æ
+        companyLogo.DOColor(Color.white, 2f); // 2ì´ˆê°„ í˜ì´ë“œ ì¸ / DOFadeë¡œ í˜ì´ë“œì¸ì‹œ ì‹¤ì œë¡œëŠ” ë™ì‘í•˜ë‚˜
+                                              // ì œëŒ€ë¡œ ë³´ì´ì§€ ì•ŠëŠ” í˜„ìƒìœ¼ë¡œ DOColorë¡œ ë™ì‘í•˜ê²Œ ë³€ê²½
         yield return new WaitForSeconds(times[1]);
         Transform companyLogoTransform = objs[1].GetComponent<Transform>();
-        companyLogoTransform.DOScale(new Vector3(1.05f, 1.05f, 1f), 3.0f); //3ÃÊ°£ ½ºÄÉÀÏ x 1.05
+        companyLogoTransform.DOScale(new Vector3(1.05f, 1.05f, 1f), 3.0f); //3ì´ˆê°„ ìŠ¤ì¼€ì¼ x 1.05
 
         yield return new WaitForSeconds(times[2]);
-        companyLogo.DOFade(0f, 1f).SetDelay(1f); // 1ÃÊ°£ ÆäÀÌµå ¾Æ¿ô
+        companyLogo.DOFade(0f, 1f).SetDelay(1f); // 1ì´ˆê°„ í˜ì´ë“œ ì•„ì›ƒ
 
         yield return new WaitForSeconds(times[3]);
-        // ¾À ·Îµå
+        // ì”¬ ë¡œë“œ
     }
 }

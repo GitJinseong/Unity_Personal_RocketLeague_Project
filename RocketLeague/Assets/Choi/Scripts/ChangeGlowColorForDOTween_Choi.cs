@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ChangeGlowColorForDOTween_Choi : MonoBehaviour
 {
-    // ÁöÁ¤µÈ ½Ã°£µ¿¾È TMP_TextÀÇ Glow »ö»óÀ» º¯°æÇÏ´Â ÇÔ¼ö
+    // ì§€ì •ëœ ì‹œê°„ë™ì•ˆ TMP_Textì˜ Glow ìƒ‰ìƒì„ ë³€ê²½í•˜ëŠ” í•¨ìˆ˜
     public static void DOColor(Material material, int id, Color targetColor, float t)
     {
         DOTween.To(() => material.GetColor(id),
