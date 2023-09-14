@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using static UnityEngine.Rendering.DebugUI;
 
 public class CustomizingManager_Choi : MonoBehaviour
@@ -56,6 +57,9 @@ public class CustomizingManager_Choi : MonoBehaviour
         private List<GameObject> parents; // 부모들을 관리하는 리스트
 
         [Header("PlayerPrefab")]
+        private string[] CarTypes = {"BlueCar", "OrangeCar"}; // CreateObjectWithCustomizing()에서 플레이어
+                                                              // 오브젝트를 생성할 때 호출되는 배열 
+                                                              // Resource 폴더에 같은 이름의 프리팹 생성해야함
         private Dictionary<string, int> 
         temp_IndexDictionary = new Dictionary<string, int>(); // 인덱스를 저장하는 딕셔너리(플레이어 프리팹 저장 목적)
                                                               // 카테고리를 키 값으로 접근한다.
@@ -86,8 +90,11 @@ public class CustomizingManager_Choi : MonoBehaviour
             // 현재 인덱스 저장
             SaveDataForPlayerPrefab();
 
-            // PlayerPrefab에 저장되어 있는 인덱스 가져오기
+            // PlayerPrefab에 저장되어 있는 Index 가져오기
             GetDataForPlayerPrefab("CarFrames");
+
+            // PlayerPrefab에 저장되어 있는 Index 들을 가져와서 차량 오브젝트 생성 후 파츠 부착하기 
+            CreateObjectWithCustomizing(0,0);
         } // Awake()
     #endregion
 
@@ -134,7 +141,7 @@ public class CustomizingManager_Choi : MonoBehaviour
     // ##################################################################################################
     // ▶[오브젝트 생성 메서드]
     // ##################################################################################################
-    // 오브젝트 풀링을 위한 오브젝트 생성 함수
+        // 오브젝트 풀링을 위한 오브젝트 생성 함수
         private void CreateObjectPools()
         {
             // 임시 변수 생성
@@ -146,9 +153,9 @@ public class CustomizingManager_Choi : MonoBehaviour
             for (int i = 0; i < csvFileList.Length; i++)
             {
                 // 임시 temp 변수에 값 할당
-                temp_parent = parents[i];
-                temp_Category = csvFileList[i];
-                temp_DataDictionaryKey = GetKeyForDataDictionary(temp_Category);
+                temp_parent = parents[i]; // 부모 할당
+                temp_Category = csvFileList[i]; // 카테고리 할당
+                temp_DataDictionaryKey = GetKeyForDataDictionary(temp_Category); // 접근 키 할당
                 // dataDictionary[키 값]에 있는 정보를 바탕으로 오브젝트 생성
                 for (int j = 0; j < dataDictionary[temp_Category][temp_DataDictionaryKey].Count; j++)
                 {
@@ -188,24 +195,38 @@ public class CustomizingManager_Choi : MonoBehaviour
                 return;
             }
         } // CreateInstantiate()
-
-        // Parents 리스트에 부모들을 추가하는 함수
-        private void InputParents()
+        
+    // PlayerPrefab에 저장되어 있는 Index를 바탕으로 오브젝트를 생성하고
+    // 부위별 파츠를 오브젝트에 장착하는 함수
+    // *teamID: [0]은 블루 / [1]은 오렌지 팀이다.
+    public void CreateObjectWithCustomizing(int pvID, int teamID)
+    {
+        // 임시 변수 선언
+        string temp_Category = "";
+        string temp_DictionaryKey = "";
+        int temp_Index = 0;
+        // Resources.Load<GameObject>(string)으로 프리팹을 검색 후 가져옴
+        GameObject temp_Prefab = Resources.Load<GameObject>(CarTypes[teamID]);
+        // Pos, Rotation 값을 기본으로 플레이어 오브젝트 생성(블루/오렌지)
+        GameObject temp_PlayerObj = Instantiate(temp_Prefab, Vector3.zero,
+           Quaternion.identity);
+        // 오브젝트 이름 설정(BlueCar/OrangeCar)
+        temp_PlayerObj.name = CarTypes[teamID];
+        // categoryList[] 만큼 순회 
+        for (int i = 0; i < categoryList.Length; i++)
         {
-            // 리스트 초기화
-            parents = new List<GameObject>();
-            // 임시 변수 생성
-            GameObject temp_Obj = new GameObject();
-            // 각 카테고리에 있는 부모 오브젝트들을 찾아 parents에 추가
-            for (int i = 0; i < categoryList.Length; i++)
-            {
-                temp_Obj = GameObject.Find(categoryList[i]);
-                if (temp_Obj != null) 
-                { 
-                    parents.Add(temp_Obj);
-                }
-            }
-        } // InputParents()
+            // 임시 변수에 키 & 딕셔너리 키 할당
+            temp_Category = categoryList[i];
+            temp_DictionaryKey = GetKeyForDataDictionary(csvFileList[i]);
+            // 할당된 키로 PlayerPrefab에 저장된 Index 호출
+            temp_Index = GetDataForPlayerPrefab(temp_Category);
+            // 오브젝트 인스턴스 생성 함수 호출, 위에서 생성된 플레이어 오브젝트를 부모로 설정
+            //
+            // 아래 호출 부분에서 딕셔너리 키값을 찾을수없다는 오류발생
+            //Debug.Log("Dictionary Contents: " + dataDictionary[temp_DictionaryKey].Count);
+            //CreateInstantiate(temp_Category, temp_DictionaryKey, temp_Index, temp_PlayerObj);
+        }
+    }
     #endregion
 
     #region [오브젝트 호출 메서드]
@@ -440,13 +461,13 @@ public class CustomizingManager_Choi : MonoBehaviour
         {
           // 트랜스폼 호출
             Vector3 parentPos = parent.transform.position;
-                Vector3 childPos = child.transform.position;
+            Vector3 childPos = child.transform.position;
 
-                // 포지션 보정(부모Pos + 자식Pos)
-                childPos = parentPos + childPos;
+            // 포지션 보정(부모Pos + 자식Pos)
+            childPos = parentPos + childPos;
 
-                // 보정된 포지션 반환
-                return childPos;
+            // 보정된 포지션 반환
+            return childPos;
         } // AdjustChildPosition()
     #endregion
 
@@ -454,9 +475,27 @@ public class CustomizingManager_Choi : MonoBehaviour
     // ##################################################################################################
     // ▶[변수 관리 메서드]
     // ##################################################################################################
-        // dataDictionary 접근용 Key를 반환하는 함수
-        // "PrefabName"으로 한번에 접근하면 접근할 수 없어 foreach로
-        // Key를 찾아서 접근한다.
+        // Parents 리스트에 부모들을 추가하는 함수
+        private void InputParents()
+        {
+            // 리스트 초기화
+            parents = new List<GameObject>();
+            // 임시 변수 생성
+            GameObject temp_Obj = new GameObject();
+            // 각 카테고리에 있는 부모 오브젝트들을 찾아 parents에 추가
+            for (int i = 0; i < categoryList.Length; i++)
+            {
+                temp_Obj = GameObject.Find(categoryList[i]);
+                if (temp_Obj != null)
+                {
+                    parents.Add(temp_Obj);
+                }
+            }
+        } // InputParents()    
+
+          // dataDictionary 접근용 Key를 반환하는 함수
+          // "PrefabName"으로 한번에 접근하면 접근할 수 없어 foreach로
+          // Key를 찾아서 접근한다.
         private string GetKeyForDataDictionary(string category)
         {
             string temp_DataDictionaryKey = "";
@@ -477,7 +516,7 @@ public class CustomizingManager_Choi : MonoBehaviour
             // 키 반환
             return temp_DataDictionaryKey;
         } // GetKeyForDataDictionary()
-    
+        
         // PlayerDataManager_Choi에서 PlayerPrefab을 저장하기 위해
         // 각 카테고리의 파츠 인덱스가 저장된 temp_IndexDictionary를 반환하는 함수
         public Dictionary<string, int> GetIndexDictionary()

@@ -25,8 +25,8 @@ public class PlayerDataManager_Choi : MonoBehaviour
                 return m_instance;
             }
         }
-
-    private Dictionary<string, int> temp_IndexDictionary; // 임시로 플레이어 인덱스를 저장하는 딕셔너리
+        [Header("Temps")]
+        private Dictionary<string, int> temp_IndexDictionary; // 임시로 플레이어 인덱스를 저장하는 딕셔너리
     #endregion
 
     #region [라이프 사이클 메서드]
