@@ -35,7 +35,8 @@ public class CustomizingManager_Choi : MonoBehaviour
     private delegate void CustomizingFunc(); // 델리게이트 정의
 
     [Header("CSVFileReader")]
-    private string defaultDirectory = "CSVFiles/"; // 기본 디렉토리 경로
+    private const string DEFAULT_DIRECTORY = "CSVFiles/"; // 기본 디렉토리 경로
+    private const string DEFAULT_KEY = "PrefabName"; // 기본 프리팹 접근 키 값 
     private string[] csvFileList =
     {
             "CarFrameList", //"FlagList", "MarkList",
@@ -116,7 +117,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         for (int i = 0; i < csvFileList.Length; i++)
         {
             temp_DataDictionary =
-            CSVReader_Choi.instance.ReadCSVFile(defaultDirectory + csvFileList[i]);
+            CSVReader_Choi.instance.ReadCSVFile(DEFAULT_DIRECTORY + csvFileList[i]);
             dataDictionary.Add(categoryList[i], temp_DataDictionary);
         }
     } // ReadCSVFileAndSave()
@@ -153,7 +154,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         // 임시 변수에 플레이어 오브젝트 할당
         GameObject temp_PlayerObj = GetPlayerObject(0);
         string temp_Category = "";
-        string temp_DataDictionaryKey = "";
+        string temp_DataDictionaryKey = DEFAULT_KEY;
         // CSV 파일 갯수 만큼 for문 반복
         for (int i = 0; i < csvFileList.Length; i++)
         {
@@ -212,7 +213,8 @@ public class CustomizingManager_Choi : MonoBehaviour
         // 임시 변수 선언
         string temp_CsvList = "";
         string temp_Category = "";
-        string temp_DictionaryKey = "";
+        // 딕셔너리 키 값 넣기
+        string temp_DictionaryKey = DEFAULT_KEY;
         int temp_Index = 0;
         // Resources.Load<GameObject>(string)으로 프리팹을 검색 후 가져옴
         GameObject temp_Prefab = Resources.Load<GameObject>(CarTypes[teamID]);
@@ -228,7 +230,6 @@ public class CustomizingManager_Choi : MonoBehaviour
         {
             // 임시 변수에 키 & 딕셔너리 키 할당
             temp_Category = categoryList[i];
-            temp_DictionaryKey = GetKeyForDataDictionary(temp_Category);
             // 할당된 키로 PlayerPrefab에 저장된 Index 호출
             temp_Index = GetDataForPlayerPrefab(temp_Category);
             Debug.Log($"가져온 인덱스 {temp_Index}");

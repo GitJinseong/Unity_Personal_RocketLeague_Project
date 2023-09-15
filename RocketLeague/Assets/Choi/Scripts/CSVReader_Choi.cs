@@ -52,7 +52,9 @@ public class CSVReader_Choi : MonoBehaviour
                     foreach (string header in headers)
                     {
                         // dataDictionary에 행 이름을 키 값으로 리스트 추가
-                        dataDictionary.Add(header, new List<string>());
+                        // Trim() 함수를 사용하여 .csv 파일을 읽어올 때 생기는 공백을 제거
+                        dataDictionary.Add(header.Trim(), new List<string>());
+                        Debug.Log($"{header}");
                     }
 
                     // 첫번째 행[0]을 헤더로 사용하고 두 번째[1] 부터 데이터 행으로 사용하기 위해
@@ -65,7 +67,10 @@ public class CSVReader_Choi : MonoBehaviour
                         for (int j = 0; j < values.Length; j++) 
                         {
                             // 헤더 리스트에 값 추가
-                            dataDictionary[headers[j]].Add(values[j]);
+                            // 위에 헤더(행)에서 dataDictionary에 리스트를 추가할 때 공백을 제거했으므로
+                            // 아래에 리스트에 Add를 할 때 마찬가지로 Trim()을 써서 공백이 제거된
+                            // 키 값으로 접근해야 한다.
+                            dataDictionary[headers[j].Trim()].Add(values[j]);
                         }
                     }
                 }
@@ -102,5 +107,4 @@ public class CSVReader_Choi : MonoBehaviour
             Debug.Log(category + ": " + string.Join(", ", values));
         }
     }
-
 }
