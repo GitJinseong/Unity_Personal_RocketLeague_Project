@@ -41,6 +41,10 @@ public class CustomizingSceneController_Choi : MonoBehaviour
         // Start()에서 차량 오브젝트의 회전 함수 호출
         UpdateObjectRotateFromSlider(0.0f);
 
+        // 타이어의 포지션 위치를 재조정 하는 함수 호출
+        // partsListIndexs[0]을 매개변수로 넣어 CarFrames의 현재 인덱스를 보냄
+        CustomizingManager_Choi.instance.AdjustWheelsPosition(partsListIndexs[0]);
+
         // 이벤트 리스너 등록(onValueChanged)
         // 슬라이더 값이 변경될 때 마다 함수가 호출되게 하는 목적
         zoomSlider.onValueChanged.AddListener(UpdateCameraSizeFromSlider);
@@ -178,6 +182,10 @@ public class CustomizingSceneController_Choi : MonoBehaviour
     {
         // CustomizingManager_Choi에서 카테고리와 인덱스로 파츠를 토글하는 함수 호출
         CustomizingManager_Choi.instance.TogglePartForCategory(category, index);
+
+        // 타이어의 포지션 위치를 재조정 하는 함수 호출
+        // partsListIndexs[0]을 매개변수로 넣어 CarFrames의 현재 인덱스를 보냄
+        CustomizingManager_Choi.instance.AdjustWheelsPosition(partsListIndexs[0]);
     }
 
     // ##################################################################################################

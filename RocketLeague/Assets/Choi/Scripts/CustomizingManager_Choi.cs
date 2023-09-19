@@ -59,6 +59,9 @@ public class CustomizingManager_Choi : MonoBehaviour
     private Dictionary<string, int>
     temp_IndexDictionary = new Dictionary<string, int>(); // 인덱스를 저장하는 딕셔너리(플레이어 프리팹 저장 목적)
                                                           // 카테고리를 키 값으로 접근한다.
+
+    [Header("PhotonView")]
+    private int photonViewID = 0; // 추후 포톤뷰 연동시 변경 
     #endregion
 
     #region [라이프 사이클 메서드]
@@ -167,7 +170,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         // 카테고리 임시 변수 생성
         GameObject temp_CategoryObj;
         // 임시 변수에 플레이어 오브젝트 할당
-        GameObject temp_PlayerObj = GetPlayerObject(0);
+        GameObject temp_PlayerObj = GetPlayerObject(photonViewID);
         string temp_Category = "";
         string temp_DataDictionaryKey = DEFAULT_KEY;
         // CSV 파일 갯수 만큼 for문 반복
@@ -408,8 +411,8 @@ public class CustomizingManager_Choi : MonoBehaviour
     // 매개변수로 카테고리를 넣으면 해당 카테고리의 활성화된 오브젝트를 반환
     private GameObject GetCurrentObject(string category)
     {
-        // 부모인 플레이어 오브젝트를 찾음(추후 포톤ID넣어야함)
-        GameObject temp_ParentObj = GetPlayerObject(0);
+        // 부모인 플레이어 오브젝트를 찾음
+        GameObject temp_ParentObj = GetPlayerObject(photonViewID);
         // 카테고리에 해당하는 오브젝트 가져오기
         GameObject temp_CategoryObj = FindChildRescursive(temp_ParentObj.transform, category).gameObject;
         // 카테고리에 있는 활성화된 현재 파츠 오브젝트 가져오기
@@ -453,7 +456,7 @@ public class CustomizingManager_Choi : MonoBehaviour
     private GameObject FindTargetObject(string category, string targetObjName)
     {
         // 플레이어 오브젝트를 가져옴
-        GameObject temp_PlayerObj = GetPlayerObject(0); // 매개변수에 추후 포톤뷰 ID 넣어야함
+        GameObject temp_PlayerObj = GetPlayerObject(photonViewID);
 
         // 현재 파츠를 가져오기 위해 플레이어의 자식인 카테고리 오브젝트를 가져옴
         GameObject temp_CategoryObj = GetChildObject(temp_PlayerObj, category);
@@ -526,40 +529,42 @@ public class CustomizingManager_Choi : MonoBehaviour
     // 매개변수로 받은 인덱스에 해당하는 파츠를 전부 활성화 하는 함수
     private void ToggleAllObejcts(int[] indexs)
     {
-        // 임시 변수 선언
-        string temp_Category = "";
-        string temp_Name = "";
-        int temp_Index = 0;
-        GameObject temp_PlayerObj;
-        GameObject temp_CategoryObj;
-        GameObject temp_TargetObj;
-        GameObject temp_CurrentObj;
-        // temp_PlayerObj에 플레이어 오브젝트 할당
-        // 추후 포톤ID 넣기
-        temp_PlayerObj = GetPlayerObject(0);
+        //// 임시 변수 선언
+        //string temp_Category = "";
+        //string temp_Name = "";
+        //int temp_Index = 0;
+        //GameObject temp_PlayerObj;
+        //GameObject temp_CategoryObj;
+        //GameObject temp_TargetObj;
+        //GameObject temp_CurrentObj;
+        //// temp_PlayerObj에 플레이어 오브젝트 할당
+        //temp_PlayerObj = GetPlayerObject(photonViewID);
         for (int i = 0; i < categoryList.Length; i++)
         {
-            // 임시 변수에 카테고리 키 & 인덱스 할당
-            temp_Category = categoryList[i];
-            temp_Index = indexs[i];
+            // 카테고리와 인덱스를 받아서 파츠를 토글하는 함수 호출
+            TogglePartForCategory(categoryList[i], indexs[i]);
 
-            // 위에 있는 카테고리와 인덱스로 PrefabName 호출
-            temp_Name = GetDataDictionaryForPrefabName(temp_Category, temp_Index);
+            //// 임시 변수에 카테고리 키 & 인덱스 할당
+            //temp_Category = categoryList[i];
+            //temp_Index = indexs[i];
 
-            // 카테고리에 해당하는 타겟 파츠 오브젝트를 가져옴
-            Debug.Log($"타겟 오브젝트명 : {temp_Name}");
-            Debug.Log($"플레이어 이름 : {temp_PlayerObj.name}");
-            temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, temp_Category).gameObject;
-            Debug.Log($"카테고리 오브젝트명 : {temp_CategoryObj.name}");
-            // 카테고리 오브젝트 자식 하위의 타겟 오브젝트를 가져옴
-            temp_TargetObj = FindChildRescursive(temp_CategoryObj.transform, temp_Name).gameObject;
+            //// 위에 있는 카테고리와 인덱스로 PrefabName 호출
+            //temp_Name = GetDataDictionaryForPrefabName(temp_Category, temp_Index);
 
-            // 타겟 오브젝트가 null이 아닐 경우
-            if (temp_TargetObj != null)
-            {
-                // temp_TargetObj를 활성화
-                temp_TargetObj.SetActive(true);
-            }
+            //// 카테고리에 해당하는 타겟 파츠 오브젝트를 가져옴
+            //Debug.Log($"타겟 오브젝트명 : {temp_Name}");
+            //Debug.Log($"플레이어 이름 : {temp_PlayerObj.name}");
+            //temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, temp_Category).gameObject;
+            //Debug.Log($"카테고리 오브젝트명 : {temp_CategoryObj.name}");
+            //// 카테고리 오브젝트 자식 하위의 타겟 오브젝트를 가져옴
+            //temp_TargetObj = FindChildRescursive(temp_CategoryObj.transform, temp_Name).gameObject;
+
+            //// 타겟 오브젝트가 null이 아닐 경우
+            //if (temp_TargetObj != null)
+            //{
+            //    // temp_TargetObj를 활성화
+            //    temp_TargetObj.SetActive(true);
+            //}
 
             //// 카테고리에 해당하는 오브젝트 가져오기
             ////temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, temp_Category).gameObject;
@@ -584,8 +589,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         GameObject temp_CurrentObj;
 
         // temp_PlayerObj에 플레이어 오브젝트 할당
-        // 추후 포톤ID 넣기
-        temp_PlayerObj = GetPlayerObject(0);
+        temp_PlayerObj = GetPlayerObject(photonViewID);
 
         // 카테고리와 인덱스로 PrefabName 호출
         temp_Name = GetDataDictionaryForPrefabName(category, index);
@@ -617,9 +621,61 @@ public class CustomizingManager_Choi : MonoBehaviour
         // 포지션 보정(부모Pos + 자식Pos)
         childPos = parentPos + childPos;
 
+        Debug.Log($"{child.name}변환된Pos: {childPos}");
+
         // 보정된 포지션 반환
         return childPos;
     } // AdjustChildPosition()
+
+    // 휠의 모든 포지션을 보정하는 함수
+    // CarFrames의 리스트에 있는 포지션 값을 가져와서 보정한다.
+    // 매개변수로 현재 CarFrames의 인덱스를 받는다.
+    public void AdjustWheelsPosition(int index)
+    {
+        // 임시 변수 선언
+        float temp_PosX = 0f;
+        float temp_PosY = 0f;
+        float temp_PosZ = 0f;
+        string temp_Key = "";
+        string temp_Category = "CarFrames";
+        GameObject temp_CategoryObj;
+        GameObject temp_PlayerObj;
+        Vector3 temp_Pos;
+        // temp_PlayerObj에 플레이어 오브젝트 할당
+        temp_PlayerObj = GetPlayerObject(photonViewID);
+        // 휠이 categoryList의 index 1번 부터 시작하여 i=1로 설정
+        for (int i = 1; i < categoryList.Length; i++)
+        {
+            // temp_Key에 키 값 할당 
+            temp_Key = categoryList[i] + "_Pos";
+
+            // 플레이어 오브젝트와 카테고리를 매개변수로 
+            // temp_CategoryObj에 카테고리 오브젝트 호출
+            temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, categoryList[i]).gameObject;
+
+            // dataDictionary에서 temp_Key로 포지션 값들을 가져온 후
+            // string -> float으로 변환 & 매개변수로 받은 index로 현재 CarFrames에 접근
+            temp_PosX = float.Parse(dataDictionary[temp_Category][temp_Key + "X"][index]);
+            temp_PosY = float.Parse(dataDictionary[temp_Category][temp_Key + "Y"][index]);
+            temp_PosZ = float.Parse(dataDictionary[temp_Category][temp_Key + "Z"][index]);
+
+            // temp_Pos에 포지션 값 할당
+            temp_Pos = new Vector3(temp_PosX, temp_PosY, temp_PosZ);
+
+            // 가져온 휠 카테고리 오브젝트의 로컬 포지션 변경
+            // 로컬 포지션을 변경해야 부모 오브젝트의 포지션과는 관계 없이 포지션이 설정된다.
+            temp_CategoryObj.transform.localPosition = temp_Pos;
+
+            // 디버그 메세지
+            Debug.Log($"index {index}: 가져온 포지션 값: {temp_CategoryObj.name} " +
+                $"PosX: {dataDictionary[temp_Category][temp_Key + "X"][index]} " +
+                $"PosY: {dataDictionary[temp_Category][temp_Key + "Y"][index]} " +
+                $"PosZ: {dataDictionary[temp_Category][temp_Key + "Z"][index]} ");
+
+            Debug.Log($"index {index}: 변환된 포지션 값: {temp_CategoryObj.name} " +
+                $"Pos: {temp_CategoryObj.transform.localPosition}");
+        }
+    }
     #endregion
 
     #region [변수 관리 메서드]

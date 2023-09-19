@@ -1,2 +1,2 @@
-﻿Index,Name,Info,PrefabName
-0,기본,기본 프레임이다,DefaultCarFrame
+﻿Index,Name,Info,PrefabName,Wheels_FL_PosX,Wheels_FL_PosY,Wheels_FL_PosZ,Wheels_FR_PosX,Wheels_FR_PosY,Wheels_FR_PosZ,Wheels_BL_PosX,Wheels_BL_PosY,Wheels_BL_PosZ,Wheels_BR_PosX,Wheels_BR_PosY,Wheels_BR_PosZ
+0,기본,기본 프레임이다,DefaultCarFrame,-1.4,-0.3,2.4,1.4,-0.3,2.4,-1.5,-0.2,-1.8,1.5,-0.2,-1.8
