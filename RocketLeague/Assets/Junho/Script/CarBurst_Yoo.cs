@@ -1,8 +1,9 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CarBurst_Yoo : MonoBehaviour
+public class CarBurst_Yoo : MonoBehaviourPun
 {
     public NewCar_Yoo myCar;
     public GameObject myCarObject;
@@ -11,16 +12,28 @@ public class CarBurst_Yoo : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //// 포톤 관련 추가
+        //if (!photonView.IsMine)
+        //{
+        //    return;
+        //}
+
         myCar = transform.parent.GetComponentInChildren<NewCar_Yoo>();
         myCarObject = transform.parent.gameObject;
         otherCars = new List<NewCar_Yoo>();
         otherCarObjects = new List<GameObject>();
     }
-
+        
     // Update is called once per frame
     void Update()
     {
-        if(otherCars.Count != 0)
+        //// 포톤 관련 추가
+        //if (!photonView.IsMine)
+        //{
+        //    return;
+        //}
+
+        if (otherCars.Count != 0)
         {
             for(int i = 0; i < otherCars.Count; i++)
             {

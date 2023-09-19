@@ -1,8 +1,9 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CheckCar_Yoo : MonoBehaviour
+public class CheckCar_Yoo : MonoBehaviourPun
 {
     public List<GameObject> cars;
     public GameObject car;
@@ -16,6 +17,12 @@ public class CheckCar_Yoo : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //// 포톤 관련 추가
+        //if (!photonView.IsMine)
+        //{
+        //    return;
+        //}
+
         cars = new List<GameObject>();
         car = null;
         targetCar = null;
@@ -28,6 +35,12 @@ public class CheckCar_Yoo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //// 포톤 관련 추가
+        //if (!photonView.IsMine)
+        //{
+        //    return;
+        //}
+
         if (cars.Count == 0)
         {
             targetCar = null;
@@ -65,11 +78,6 @@ public class CheckCar_Yoo : MonoBehaviour
             targetDir = (targetCar.transform.GetChild(1).position - transform.position).normalized;
             targetRigid = targetCar.transform.GetChild(0).gameObject.GetComponent<Rigidbody>();
         }
-    }
-
-    private void FixedUpdate()
-    {
-
     }
 
     private void OnTriggerEnter(Collider collision)

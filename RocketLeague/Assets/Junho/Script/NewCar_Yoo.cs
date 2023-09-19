@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.U2D;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Photon.Pun;
 
-public class NewCar_Yoo : MonoBehaviour
+public class NewCar_Yoo : MonoBehaviourPun
 {
     public Transform kartNormal;
     public Transform kartModel;
@@ -28,7 +28,7 @@ public class NewCar_Yoo : MonoBehaviour
     private float normalAcceleration;
     private float timeAfterFirstBoost;
     private float useSecondBoostDelay = 0.75f;
-    private bool useSecondBoost;
+    public bool useSecondBoost { get; private set; }
     #endregion
 
     // 아이템 관련 추가
@@ -40,6 +40,15 @@ public class NewCar_Yoo : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //if(photonView.IsMine)
+        //{
+        //    // 부스터 관련 추가
+        //    #region
+        //    booster = GetComponent<CarBooster_Yoo>();
+        //    normalAcceleration = acceleration;
+        //    useSecondBoost = false;
+        //    #endregion
+        //}
         // 부스터 관련 추가
         #region
         booster = GetComponent<CarBooster_Yoo>();
@@ -51,6 +60,12 @@ public class NewCar_Yoo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //// 포톤 관련 추가
+        //if (!photonView.IsMine)
+        //{
+        //    return;
+        //}
+
         Vector3 newposition = new Vector3(sphere.transform.position.x, sphere.transform.position.y - 3.5f, sphere.transform.position.z);
         transform.position = newposition;
         float speedDir = Input.GetAxis("Vertical");
@@ -164,12 +179,14 @@ public class NewCar_Yoo : MonoBehaviour
 
 
         }
-
-
-
     }
     private void FixedUpdate()
     {
+        //// 포톤 관련 추가
+        //if(!photonView.IsMine)
+        //{
+        //    return;
+        //}
 
         sphere.AddForce(kartModel.transform.forward * currentSpeed, ForceMode.Acceleration);
 

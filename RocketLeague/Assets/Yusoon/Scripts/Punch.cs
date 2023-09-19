@@ -5,7 +5,7 @@ using UnityEngine;
 public class Punch : MonoBehaviour
 {
     public Transform target;
-    Rigidbody rb;
+    
     // Start is called before the first frame update
     void Start()
     {

@@ -1,8 +1,9 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CarSkill_Yoo : MonoBehaviour
+public class CarSkill_Yoo : MonoBehaviourPun
 {
     private const float CAR_POWERUP_TIME = 10f;
     private const float CAR_SUDDEN_ACCELERATION_TIME = 8f;
@@ -22,6 +23,12 @@ public class CarSkill_Yoo : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //// 포톤 관련 추가
+        //if (!photonView.IsMine)
+        //{
+        //    return;
+        //}
+
         myCar = GetComponent<NewCar_Yoo>();
         checkCar = GetComponent<CheckCar_Yoo>();
         skill = null;
@@ -37,7 +44,13 @@ public class CarSkill_Yoo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(skill == null)
+        //// 포톤 관련 추가
+        //if (!photonView.IsMine)
+        //{
+        //    return;
+        //}
+
+        if (skill == null)
         {
             timeAfterUseSkill += Time.deltaTime;
         }

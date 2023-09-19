@@ -1,12 +1,7 @@
 
-using JetBrains.Annotations;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
-using static UnityEngine.Rendering.DebugUI;
+
 
 public class CustomizingManager_Choi : MonoBehaviour
 {
@@ -83,22 +78,26 @@ public class CustomizingManager_Choi : MonoBehaviour
 
         // 원하는 오브젝트 가져오기
         // 매개변수로 (카테고리 / 찾을 파츠 오브젝트명) 줘야함
-        Debug.Log($"가져온 오브젝트 파츠명: {FindTargetObject("Wheels_FR", "DefaultWheel_FR").name}");
+        //Debug.Log($"가져온 오브젝트 파츠명: {FindTargetObject("Wheels_FR", "DefaultWheel_FR").name}");
 
         // 현재 파츠 가져오기
-        Debug.Log($"CarFrames의 현재 파츠 가져오기 : {GetCurrentObject("CarFrames").name}");
+        //Debug.Log($"CarFrames의 현재 파츠 가져오기 : {GetCurrentObject("CarFrames").name}");
+
+        // 현재 인덱스 저장
+        //SaveDataForPlayerPrefab();
+
+        // PlayerPrefab에 저장되어 있는 Index 가져오기
+        //GetDataForPlayerPrefab("CarFrames");
+
+        // PlayerPrefab에 저장되어 있는 파츠별 Index 가져온 후
+        // 가져온 Index[]로 전부 토글하는 함수
+        ToggleAllObejcts(GetAllDataForPlayerPrefabs());
 
         // 플레이어의 현재 모든 파츠를 temp_IndexDictionary에 저장
         SaveAllPlayerPartsToTempIndexDictionary();
 
-        // 현재 인덱스 저장
-        SaveDataForPlayerPrefab();
-
-        // PlayerPrefab에 저장되어 있는 Index 가져오기
-        GetDataForPlayerPrefab("CarFrames");
-
         // PlayerPrefab에 저장되어 있는 Index 들을 가져와서 차량 오브젝트 생성 후 파츠 부착하기 
-        CreateObjectWithCustomizing(0, 0);
+        //CreateObjectWithCustomizing(0, 0);
     } // Awake()
     #endregion
 
@@ -140,6 +139,22 @@ public class CustomizingManager_Choi : MonoBehaviour
         // 호출한 Index 값 반환
         return temp_Index;
     } // GetDataForPlayerPrefab()
+
+    // PlayerPrefab에 저장된 모든 인덱스를 호출하고 배열로 반환하는 함수
+    private int[] GetAllDataForPlayerPrefabs()
+    {
+        // 임시로 인덱스를 저장할 배열 생성
+        int[] temp_Indexs = new int[categoryList.Length];
+        // 카테고리 배열 크기 만큼 순회
+        for (int i = 0; i < categoryList.Length; i++)
+        {
+            // temp_Indexs에 플레이어 프리팹에 저장된 인덱스를 추가
+            temp_Indexs[i] = GetDataForPlayerPrefab(categoryList[i]);
+        }
+
+        // 인덱스 배열 반환
+        return temp_Indexs;
+    } // etAllDataForPlayerPrefabs()
     #endregion
 
     #region [오브젝트 생성 메서드]
@@ -188,7 +203,7 @@ public class CustomizingManager_Choi : MonoBehaviour
             // 오브젝트 이름 설정
             temp_Obj.name = temp_Prefab.name;
             // 오브젝트 비활성화
-            temp_Obj.SetActive(true);
+            temp_Obj.SetActive(false);
 
             Debug.Log("CreateInstantiate(): ▶ 오브젝트 인스턴스 생성에 성공하였습니다.");
         }
@@ -204,6 +219,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         }
     } // CreateInstantiate()
 
+    // 모든 파츠 리스트를 순회하는 함수
     // PlayerPrefab에 저장되어 있는 Index를 바탕으로 오브젝트를 생성하고
     // 부위별 파츠를 오브젝트에 장착하는 함수
     // *teamID: [0]은 블루 / [1]은 오렌지 팀이다.
@@ -311,9 +327,28 @@ public class CustomizingManager_Choi : MonoBehaviour
         return null;
     } // FindChildRescursive()
 
+    //// 카테고리에 해당하는 부모 오브젝트를 가져오는 함수
+    //// CarFrames, Wheels와 같은 오브젝트를 가져온다.
+    //private GameObject GetCategoryObject(string category)
+    //{
+    //    // 임시 변수 선언
+    //    GameObject temp_Obj;
+    //    GameObject temp_ParentObj;
+
+    //    // temp_ParentObj에 플레이어 오브젝트 할당
+    //    temp_ParentObj = GetPlayerObject
+
+    //    // temp_ParentObj에 부모 오브젝트를 
+    //    // temp_Obj에 카테고리에 해당하는 오브젝트 할당
+    //    temp_Obj = FindChildRescursive(temp_Parent, category);
+
+
+    //}
+
     // 자식 오브젝트를 가져오는 함수
     private GameObject GetChildObject(GameObject parentObj, string childName)
     {
+        // 임시 변수에 부모 트랜스폼 추가
         Transform temp_ParentTransform = parentObj.transform;
 
         // 재귀 함수를 사용하여 원하는 자식 오브젝트를 찾음
@@ -403,7 +438,7 @@ public class CustomizingManager_Choi : MonoBehaviour
     } // GetCurrentObject()
 
     // 현재 플레이어의 모든 파츠를 가져와서 temp_IndexDictionary에 저장하는 함수
-    private void SaveAllPlayerPartsToTempIndexDictionary()
+    public void SaveAllPlayerPartsToTempIndexDictionary()
     {
         for (int i = 0; i < categoryList.Length; i++)
         {
@@ -487,6 +522,91 @@ public class CustomizingManager_Choi : MonoBehaviour
 
     } //ToggleObject()
 
+    // 최초 실행시 모든 카테고리에 있는 오브젝트 중에
+    // 매개변수로 받은 인덱스에 해당하는 파츠를 전부 활성화 하는 함수
+    private void ToggleAllObejcts(int[] indexs)
+    {
+        // 임시 변수 선언
+        string temp_Category = "";
+        string temp_Name = "";
+        int temp_Index = 0;
+        GameObject temp_PlayerObj;
+        GameObject temp_CategoryObj;
+        GameObject temp_TargetObj;
+        GameObject temp_CurrentObj;
+        // temp_PlayerObj에 플레이어 오브젝트 할당
+        // 추후 포톤ID 넣기
+        temp_PlayerObj = GetPlayerObject(0);
+        for (int i = 0; i < categoryList.Length; i++)
+        {
+            // 임시 변수에 카테고리 키 & 인덱스 할당
+            temp_Category = categoryList[i];
+            temp_Index = indexs[i];
+
+            // 위에 있는 카테고리와 인덱스로 PrefabName 호출
+            temp_Name = GetDataDictionaryForPrefabName(temp_Category, temp_Index);
+
+            // 카테고리에 해당하는 타겟 파츠 오브젝트를 가져옴
+            Debug.Log($"타겟 오브젝트명 : {temp_Name}");
+            Debug.Log($"플레이어 이름 : {temp_PlayerObj.name}");
+            temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, temp_Category).gameObject;
+            Debug.Log($"카테고리 오브젝트명 : {temp_CategoryObj.name}");
+            // 카테고리 오브젝트 자식 하위의 타겟 오브젝트를 가져옴
+            temp_TargetObj = FindChildRescursive(temp_CategoryObj.transform, temp_Name).gameObject;
+
+            // 타겟 오브젝트가 null이 아닐 경우
+            if (temp_TargetObj != null)
+            {
+                // temp_TargetObj를 활성화
+                temp_TargetObj.SetActive(true);
+            }
+
+            //// 카테고리에 해당하는 오브젝트 가져오기
+            ////temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, temp_Category).gameObject;
+
+            //// 카테고리에 해당하는 활성화된 현재 오브젝트를 가져옴
+            //temp_CurrentObj = GetCurrentObject(temp_Category);
+
+            //// 현재 오브젝트의 Active를 false하고 / 타겟 오브젝트를 true함
+            //// currentObj와 TargetObj를 토글
+            //ToggleObject(temp_CurrentObj, temp_TargetObj);
+        }
+    } // ToggleAllObejcts()
+
+    // 카테고리와 인덱스를 받아서 파츠를 토글하는 함수
+    public void TogglePartForCategory(string category, int index)
+    {
+        // 임시 변수 선언
+        string temp_Name = "";
+        GameObject temp_PlayerObj;
+        GameObject temp_CategoryObj;
+        GameObject temp_TargetObj;
+        GameObject temp_CurrentObj;
+
+        // temp_PlayerObj에 플레이어 오브젝트 할당
+        // 추후 포톤ID 넣기
+        temp_PlayerObj = GetPlayerObject(0);
+
+        // 카테고리와 인덱스로 PrefabName 호출
+        temp_Name = GetDataDictionaryForPrefabName(category, index);
+
+        // 카테고리에 해당하는 타겟 파츠 오브젝트를 가져옴
+        Debug.Log($"타겟 오브젝트명 : {temp_Name}");
+        Debug.Log($"플레이어 이름 : {temp_PlayerObj.name}");
+        temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, category).gameObject;
+        Debug.Log($"카테고리 오브젝트명 : {temp_CategoryObj.name}");
+
+        // 카테고리 오브젝트 자식 하위의 타겟 오브젝트를 가져옴
+        temp_TargetObj = FindChildRescursive(temp_CategoryObj.transform, temp_Name).gameObject;
+
+        // 타겟 오브젝트가 null이 아닐 경우
+        if (temp_TargetObj != null)
+        {
+            // temp_TargetObj를 활성화
+            temp_TargetObj.SetActive(true);
+        }
+    } // TogglePartForCategory()
+
     // 부모와 자식간의 포지션을 보정하는 함수
     private Vector3 AdjustChildPosition(GameObject parent, GameObject child)
     {
@@ -524,6 +644,60 @@ public class CustomizingManager_Choi : MonoBehaviour
         }
     } // InputParents()    
 
+    // PlayerDataManager_Choi에서 PlayerPrefab을 저장하기 위해
+    // 각 카테고리의 파츠 인덱스가 저장된 temp_IndexDictionary를 반환하는 함수
+    public Dictionary<string, int> GetIndexDictionary()
+    {
+        // temp_IndexDictionary를 반환
+        return temp_IndexDictionary;
+    }
+
+    // 카테고리와 인덱스로 DataDictionary에 있는 Prefab이름을 가져오는 함수
+    // PlayerPrefab에 저장되어 있는 인덱스로 오브젝트 토글을 하기위해 사용한다
+    private string GetDataDictionaryForPrefabName(string category, int index)
+    {
+        // 임시 변수 선언
+        string temp_Name = "";
+        // 카테고리와 인덱스로 dataDictionary에 있는 PrefabName을 호출
+        temp_Name = dataDictionary[category]["PrefabName"][index];
+        // 가져온 temp_Name 반환
+        return temp_Name;
+    }
+
+    // 카테고리별 최대 인덱스를 배열로 반환하는 함수
+    public int[] GetMaxIndexForCategorys()
+    {
+        // 임시로 7을 넣어 배열 생성
+        int[] temp_MaxIndexs = new int[7];
+
+        // categoryList만큼 순회
+        for (int i = 0; i < categoryList.Length; i++)
+        {
+            // temp_MaxIndexs에 최대 인덱스 저장
+            // Count를 사용할 경우 행이 포함되어 추가로 -1를 해준다.
+            temp_MaxIndexs[i] = dataDictionary[categoryList[i]]["Index"].Count - 1;
+        }
+
+        // maxIndexs 배열 반환
+        return temp_MaxIndexs;
+    }
+    #endregion
+
+    #region [미사용 메서드]
+    // ##################################################################################################
+    // ▶[미사용 메서드]
+    // ##################################################################################################
+    // 델리게이트 호출 함수
+    private void CallDelegateFunc(string funcName)
+    {
+        // 델리게이트 함수 안에 해당하는 함수명이 있는지 확인
+        if (customizingFuncs.ContainsKey(funcName))
+        {
+            CustomizingFunc func = customizingFuncs[funcName];
+            func(); // 함수 호출
+        }
+    } // CallDelegateFunc()
+
     // dataDictionary 접근용 Key를 반환하는 함수
     // "PrefabName"으로 한번에 접근하면 접근할 수 없어 foreach로
     // Key를 찾아서 접근한다.
@@ -547,29 +721,5 @@ public class CustomizingManager_Choi : MonoBehaviour
         // 키 반환
         return temp_DataDictionaryKey;
     } // GetKeyForDataDictionary()
-
-    // PlayerDataManager_Choi에서 PlayerPrefab을 저장하기 위해
-    // 각 카테고리의 파츠 인덱스가 저장된 temp_IndexDictionary를 반환하는 함수
-    public Dictionary<string, int> GetIndexDictionary()
-    {
-        // temp_IndexDictionary를 반환
-        return temp_IndexDictionary;
-    }
-    #endregion
-
-    #region [미사용 메서드]
-    // ##################################################################################################
-    // ▶[미사용 메서드]
-    // ##################################################################################################
-    // 델리게이트 호출 함수
-    private void CallDelegateFunc(string funcName)
-    {
-        // 델리게이트 함수 안에 해당하는 함수명이 있는지 확인
-        if (customizingFuncs.ContainsKey(funcName))
-        {
-            CustomizingFunc func = customizingFuncs[funcName];
-            func(); // 함수 호출
-        }
-    } // CallDelegateFunc()
     #endregion
 }

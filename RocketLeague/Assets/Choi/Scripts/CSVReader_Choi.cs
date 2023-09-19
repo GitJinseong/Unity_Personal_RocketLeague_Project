@@ -70,7 +70,8 @@ public class CSVReader_Choi : MonoBehaviour
                             // 위에 헤더(행)에서 dataDictionary에 리스트를 추가할 때 공백을 제거했으므로
                             // 아래에 리스트에 Add를 할 때 마찬가지로 Trim()을 써서 공백이 제거된
                             // 키 값으로 접근해야 한다.
-                            dataDictionary[headers[j].Trim()].Add(values[j]);
+                            // Info를 현재 사용안하므로 values도 Trim()을 사용하여 공백 제거
+                            dataDictionary[headers[j].Trim()].Add(values[j].Trim());
                         }
                     }
                 }

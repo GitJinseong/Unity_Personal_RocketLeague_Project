@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Photon.Pun;
 
-public class BoostUI_Yoo : MonoBehaviour
+public class BoostUI_Yoo : MonoBehaviourPun
 {
     public float boost { get; private set; }
 
@@ -13,7 +14,7 @@ public class BoostUI_Yoo : MonoBehaviour
     private Image boostImage;
     // Start is called before the first frame update
     void Start()
-    {
+    { 
         boostImage = transform.GetChild(1).GetComponent<Image>();
         boostText = transform.GetChild(2).transform.GetChild(0).GetComponent<TMP_Text>();
     }
