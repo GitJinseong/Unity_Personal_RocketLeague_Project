@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 public class RumbleMatch : MonoBehaviour
 {
+    GameObject a;
     // Start is called before the first frame update
     void Start()
     {

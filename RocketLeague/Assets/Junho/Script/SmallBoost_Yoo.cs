@@ -1,10 +1,12 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SmallBoost_Yoo : MonoBehaviour
+public class SmallBoost_Yoo : MonoBehaviourPun
 {
     private CarBooster_Yoo carBooster;
+    private Collider boostCollider;
     private float regenTime;
     private float timeAfterUse;
 
@@ -12,14 +14,20 @@ public class SmallBoost_Yoo : MonoBehaviour
     void Start()
     {
         gameObject.transform.localScale = Vector3.zero;
+        boostCollider = GetComponent<Collider>();
         regenTime = 10f;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+
         // 부스터의 스케일이 0이라면
-        if(gameObject.transform.localScale == Vector3.zero)
+        if (gameObject.transform.localScale == Vector3.zero)
         {
             // 사용후의 시간을 증가시킴
             timeAfterUse += Time.deltaTime;
@@ -28,7 +36,11 @@ public class SmallBoost_Yoo : MonoBehaviour
             if(timeAfterUse >= regenTime)
             {
                 // 부스터의 스케일을 2,2,2로 초기화 후 사용후의 시간 0으로 초기화
-                gameObject.transform.localScale = Vector3.one * 2;
+                DoScaleOn();
+
+                //gameObject.transform.localScale = Vector3.one * 2;
+
+                //boostCollider.enabled = true;
                 //Debug.Log("작부 생성완료");
                 timeAfterUse = 0;
             }
@@ -48,8 +60,41 @@ public class SmallBoost_Yoo : MonoBehaviour
 
                 carBooster.AddBoost(12);
 
-                gameObject.transform.localScale = Vector3.zero;
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    DoScaleOff();
+                }
+
+                //gameObject.transform.localScale = Vector3.zero;
+
+                //boostCollider.enabled = false;
             }
         }
+    }
+
+    [PunRPC]
+    void ScaleOff()
+    {
+        gameObject.transform.localScale = Vector3.zero;
+
+        boostCollider.enabled = false;
+    }
+
+    [PunRPC]
+    void ScaleOn()
+    {
+        gameObject.transform.localScale = Vector3.one * 2;
+
+        boostCollider.enabled = true;
+    }
+
+    void DoScaleOn()
+    {
+        photonView.RPC("ScaleOn", RpcTarget.AllBuffered);
+    }
+
+    void DoScaleOff()
+    {
+        photonView.RPC("ScaleOff", RpcTarget.AllBuffered);
     }
 }

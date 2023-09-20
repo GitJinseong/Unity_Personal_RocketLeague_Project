@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
-public class GameManager : MonoBehaviourPunCallbacks,IPunObservable
+using Unity.VisualScripting;
+
+public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
     public static GameManager instance
     {
@@ -21,50 +23,45 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunObservable
         }
     }
 
-    private static GameManager m_instance;   // 싱글톤이 할당될 static 변수
+    public static GameManager m_instance;   // 싱글톤이 할당될 static 변수
 
-    public GameObject ballPrefab;
-    public GameObject ballAuraPf;
-    public GameObject ballObject;
-    public GameObject ballAura;
-    public GameObject blueCar;
-    public GameObject orangeCar;
-    public Rigidbody ballRb;
-    public Transform ballSpawnTransform;
-    public Transform[] blueCarSpawner;
-    public Transform[] orangeCarSpawner;
-    public Transform blueSpawnPoint;
-    public Transform orangeSpawnPoint;
-
-    public int blueSpawnCheck = default;
-    public int orangeSpawnCheck = default;
-    public int gameMaxPlayers = default;
-    public int playerTeamCheck = default;
-    public TMP_Text blueScoreText;
-    public TMP_Text orangeScoreText;
+    public GameObject ballPrefab;   // 축구공을 생성할 축구공 프리팹
+    public GameObject ballAuraPf;   // 축구공 표식을 생성할 축구공 표식 프리팹
+    public GameObject blueCar;   // 블루팀 RC 카 생성할 프리팹
+    public GameObject orangeCar;   // 오렌지팀 RC 카 생성할 프리팹
+    public Transform ballSpawnTransform;   // 축구공을 생성할 구역
+    public Transform[] blueCarSpawner;   // 블루팀 RC 카를 생성할 구역
+    public Transform[] orangeCarSpawner;   // 오렌지팀 RC 카를 생성할 구역
+    public TMP_Text blueScoreText;   // 블루팀 스코어 텍스트
+    public TMP_Text orangeScoreText;   // 오렌지팀 스코어 텍스트
     public TMP_Text currentTimerText;
 
-    public int blueScore;
-    public int orangeScore;
+    public int blueScore;   // 블루팀 골 스코어
+    public int orangeScore;   // 오렌지팀 골 스코어
+    public bool isGoaled = false;   // 현재 골 성공 상태인지 체크
 
-    public int playerCount = default;
-    public bool isGoaled = false;
-    public int[] score = new int[2];
- 
+    private GameObject ballOj;   // 축구공 오브젝트
+    private Rigidbody ballRb;   // 축구공 리짓바디
+    private Transform blueSpawnPoint;   // 플레이어가 RC 카를 생성할 블루팀 포인트 구역
+    private Transform orangeSpawnPoint;   // 플레이어가 RC 카를 생성할 오렌지팀 포인트 구역
+
+    private int playerCount = default;   // 룸에 참여중인 플레이어 수
+
     void Awake()
     {
-        playerCount = PhotonNetwork.PlayerList.Length;
-        score[0] = 0;
-        score[1] = 0;
+        playerCount = PhotonNetwork.PlayerList.Length;   // 포톤 서버에 접속한 플레이어 수만큼 플레이어 수로 지정해준다
     }
 
     void Start()
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            ballObject = PhotonNetwork.Instantiate(ballPrefab.name, ballSpawnTransform.position, Quaternion.identity);
-            ballAura = PhotonNetwork.Instantiate(ballAuraPf.name, new Vector3(0f, 1.6f, 0f), Quaternion.Euler(90f, 0f, 0f));
-            ballRb = ballObject.GetComponent<Rigidbody>();
+               // 마스터 클라이언트 일시 축구공 프리팹을 불러와 축구공 오브젝트를 생성한다
+            ballOj = PhotonNetwork.Instantiate(ballPrefab.name, ballSpawnTransform.position, Quaternion.identity);
+               // 축구공 표식 오브젝트도 프리팹을 불러와 오브젝트를 생성한다
+            PhotonNetwork.Instantiate(ballAuraPf.name, new Vector3(0f, 1.6f, 0f), Quaternion.Euler(90f, 0f, 0f));
+
+            ballRb = ballOj.GetComponent<Rigidbody>();   // 축구공 리짓바디를 변수로 저장한다
         }
 
         if (playerCount % 2 == 0)
@@ -105,47 +102,28 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunObservable
         playerCount = PhotonNetwork.PlayerList.Length;
     }
 
-    public void GoalTeam1(int newScore)   // 1팀이 2팀의 골대에 골을 넣었을때 실행
+    void Update()
     {
-        score[0] += newScore;   // 1팀의 score 에 1 점을 더해준다
-
-        ResetGame();
-
-        //ball.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        //ball.GetComponent<Rigidbody>().rotation = Quaternion.identity;
-        //ball.gameObject.SetActive(false);
-        //StartCoroutine(GameResetWaitTime());   // 골을 넣은 후 잠시 딜레이 시간을 주는 함수를 실행한다
-    }
-
-    public void GoalTeam2(int newScore)   // 2팀이 1팀의 골대에 골을 넣었을때 실행
-    {
-        score[1] += newScore;   // 2팀의 score 에 1 점을 더해준다
-
-        ResetGame();
-
-        //ballObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        //ballObject.GetComponent<Rigidbody>().rotation = Quaternion.identity;
-        //ballObject.gameObject.SetActive(false);
-        //StartCoroutine(GameResetWaitTime());   // 골을 넣은 후 잠시 딜레이 시간을 주는 함수를 실행한다
+        //* fix : score system *//
     }
 
     public void ResetGame()
     {
-        ballObject.SetActive(false);
+        ballOj.SetActive(false);
         ballRb.velocity = Vector3.zero;
         ballRb.angularVelocity = Vector3.zero;
-        ballObject.transform.position = ballSpawnTransform.position;
+        ballOj.transform.position = ballSpawnTransform.position;
 
         StartCoroutine(ResetGameDelay());
-        //* add : goalEffect *//
-        
+
+        //* fix : goalEffect *//
     }
 
     IEnumerator ResetGameDelay()
     {
         yield return new WaitForSeconds(3f);
 
-        ballObject.SetActive(true);
+        ballOj.SetActive(true);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -156,33 +134,43 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunObservable
     [PunRPC]
     public void AddBlueScore()
     {
-        blueScore+=1;
+        blueScore += 1;
+        photonView.RPC("UpdateScore", RpcTarget.All, blueScore, orangeScore);
     }
 
     [PunRPC]
     public void AddOrangeScore()
     {
-        orangeScore+=1;
+        orangeScore += 1;
+        photonView.RPC("UpdateScore", RpcTarget.All, blueScore, orangeScore);
     }
 
     public void OrangeScoreUp()
     {
-        photonView.RPC("AddOrangeScore", RpcTarget.AllBuffered);
+        photonView.RPC("AddOrangeScore", RpcTarget.MasterClient);
     }
 
     public void BlueScoreUp()
     {
-        photonView.RPC("AddBlueScore", RpcTarget.AllBuffered);
-
+        photonView.RPC("AddBlueScore", RpcTarget.MasterClient);
     }
 
+    [PunRPC]
+    public void UpdateScore(int _blueScore, int _orangeScore)
+    {
+        blueScore = _blueScore;
+        orangeScore = _orangeScore;
 
-  
+        blueScoreText.text = string.Format("{0}", blueScore);
+        orangeScoreText.text = string.Format("{0}", orangeScore);
+    }
+
+    [PunRPC]
     public void BallRespawn()
     {
         photonView.RPC("BallSpawn", RpcTarget.MasterClient);
-
     }
+
     [PunRPC]
     private void BallSpawn()
     {
@@ -191,7 +179,6 @@ public class GameManager : MonoBehaviourPunCallbacks,IPunObservable
             PhotonNetwork.Instantiate(ballPrefab.name, ballSpawnTransform.position, Quaternion.identity);
         }
     }
-
 
     // 주기적으로 자동 실행되는, 동기화 메서드
     //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PhotonServerSettings
   m_EditorClassIdentifier: 
   AppSettings:
-    AppIdRealtime: b6f7ae22-1bd1-4733-9c11-ec442295089d
+    AppIdRealtime: c0924388-b08f-42be-b44d-c286feccecf5
     AppIdFusion: 
     AppIdChat: 
     AppIdVoice: 
@@ -59,6 +59,15 @@ MonoBehaviour:
   - AddOrangeScore
   - BallSpawn
   - ShootForce
+  - OneBoostOn
+  - TwoBoostOff
+  - TwoBoostOn
+  - ScaleOff
+  - ScaleOn
+  - BallRespawn
+  - ChangeAura
+  - UpdateAura
+  - UpdateScore
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

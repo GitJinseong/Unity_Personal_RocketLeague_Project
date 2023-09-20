@@ -34,12 +34,12 @@ public class CustomizingManager_Choi : MonoBehaviour
     private const string DEFAULT_KEY = "PrefabName"; // 기본 프리팹 접근 키 값 
     private string[] csvFileList =
     {
-            "CarFrameList", //"FlagList", "MarkList",
+            "CarFrameList", "FlagList", "MarkList",
             "WheelList_FL", "WheelList_FR", "WheelList_BL", "WheelList_BR"
         }; // CSV 파일명 리스트
     private string[] categoryList =
     {
-            "CarFrames", //"Flags", "Marks",
+            "CarFrames", "Flags", "Marks",
             "Wheels_FL", "Wheels_FR", "Wheels_BL", "Wheels_BR"
         };
     private Dictionary<string, List<string>> temp_DataDictionary; // CSV 파일 임시 저장용 딕셔너리
@@ -53,7 +53,7 @@ public class CustomizingManager_Choi : MonoBehaviour
     private List<GameObject> parents; // 부모들을 관리하는 리스트
 
     [Header("PlayerPrefab")]
-    private string[] CarTypes = { "BlueCar", "OrangeCar" }; // CreateObjectWithCustomizing()에서 플레이어
+    private string[] CarTypes = { "CustomizingCar", "OrangeCar" }; // CreateObjectWithCustomizing()에서 플레이어
                                                             // 오브젝트를 생성할 때 호출되는 배열 
                                                             // Resource 폴더에 같은 이름의 프리팹 생성해야함
     private Dictionary<string, int>
@@ -100,7 +100,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         SaveAllPlayerPartsToTempIndexDictionary();
 
         // PlayerPrefab에 저장되어 있는 Index 들을 가져와서 차량 오브젝트 생성 후 파츠 부착하기 
-        //CreateObjectWithCustomizing(0, 0);
+        CreateObjectWithCustomizing(0, 0);
     } // Awake()
     #endregion
 
@@ -139,16 +139,25 @@ public class CustomizingManager_Choi : MonoBehaviour
         // PlayerPrefab에 저장된 인덱스를 키값으로 호출
         int temp_Index = PlayerDataManager_Choi.instance.GetPlayerPrefForIndex(key);
 
+        // 가져온 인덱스가 -1일 경우
+        // (인덱스를 가져오지 못했을 경우)
+        if (temp_Index == -1)
+        {
+            // 오류 해결을 위해 강제로 0으로 변환
+            temp_Index = 0;
+        }
+
         // 호출한 Index 값 반환
         return temp_Index;
     } // GetDataForPlayerPrefab()
 
     // PlayerPrefab에 저장된 모든 인덱스를 호출하고 배열로 반환하는 함수
-    private int[] GetAllDataForPlayerPrefabs()
+    public int[] GetAllDataForPlayerPrefabs()
     {
         // 임시로 인덱스를 저장할 배열 생성
         int[] temp_Indexs = new int[categoryList.Length];
         // 카테고리 배열 크기 만큼 순회
+        // 임시로 categoryList.Length -> 7로 사용
         for (int i = 0; i < categoryList.Length; i++)
         {
             // temp_Indexs에 플레이어 프리팹에 저장된 인덱스를 추가
@@ -263,7 +272,7 @@ public class CustomizingManager_Choi : MonoBehaviour
             temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, temp_Category).gameObject;
             // 카테고리, 딕셔너리키, 인덱스, 카테고리 오브젝트를 사용하여 인스턴스를 생성한다.
             // 해당하는 카테고리 오브젝트의 자식으로 파츠가 생성된다.
-            CreateInstantiate(temp_Category, temp_DictionaryKey, 0, temp_CategoryObj);
+            CreateInstantiate(temp_Category, temp_DictionaryKey, temp_Index, temp_CategoryObj);
         }
     }
     #endregion
@@ -542,7 +551,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         for (int i = 0; i < categoryList.Length; i++)
         {
             // 카테고리와 인덱스를 받아서 파츠를 토글하는 함수 호출
-            TogglePartForCategory(categoryList[i], indexs[i]);
+            TogglePartForCategory(categoryList[i], indexs[i], false);
 
             //// 임시 변수에 카테고리 키 & 인덱스 할당
             //temp_Category = categoryList[i];
@@ -579,7 +588,7 @@ public class CustomizingManager_Choi : MonoBehaviour
     } // ToggleAllObejcts()
 
     // 카테고리와 인덱스를 받아서 파츠를 토글하는 함수
-    public void TogglePartForCategory(string category, int index)
+    public void TogglePartForCategory(string category, int index, bool isToggle)
     {
         // 임시 변수 선언
         string temp_Name = "";
@@ -603,11 +612,26 @@ public class CustomizingManager_Choi : MonoBehaviour
         // 카테고리 오브젝트 자식 하위의 타겟 오브젝트를 가져옴
         temp_TargetObj = FindChildRescursive(temp_CategoryObj.transform, temp_Name).gameObject;
 
+        // 카테고리에 해당하는 현재 파츠를 가져옴
+        temp_CurrentObj = GetCurrentObject(category);
+
         // 타겟 오브젝트가 null이 아닐 경우
         if (temp_TargetObj != null)
         {
-            // temp_TargetObj를 활성화
-            temp_TargetObj.SetActive(true);
+            // 만약 isToggle이 true일 경우
+            if (isToggle)
+            {
+                // 장비 교체를 위해 temp_TargetObj를 활성화 하고 기존 오브젝트를
+                // 비활성화하는 토글 함수 호출
+                ToggleObject(temp_CurrentObj, temp_TargetObj);
+            }
+
+            // 아닐 경우
+            else
+            {
+                // 타겟 오브젝트를 활성화
+                temp_TargetObj.SetActive(true);
+            }
         }
     } // TogglePartForCategory()
 
@@ -643,8 +667,8 @@ public class CustomizingManager_Choi : MonoBehaviour
         Vector3 temp_Pos;
         // temp_PlayerObj에 플레이어 오브젝트 할당
         temp_PlayerObj = GetPlayerObject(photonViewID);
-        // 휠이 categoryList의 index 1번 부터 시작하여 i=1로 설정
-        for (int i = 1; i < categoryList.Length; i++)
+        // 휠이 categoryList의 index 3번 부터 시작하여 i=1로 설정
+        for (int i = 3; i < categoryList.Length; i++)
         {
             // temp_Key에 키 값 할당 
             temp_Key = categoryList[i] + "_Pos";
@@ -715,6 +739,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         // 임시 변수 선언
         string temp_Name = "";
         // 카테고리와 인덱스로 dataDictionary에 있는 PrefabName을 호출
+        Debug.Log($"이름:{category} 인덱스: {index}");
         temp_Name = dataDictionary[category]["PrefabName"][index];
         // 가져온 temp_Name 반환
         return temp_Name;

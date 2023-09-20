@@ -1,97 +1,171 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
-    private string gameVersion = default;   // °ÔÀÓ ¹öÀü
+    private string gameVersion = default;   // ê²Œì„ ë²„ì „
 
-    public Text connectionInfoText;   // ³×Æ®¿öÅ© Á¤º¸¸¦ Ç¥½ÃÇÒ ÅØ½ºÆ®
-    public Button joinButton;   // ·ë Á¢¼Ó ¹öÆ°
+    public Text connectionInfoText;   // ë„¤íŠ¸ì›Œí¬ ì •ë³´ë¥¼ í‘œì‹œí•  í…ìŠ¤íŠ¸
+    public Button joinButton;   // ë£¸ ì ‘ì† ë²„íŠ¼
     public GameObject playButtons;
     public GameObject gameModeButtons;
+    public int gameMode;
+    const int STANDARD = 0;
+    const int DOUBLE = 1;
+    const int RUMBLE = 2;
+    string gameModeStr;
+
     void Awake()
     {
-        gameVersion = "0.1.1";   // °ÔÀÓ ¹öÀü °ª
+        gameVersion = "0.1.1";   // ê²Œì„ ë²„ì „ ê°’
     }
 
-       // °ÔÀÓ ½ÇÇà°ú µ¿½Ã¿¡ ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ½Ãµµ
+       // ê²Œì„ ì‹¤í–‰ê³¼ ë™ì‹œì— ë§ˆìŠ¤í„° ì„œë²„ ì ‘ì† ì‹œë„
     private void Start()
     {
-           // Á¢¼Ó¿¡ ÇÊ¿äÇÑ Á¤º¸ ¼³Á¤
+           // ì ‘ì†ì— í•„ìš”í•œ ì •ë³´ ì„¤ì •
         PhotonNetwork.GameVersion = gameVersion;
-           // ¼³Á¤ÇÑ Á¤º¸·Î ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ½Ãµµ
+           // ì„¤ì •í•œ ì •ë³´ë¡œ ë§ˆìŠ¤í„° ì„œë²„ ì ‘ì† ì‹œë„
         PhotonNetwork.ConnectUsingSettings();
 
-           // ·ë Á¢¼Ó ¹öÆ° Àá½Ã ºñÈ°¼ºÈ­
+           // ë£¸ ì ‘ì† ë²„íŠ¼ ì ì‹œ ë¹„í™œì„±í™”
         joinButton.interactable = false;
-           // Á¢¼Ó ½Ãµµ Áß ÀÓÀ» ÅØ½ºÆ®·Î Ç¥½Ã
+           // ì ‘ì† ì‹œë„ ì¤‘ ì„ì„ í…ìŠ¤íŠ¸ë¡œ í‘œì‹œ
         connectionInfoText.text = "Connect to master server ...";
     }      // Start()
 
-       // ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ¼º°ø½Ã ÀÚµ¿ ½ÇÇà
+       // ë§ˆìŠ¤í„° ì„œë²„ ì ‘ì† ì„±ê³µì‹œ ìë™ ì‹¤í–‰
     public override void OnConnectedToMaster()
     {
-           // ·ë Á¢¼Ó ¹öÆ° È°¼ºÈ­
+           // ë£¸ ì ‘ì† ë²„íŠ¼ í™œì„±í™”
         joinButton.interactable = true;
-           // Á¢¼Ó Á¤º¸ Ç¥½Ã
+           // ì ‘ì† ì •ë³´ í‘œì‹œ
         connectionInfoText.text = "Online: connected to master server succed";
     }      // OnConnectedToMaster()
 
-       // ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ½ÇÆĞ½Ã ÀÚµ¿ ½ÇÇà
+       // ë§ˆìŠ¤í„° ì„œë²„ ì ‘ì† ì‹¤íŒ¨ì‹œ ìë™ ì‹¤í–‰
     public override void OnDisconnected(DisconnectCause cause)
     {
-           // ·ë Á¢¼Ó ¹öÆ° ºñÈ°¼ºÈ­
+           // ë£¸ ì ‘ì† ë²„íŠ¼ ë¹„í™œì„±í™”
         joinButton.interactable = false;
-           // ·ë Á¢¼Ó Á¤º¸ Ç¥½Ã
+           // ë£¸ ì ‘ì† ì •ë³´ í‘œì‹œ
         connectionInfoText.text = string.Format("{0}\n{1}", "offline: Disconnected to master server", "Retry connect now ...");
-           // ¸¶½ºÅÍ ¼­¹ö·ÎÀÇ ÀçÁ¢¼Ó ½Ãµµ
+           // ë§ˆìŠ¤í„° ì„œë²„ë¡œì˜ ì¬ì ‘ì† ì‹œë„
         PhotonNetwork.ConnectUsingSettings();
     }      // OnDisconnected ()
 
-       // ·ë Á¢¼Ó ½Ãµµ
+
+
+    public void StandardMode()
+    {
+        gameMode= STANDARD;
+        Connect();
+    }
+    public void DoubleMode()
+    {
+        gameMode = DOUBLE;
+        Connect();
+    }
+
+    public void RumbleMode()
+    {
+        gameMode=RUMBLE;
+        Connect();
+    }
+
+       // ë£¸ ì ‘ì† ì‹œë„
     public void Connect()
     {
-           // Áßº¹ Á¢¼Ó ½Ãµµ¸¦ ¸·±â À§ÇØ Á¢¼Ó ¹öÆ° Àá½Ã ºñÈ°¼ºÈ­
+           // ì¤‘ë³µ ì ‘ì† ì‹œë„ë¥¼ ë§‰ê¸° ìœ„í•´ ì ‘ì† ë²„íŠ¼ ì ì‹œ ë¹„í™œì„±í™”
         joinButton.interactable = false;
 
-           // ¸¶½ºÅÍ ¼­¹ö¿¡ Á¢¼Ó ÁßÀÌ¶ó¸é
+        // ë§ˆìŠ¤í„° ì„œë²„ì— ì ‘ì† ì¤‘ì´ë¼ë©´
         if (PhotonNetwork.IsConnected)
         {
-               // ·ë Á¢¼Ó ½ÇÇà
+            // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            RoomOptions roomOptions = new RoomOptions
+            {
+                MaxPlayers = 4, // ìµœëŒ€ í”Œë ˆì´ì–´ ìˆ˜ ì¡°ì •
+                IsOpen = true, // ë°© ì—´ê¸°
+                IsVisible = true, // ë°© í‘œì‹œí•˜ê¸°
+                CustomRoomProperties = new ExitGames.Client.Photon.Hashtable
+            {
+                { "GameMode", gameMode } // ê²Œì„ ëª¨ë“œë¥¼ ë°© ì†ì„±ìœ¼ë¡œ ì„¤ì •
+            }
+            };
+            switch(gameMode)
+            {
+                case STANDARD:
+                    gameModeStr="Standard";
+                    break;
+                    case DOUBLE:
+                    gameModeStr="Double";
+
+                    break;
+                case RUMBLE:
+                    gameModeStr="Rumble";
+
+                    break;
+                    default:
+                    break;
+
+            }
             connectionInfoText.text = "Connect to Room ...";
-            PhotonNetwork.JoinRandomRoom();
+            PhotonNetwork.JoinOrCreateRoom(gameModeStr, roomOptions,TypedLobby.Default);
         }
         else
         {
-               // ¸¶½ºÅÍ ¼­¹ö¿¡ Á¢¼Ó ÁßÀÌ ¾Æ´Ï¶ó¸é ¸¶½ºÅÍ ¼­¹ö¿¡ Á¢¼Ó ½Ãµµ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´Ï¶ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½
             connectionInfoText.text = string.Format("{0}\n{1}", "offline: Disconnected to master server", "Retry connect now ...");
-            PhotonNetwork.ConnectUsingSettings();
         }
     }   // Connect()
 
-       // (ºó ¹æÀÌ ¾ø¾î)·£´ı ·ë Âü°¡¿¡ ½ÇÆĞÇÑ °æ¿ì ÀÚµ¿ ½ÇÇà
+       // (ë¹ˆ ë°©ì´ ì—†ì–´)ëœë¤ ë£¸ ì°¸ê°€ì— ì‹¤íŒ¨í•œ ê²½ìš° ìë™ ì‹¤í–‰
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-           // Á¢¼Ó »óÅÂ Ç¥½Ã
+           // ì ‘ì† ìƒíƒœ í‘œì‹œ
         connectionInfoText.text = "Nothing to empty room, Create new room ...";
-           // ÃÖ´ë 6¸í ¼ö¿ë °¡´ÉÇÑ ºó ¹æ »ı¼º
-        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 4 });
+           // ï¿½Ö´ï¿½ 6ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 6 });
     }      // OnJoinRandomFailed()
 
+   
 
-
-       // ·ë¿¡ Âü°¡ ¿Ï·áµÈ °æ¿ì ÀÚµ¿ ½ÇÇà
+       // ë£¸ì— ì°¸ê°€ ì™„ë£Œëœ ê²½ìš° ìë™ ì‹¤í–‰
     public override void OnJoinedRoom()
     { 
-            // Á¢¼Ó »óÅÂ Ç¥½Ã
+            // ì ‘ì† ìƒíƒœ í‘œì‹œ
         connectionInfoText.text = "Successes joined room";
-        PhotonNetwork.LeaveLobby();   // Lobby ¾ÀÀ» ¶°³ª´Â ÇÔ¼ö ½ÇÇà
-        // ÇÃ·¹ÀÌ ¹öÆ°À» ´©¸£¸é °ÔÀÓ ·ë ¾ÀÀ¸·Î ÀÌµ¿
-        PhotonNetwork.LoadLevel("StandardScene");
-    }      // OnJoinedRoom()
+        PhotonNetwork.LeaveLobby();   // Lobby ì”¬ì„ ë– ë‚˜ëŠ” í•¨ìˆ˜ ì‹¤í–‰
+        // í”Œë ˆì´ ë²„íŠ¼ì„ ëˆ„ë¥´ë©´ ê²Œì„ ë£¸ ì”¬ìœ¼ë¡œ ì´ë™
+        if(gameMode == STANDARD)
+        {
 
+        PhotonNetwork.LoadLevel("StandardScene");
+        }
+        if(gameMode==RUMBLE)
+        {
+            PhotonNetwork.LoadLevel("RumbleScene");
+        }
+    }      // OnJoinedRoom()
+    private void CreateRoom(string roomName)
+    {
+        RoomOptions roomOptions = new RoomOptions
+        {
+            MaxPlayers = 4, // ìµœëŒ€ í”Œë ˆì´ì–´ ìˆ˜ ì¡°ì •
+            IsOpen = true, // ë°© ì—´ê¸°
+            IsVisible = true, // ë°© í‘œì‹œí•˜ê¸°
+            CustomRoomProperties = new ExitGames.Client.Photon.Hashtable
+            {
+                { "GameMode", gameMode } // ê²Œì„ ëª¨ë“œë¥¼ ë°© ì†ì„±ìœ¼ë¡œ ì„¤ì •
+            }
+        };
+
+        // ë°© ìƒì„± ì‹œë„
+        PhotonNetwork.CreateRoom(roomName, roomOptions);
+    }
     public void MatchButtonActive()
     {
         playButtons.SetActive(false);

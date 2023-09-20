@@ -14,7 +14,7 @@ public class NewCar_Yoo : MonoBehaviourPun
     public LayerMask layerMask;
     public LayerMask fieldMask;
 
-    int jumpCount = 0;
+    //int jumpCount = 0;
     bool drifting = false;
     float speed;
     public float currentSpeed;
@@ -50,6 +50,7 @@ public class NewCar_Yoo : MonoBehaviourPun
         //    #endregion
         //}
         // 부스터 관련 추가
+
         #region
         booster = GetComponent<CarBooster_Yoo>();
         normalAcceleration = acceleration;
@@ -258,7 +259,7 @@ public class NewCar_Yoo : MonoBehaviourPun
 
         if (collision.gameObject.tag.Equals("field"))
         {
-            jumpCount = 0;
+            //jumpCount = 0;
         }
     }
     private void OnCollisionStay(Collision collision)

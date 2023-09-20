@@ -22,17 +22,31 @@ public class NewCar : MonoBehaviourPunCallbacks
     public Rigidbody sphere;
     public bool outOfControl = false;
     private bool isNotControl=false;
-  
+
+    // 부스터 관련 추가
+    #region
+    private CarBooster_Yoo booster;
+    private float normalAcceleration;
+    private float timeAfterFirstBoost;
+    private float useSecondBoostDelay = 0.75f;
+    public bool useSecondBoost { get; private set; }
+    #endregion
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        // 부스터 관련 추가
+        #region
+        booster = GetComponent<CarBooster_Yoo>();
+        normalAcceleration = acceleration;
+        useSecondBoost = false;
+        #endregion
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(photonView.IsMine==false)
+        if (photonView.IsMine == false)
         {
             return;
         }
@@ -47,8 +61,45 @@ public class NewCar : MonoBehaviourPunCallbacks
                 StartCoroutine(ControlTimer());
             }
             speedDir=1;
-            acceleration=120;
+            acceleration= normalAcceleration * 3.5f;
         }
+
+        // 부스터 관련 추가
+        #region
+        if (booster.useBoost == true)
+        {
+            speedDir = 1;
+            if (useSecondBoost == false)
+            {
+                if (acceleration >= normalAcceleration * 2.25f)
+                {
+                    timeAfterFirstBoost += Time.deltaTime;
+                    //if(timeAfterFirstBoost <= useSecondBoostDelay)
+                    //{
+                    //    Debug.Log("2단 부스터까지 남은 시간" + (useSecondBoostDelay - timeAfterFirstBoost));
+                    //}
+                }
+
+                if (timeAfterFirstBoost >= useSecondBoostDelay)
+                {
+                    useSecondBoost = true;
+                    //Debug.Log("2단 부스터 사용");
+                }
+            }
+        }
+
+        if (booster.useBoost == false)
+        {
+            timeAfterFirstBoost = 0;
+            useSecondBoost = false;
+        }
+
+        if (outOfControl == false && booster.useBoost == false)
+        {
+            acceleration = normalAcceleration;
+        }
+        #endregion
+
         speed = speedDir * acceleration;
 
         if (Input.GetAxis("Horizontal") != 0)
@@ -125,15 +176,30 @@ public class NewCar : MonoBehaviourPunCallbacks
     }
     private void FixedUpdate()
     {
-        if (photonView.IsMine==false)
+        if (photonView.IsMine == false)
         {
             return;
         }
         sphere.AddForce(kartModel.transform.forward * currentSpeed, ForceMode.Acceleration);
        
         sphere.AddForce(-kartNormal.transform.up * gravity, ForceMode.Acceleration);
-      
-        
+
+        // 부스터 관련 추가
+        #region
+        if (booster.useBoost == true && useSecondBoost == false)
+        {
+            acceleration *= 1.1f;
+            if (acceleration >= normalAcceleration * 2.25f)
+            {
+                acceleration = normalAcceleration * 2.25f;
+            }
+        }
+
+        if (useSecondBoost == true)
+        {
+            acceleration = normalAcceleration * 3.5f;
+        }
+        #endregion
 
 
         //RaycastHit hitOn;

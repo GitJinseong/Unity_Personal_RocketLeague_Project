@@ -14,7 +14,7 @@ public class BoostUI_Yoo : MonoBehaviourPun
     private Image boostImage;
     // Start is called before the first frame update
     void Start()
-    { 
+    {
         boostImage = transform.GetChild(1).GetComponent<Image>();
         boostText = transform.GetChild(2).transform.GetChild(0).GetComponent<TMP_Text>();
     }
