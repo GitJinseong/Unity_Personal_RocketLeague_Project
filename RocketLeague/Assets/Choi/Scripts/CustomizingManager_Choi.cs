@@ -53,7 +53,7 @@ public class CustomizingManager_Choi : MonoBehaviour
     private List<GameObject> parents; // 부모들을 관리하는 리스트
 
     [Header("PlayerPrefab")]
-    private string[] CarTypes = { "CustomizingCar", "OrangeCar" }; // CreateObjectWithCustomizing()에서 플레이어
+    private string[] TeamTypes = { "BlueTeam", "OrangeTeam" }; // CreateObjectWithCustomizing()에서 플레이어
                                                             // 오브젝트를 생성할 때 호출되는 배열 
                                                             // Resource 폴더에 같은 이름의 프리팹 생성해야함
     private Dictionary<string, int>
@@ -79,18 +79,19 @@ public class CustomizingManager_Choi : MonoBehaviour
         // 오브젝트 풀링을 위한 오브젝트 생성
         CreateObjectPools();
 
-        // 원하는 오브젝트 가져오기
-        // 매개변수로 (카테고리 / 찾을 파츠 오브젝트명) 줘야함
-        //Debug.Log($"가져온 오브젝트 파츠명: {FindTargetObject("Wheels_FR", "DefaultWheel_FR").name}");
+            //[디버그용]
+            // 원하는 오브젝트 가져오기
+            // 매개변수로 (카테고리 / 찾을 파츠 오브젝트명) 줘야함
+            //Debug.Log($"가져온 오브젝트 파츠명: {FindTargetObject("Wheels_FR", "DefaultWheel_FR").name}");
 
-        // 현재 파츠 가져오기
-        //Debug.Log($"CarFrames의 현재 파츠 가져오기 : {GetCurrentObject("CarFrames").name}");
+            // 현재 파츠 가져오기
+            //Debug.Log($"CarFrames의 현재 파츠 가져오기 : {GetCurrentObject("CarFrames").name}");
 
-        // 현재 인덱스 저장
-        //SaveDataForPlayerPrefab();
+            // 현재 인덱스 저장
+            //SaveDataForPlayerPrefab();
 
-        // PlayerPrefab에 저장되어 있는 Index 가져오기
-        //GetDataForPlayerPrefab("CarFrames");
+            // PlayerPrefab에 저장되어 있는 Index 가져오기
+            //GetDataForPlayerPrefab("CarFrames");
 
         // PlayerPrefab에 저장되어 있는 파츠별 Index 가져온 후
         // 가져온 Index[]로 전부 토글하는 함수
@@ -100,7 +101,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         SaveAllPlayerPartsToTempIndexDictionary();
 
         // PlayerPrefab에 저장되어 있는 Index 들을 가져와서 차량 오브젝트 생성 후 파츠 부착하기 
-        CreateObjectWithCustomizing(0, 0);
+        //CreateObjectWithCustomizing(1);
     } // Awake()
     #endregion
 
@@ -195,13 +196,13 @@ public class CustomizingManager_Choi : MonoBehaviour
             for (int j = 0; j < dataDictionary[temp_Category][temp_DataDictionaryKey].Count; j++)
             {
                 // 오브젝트 인스턴스 생성 함수 호출
-                CreateInstantiate(temp_Category, temp_DataDictionaryKey, j, temp_CategoryObj);
+                CreateInstantiate(temp_Category, temp_DataDictionaryKey, j, temp_CategoryObj, false);
             }
         }
     } // CreateObjectPools()
 
     // 오브젝트 인스턴스 생성 함수
-    private void CreateInstantiate(string category, string key, int index, GameObject parent)
+    private void CreateInstantiate(string category, string key, int index, GameObject parent, bool isActive)
     {
         // 프리팹 인스턴스 오브젝트 생성
         GameObject temp_Prefab = GetPrefab(category, key, index);
@@ -214,8 +215,8 @@ public class CustomizingManager_Choi : MonoBehaviour
                 temp_Prefab.transform.rotation, parent.transform);
             // 오브젝트 이름 설정
             temp_Obj.name = temp_Prefab.name;
-            // 오브젝트 비활성화
-            temp_Obj.SetActive(false);
+            // 매개변수로 받은 isActive에 따라 활성화/비활성화 구분
+            temp_Obj.SetActive(isActive);
 
             Debug.Log("CreateInstantiate(): ▶ 오브젝트 인스턴스 생성에 성공하였습니다.");
         }
@@ -235,24 +236,27 @@ public class CustomizingManager_Choi : MonoBehaviour
     // PlayerPrefab에 저장되어 있는 Index를 바탕으로 오브젝트를 생성하고
     // 부위별 파츠를 오브젝트에 장착하는 함수
     // *teamID: [0]은 블루 / [1]은 오렌지 팀이다.
-    public void CreateObjectWithCustomizing(int pvID, int teamID)
+    public void CreateObjectWithCustomizing(int teamID)
     {
         Debug.Log("호출");
         // 임시 변수 선언
         string temp_CsvList = "";
         string temp_Category = "";
-        // 딕셔너리 키 값 넣기
-        string temp_DictionaryKey = DEFAULT_KEY;
         int temp_Index = 0;
+        // prefabName으로 PlayerCar 설정
+        string prefabName = "PlayerCar";
+        // 딕셔너리 키 값 넣기
+        string dictionaryKey = DEFAULT_KEY;
+        int CarFrameIndex = 0;
         // Resources.Load<GameObject>(string)으로 프리팹을 검색 후 가져옴
-        GameObject temp_Prefab = Resources.Load<GameObject>(CarTypes[teamID]);
-        // Pos, Rotation 값을 기본으로 플레이어 오브젝트 생성(블루/오렌지)
-        GameObject temp_PlayerObj = Instantiate(temp_Prefab, Vector3.zero,
+        GameObject prefab = Resources.Load<GameObject>(prefabName);
+        // Pos, Rotation 값을 기본으로 플레이어 오브젝트 생성
+        GameObject playerObj = Instantiate(prefab, Vector3.zero,
            Quaternion.identity);
         // 임시로 카테고리를 저장할 오브젝트
         GameObject temp_CategoryObj;
-        // 오브젝트 이름 설정(BlueCar/OrangeCar)
-        temp_PlayerObj.name = CarTypes[teamID];
+        // 오브젝트 이름 설정(BlueTeam/OrangeTeam)
+        playerObj.name = TeamTypes[teamID];
         // categoryList[] 만큼 순회 
         for (int i = 0; i < categoryList.Length; i++)
         {
@@ -260,6 +264,27 @@ public class CustomizingManager_Choi : MonoBehaviour
             temp_Category = categoryList[i];
             // 할당된 키로 PlayerPrefab에 저장된 Index 호출
             temp_Index = GetDataForPlayerPrefab(temp_Category);
+            // 만약 카테고리가 CarFrames일 경우
+            if (categoryList[i] == "CarFrames")
+            {
+                // 현재 저장된 CarFrames index의 Team을 가져온다
+                string team = dataDictionary[categoryList[i]]["Team"][temp_Index];
+                // CarFrames의 팀이 현재 팀과 같은지 비교한다
+                // 같을 경우
+                if (team == TeamTypes[teamID])
+                {
+                    // 동작 없음
+                }
+
+                // 같지 않을 경우
+                else
+                {
+                    // 팀에 맞게 CarFrame의 인덱스를 조정하는 함수를 호출
+                    // 매개변수로 현재 팀과 위에서 호출한 temp_Index를 넣는다.
+                    temp_Index = ChangeCarFrameIndexForTeamType(TeamTypes[teamID], temp_Index);
+                    CarFrameIndex = temp_Index;
+                }
+            }
             Debug.Log($"가져온 인덱스 {temp_Index}");
             // 오브젝트 인스턴스 생성 함수 호출, 위에서 생성된 플레이어 오브젝트를 부모로 설정
             // 아래 호출 부분에서 딕셔너리 키값을 찾을수없다는 오류발생
@@ -269,11 +294,16 @@ public class CustomizingManager_Choi : MonoBehaviour
                 Debug.Log(value.Key);
             }
             // 플레이어 오브젝트 하위의 카테고리에 맞는 오브젝트 검색 후 반환된 오브젝트 저장
-            temp_CategoryObj = FindChildRescursive(temp_PlayerObj.transform, temp_Category).gameObject;
+            temp_CategoryObj = FindChildRescursive(playerObj.transform, temp_Category).gameObject;
             // 카테고리, 딕셔너리키, 인덱스, 카테고리 오브젝트를 사용하여 인스턴스를 생성한다.
             // 해당하는 카테고리 오브젝트의 자식으로 파츠가 생성된다.
-            CreateInstantiate(temp_Category, temp_DictionaryKey, temp_Index, temp_CategoryObj);
+            CreateInstantiate(temp_Category, dictionaryKey, temp_Index, temp_CategoryObj, true);
         }
+        // CarFrame에 맞게 휠의 포지션을 변경하는 함수 호출
+        // 매개변수로 CarFrame의 변환된 인덱스 temp_CarFrameIndex를 넣는다.
+        AdjustWheelsPosition(CarFrameIndex);
+        // 위 함수의 디버그용으로 임시 함수호출
+        AdjustWheelsPositionForDebug(playerObj, CarFrameIndex);
     }
     #endregion
 
@@ -700,6 +730,52 @@ public class CustomizingManager_Choi : MonoBehaviour
                 $"Pos: {temp_CategoryObj.transform.localPosition}");
         }
     }
+
+    // AdjustWheelsPositionForDebug()의 디버그 버전 함수
+    // 임시로 사용후 삭제예정
+    public void AdjustWheelsPositionForDebug(GameObject playerObj, int index)
+    {
+        // 임시 변수 선언
+        float temp_PosX = 0f;
+        float temp_PosY = 0f;
+        float temp_PosZ = 0f;
+        string temp_Key = "";
+        string temp_Category = "CarFrames";
+        GameObject temp_CategoryObj;
+        Vector3 temp_Pos;
+        // 휠이 categoryList의 index 3번 부터 시작하여 i=1로 설정
+        for (int i = 3; i < categoryList.Length; i++)
+        {
+            // temp_Key에 키 값 할당 
+            temp_Key = categoryList[i] + "_Pos";
+
+            // 플레이어 오브젝트와 카테고리를 매개변수로 
+            // temp_CategoryObj에 카테고리 오브젝트 호출
+            temp_CategoryObj = FindChildRescursive(playerObj.transform, categoryList[i]).gameObject;
+
+            // dataDictionary에서 temp_Key로 포지션 값들을 가져온 후
+            // string -> float으로 변환 & 매개변수로 받은 index로 현재 CarFrames에 접근
+            temp_PosX = float.Parse(dataDictionary[temp_Category][temp_Key + "X"][index]);
+            temp_PosY = float.Parse(dataDictionary[temp_Category][temp_Key + "Y"][index]);
+            temp_PosZ = float.Parse(dataDictionary[temp_Category][temp_Key + "Z"][index]);
+
+            // temp_Pos에 포지션 값 할당
+            temp_Pos = new Vector3(temp_PosX, temp_PosY, temp_PosZ);
+
+            // 가져온 휠 카테고리 오브젝트의 로컬 포지션 변경
+            // 로컬 포지션을 변경해야 부모 오브젝트의 포지션과는 관계 없이 포지션이 설정된다.
+            temp_CategoryObj.transform.localPosition = temp_Pos;
+
+            // 디버그 메세지
+            Debug.Log($"index {index}: 가져온 포지션 값: {temp_CategoryObj.name} " +
+                $"PosX: {dataDictionary[temp_Category][temp_Key + "X"][index]} " +
+                $"PosY: {dataDictionary[temp_Category][temp_Key + "Y"][index]} " +
+                $"PosZ: {dataDictionary[temp_Category][temp_Key + "Z"][index]} ");
+
+            Debug.Log($"index {index}: 변환된 포지션 값: {temp_CategoryObj.name} " +
+                $"Pos: {temp_CategoryObj.transform.localPosition}");
+        }
+    }
     #endregion
 
     #region [변수 관리 메서드]
@@ -761,6 +837,31 @@ public class CustomizingManager_Choi : MonoBehaviour
 
         // maxIndexs 배열 반환
         return temp_MaxIndexs;
+    }
+
+    // TeamType에 맞게 CarFrame의 인덱스를 변경하는 함수
+    // 자신이 설정한 CarFrame의 팀 정보와 실제 팀이 다를 경우에만 사용한다
+    public int ChangeCarFrameIndexForTeamType(string teamType, int index)
+    {
+        // TeamType에 맞게 케이스로 분류해서 처리한다
+        // 매개변수로 받은 팀은 실제 팀이다.
+        switch (teamType)
+        {
+            // TeamType이 "BlueTeam"일 경우
+            case "BlueTeam":
+                // 인덱스 감산
+                index--;
+                Debug.Log($"인덱스감산 후 {index}");
+                break;
+
+            // TeamType이 "OrangeTeam"일 경우
+            case "OrangeTeam":
+                // 인덱스 증감
+                index++;
+                Debug.Log($"인덱스증감 후 {index}");
+                break;
+        }
+        return index;
     }
     #endregion
 
