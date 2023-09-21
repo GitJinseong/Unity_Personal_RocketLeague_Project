@@ -1,9 +1,9 @@
-
+using Photon.Pun;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-public class CustomizingManager_Choi : MonoBehaviour
+public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
 {
     #region [싱글톤 & 변수 선언부]
     // ##################################################################################################
@@ -74,10 +74,10 @@ public class CustomizingManager_Choi : MonoBehaviour
         ReadCSVFileAndSave();
 
         // parents 리스트에 GameObject 부모들을 추가
-        InputParents();
+        //InputParents();
 
         // 오브젝트 풀링을 위한 오브젝트 생성
-        CreateObjectPools();
+        //reateObjectPools();
 
             //[디버그용]
             // 원하는 오브젝트 가져오기
@@ -95,10 +95,10 @@ public class CustomizingManager_Choi : MonoBehaviour
 
         // PlayerPrefab에 저장되어 있는 파츠별 Index 가져온 후
         // 가져온 Index[]로 전부 토글하는 함수
-        ToggleAllObejcts(GetAllDataForPlayerPrefabs());
+        //ToggleAllObejcts(GetAllDataForPlayerPrefabs());
 
         // 플레이어의 현재 모든 파츠를 temp_IndexDictionary에 저장
-        SaveAllPlayerPartsToTempIndexDictionary();
+       // SaveAllPlayerPartsToTempIndexDictionary();
 
         // PlayerPrefab에 저장되어 있는 Index 들을 가져와서 차량 오브젝트 생성 후 파츠 부착하기 
         //CreateObjectWithCustomizing(1);
@@ -175,12 +175,12 @@ public class CustomizingManager_Choi : MonoBehaviour
     // ▶[오브젝트 생성 메서드]
     // ##################################################################################################
     // 오브젝트 풀링을 위한 오브젝트 생성 함수
-    private void CreateObjectPools()
+    public void CreateObjectPools()
     {
         // 카테고리 임시 변수 생성
         GameObject temp_CategoryObj;
         // 임시 변수에 플레이어 오브젝트 할당
-        GameObject temp_PlayerObj = GetPlayerObject(photonViewID);
+        GameObject temp_PlayerObj = GetPlayerObject();
         string temp_Category = "";
         string temp_DataDictionaryKey = DEFAULT_KEY;
         // CSV 파일 갯수 만큼 for문 반복
@@ -232,10 +232,44 @@ public class CustomizingManager_Choi : MonoBehaviour
         }
     } // CreateInstantiate()
 
+    // 포톤뷰 전용 오브젝트 인스턴스 생성 함수
+    private void CreateInstantiateForPhotonView(string category, string key, int index, GameObject parent, bool isActive)
+    {
+        // 프리팹 인스턴스 오브젝트 생성
+        GameObject temp_Prefab = GetPrefab(category, key, index);
+
+        // 인스턴스 생성 성공시
+        if (temp_Prefab != null)
+        {
+            // 오브젝트 생성 & 포지션 보정
+            GameObject temp_Obj = PhotonNetwork.Instantiate(temp_Prefab.name, AdjustChildPosition(parent, temp_Prefab),
+                temp_Prefab.transform.rotation);
+            // 오브젝트 이름 설정
+            temp_Obj.name = temp_Prefab.name;
+            // 오브젝트 부모 설정
+            temp_Obj.transform.parent = parent.transform;
+            // 매개변수로 받은 isActive에 따라 활성화/비활성화 구분
+            temp_Obj.SetActive(isActive);
+
+            Debug.Log("CreateInstantiate(): ▶ 오브젝트 인스턴스 생성에 성공하였습니다.");
+        }
+
+        // 인스턴스 생성 실패시
+        else
+        {
+            // 디버그 메세지 출력
+            Debug.Log("CreateInstantiate(): ▶ 오브젝트 인스턴스 생성에 실패하였습니다. ▶ " +
+                "Prefab을 가져올 수 없습니다. ▶ 스크립트: CustomizingManager_Choi");
+            // 종료
+            return;
+        }
+
+    } // CreateInstantiate()
     // 모든 파츠 리스트를 순회하는 함수
     // PlayerPrefab에 저장되어 있는 Index를 바탕으로 오브젝트를 생성하고
     // 부위별 파츠를 오브젝트에 장착하는 함수
     // *teamID: [0]은 블루 / [1]은 오렌지 팀이다.
+    // 포톤뷰 전용
     public void CreateObjectWithCustomizing(int teamID)
     {
         Debug.Log("호출");
@@ -244,14 +278,14 @@ public class CustomizingManager_Choi : MonoBehaviour
         string temp_Category = "";
         int temp_Index = 0;
         // prefabName으로 PlayerCar 설정
-        string prefabName = "PlayerCar";
+        string prefabName = "PlayerCar";;
         // 딕셔너리 키 값 넣기
         string dictionaryKey = DEFAULT_KEY;
         int CarFrameIndex = 0;
         // Resources.Load<GameObject>(string)으로 프리팹을 검색 후 가져옴
         GameObject prefab = Resources.Load<GameObject>(prefabName);
-        // Pos, Rotation 값을 기본으로 플레이어 오브젝트 생성
-        GameObject playerObj = Instantiate(prefab, Vector3.zero,
+        // 매개변수로 받은 startPosition, Rotation 값으로 플레이어 오브젝트 생성
+        GameObject playerObj = PhotonNetwork.Instantiate(prefab.name, Vector3.zero,
            Quaternion.identity);
         // 임시로 카테고리를 저장할 오브젝트
         GameObject temp_CategoryObj;
@@ -273,7 +307,7 @@ public class CustomizingManager_Choi : MonoBehaviour
                 // 같을 경우
                 if (team == TeamTypes[teamID])
                 {
-                    // 동작 없음
+                    //* Empty *//
                 }
 
                 // 같지 않을 경우
@@ -297,11 +331,11 @@ public class CustomizingManager_Choi : MonoBehaviour
             temp_CategoryObj = FindChildRescursive(playerObj.transform, temp_Category).gameObject;
             // 카테고리, 딕셔너리키, 인덱스, 카테고리 오브젝트를 사용하여 인스턴스를 생성한다.
             // 해당하는 카테고리 오브젝트의 자식으로 파츠가 생성된다.
-            CreateInstantiate(temp_Category, dictionaryKey, temp_Index, temp_CategoryObj, true);
+            CreateInstantiateForPhotonView(temp_Category, dictionaryKey, temp_Index, temp_CategoryObj, true);
         }
         // CarFrame에 맞게 휠의 포지션을 변경하는 함수 호출
         // 매개변수로 CarFrame의 변환된 인덱스 temp_CarFrameIndex를 넣는다.
-        AdjustWheelsPosition(CarFrameIndex);
+        //AdjustWheelsPosition(CarFrameIndex);
         // 위 함수의 디버그용으로 임시 함수호출
         AdjustWheelsPositionForDebug(playerObj, CarFrameIndex);
     }
@@ -312,28 +346,72 @@ public class CustomizingManager_Choi : MonoBehaviour
     // ▶[오브젝트 호출 메서드]
     // ##################################################################################################
     // 플레이어 오브젝트를 가져오는 함수
-    // 추후 포톤서버 연결시 pv.IsMine으로 변경해야함
-    private GameObject GetPlayerObject(int pvID)
+    private GameObject GetPlayerObject()
     {
         // "Player" 태그로 플레이어 오브젝트를 검색
         GameObject temp_PlayerObject = GameObject.FindGameObjectWithTag("Player");
         // 플레이어 오브젝트를 찾은 경우
         if (temp_PlayerObject != null)
         {
-            Debug.Log($"GetPlayerObject(): ▶ ViewID[{pvID}]: 플레이어 오브젝트 {temp_PlayerObject.name} 호출 완료 ▶ ");
+            Debug.Log($"GetPlayerObject(): 플레이어 오브젝트 {temp_PlayerObject.name} 호출 완료 ▶ ");
         }
 
         // 플레이어 오브젝트를 찾지 못한 경우
         else
         {
             // 디버그 메세지 출력
-            Debug.Log($"GetPlayerObject(): ▶ ViewID[{pvID}]: 플레이어 오브젝트 호출 실패 ▶ " +
+            Debug.Log($"GetPlayerObject(): 플레이어 오브젝트 호출 실패 ▶ " +
                 $"'Player' 태그를 가진 오브젝트를 찾을 수 없습니다. ▶ 스크립트: CustomizingManager_Choi");
         }
 
         // 찾은 플레이어 오브젝트를 반환
         return temp_PlayerObject;
     } // GetPlayerObject()
+
+    // 플레이어 오브젝트를 가져오는 포톤 전용 함수
+    private GameObject GetPlayerObjectForPhoton()
+    {
+        // 임시 변수 선언
+        GameObject myPlayerObject = new GameObject();
+
+        //  로컬 플레이어 아이디를 가져옴
+        int localPlayerID = PhotonNetwork.LocalPlayer.ActorNumber;
+
+        // "Player" 태그로 플레이어 오브젝트를 검색한 후 배열에 담음
+        GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
+
+        // 플레이어 오브젝트가 하나라도 있을 경우
+        if (playerObjects != null)
+        {
+            // playerObjects 배열 길이 만큼 순회
+            foreach (GameObject player in playerObjects)
+            {
+                //  게임 오브젝트에 있는 포톤 뷰 아이디를 가져옴
+                PhotonView photonView = player.GetComponent<PhotonView>();
+
+                // 플레이어 오브젝트의 OwnerActorNr(ID)가 자신의 localPlayerID와
+                // 일치하는 경우 / 플레이어마다 고유한 넘버인 ActorNumber을 비교함
+                if (photonView.OwnerActorNr == localPlayerID)
+                {
+                    myPlayerObject = player;
+                    Debug.Log($"GetPlayerObject(): 플레이어 오브젝트 {localPlayerID} 호출 완료 ▶ ");
+                }
+
+            }
+        }
+
+        // 플레이어 오브젝트를 찾지 못한 경우
+        else
+        {
+            // 디버그 메세지 출력
+            Debug.Log($"GetPlayerObject(): 플레이어 오브젝트 호출 실패 ▶ " +
+                $"'Player' 태그를 가진 오브젝트를 찾을 수 없습니다. ▶ 스크립트: CustomizingManager_Choi");
+        }
+
+        // 찾은 플레이어 오브젝트를 반환
+        return myPlayerObject;
+
+    } // GetPlayerObjectForPhoton()
 
     // 재귀 함수를 사용하여 원하는 하위 자식 오브젝트를 찾는 함수
     // 부모 오브젝트의 모든 계층 구조에 있는 자식을 탐색한다.
@@ -451,7 +529,7 @@ public class CustomizingManager_Choi : MonoBehaviour
     private GameObject GetCurrentObject(string category)
     {
         // 부모인 플레이어 오브젝트를 찾음
-        GameObject temp_ParentObj = GetPlayerObject(photonViewID);
+        GameObject temp_ParentObj = GetPlayerObject();
         // 카테고리에 해당하는 오브젝트 가져오기
         GameObject temp_CategoryObj = FindChildRescursive(temp_ParentObj.transform, category).gameObject;
         // 카테고리에 있는 활성화된 현재 파츠 오브젝트 가져오기
@@ -495,7 +573,7 @@ public class CustomizingManager_Choi : MonoBehaviour
     private GameObject FindTargetObject(string category, string targetObjName)
     {
         // 플레이어 오브젝트를 가져옴
-        GameObject temp_PlayerObj = GetPlayerObject(photonViewID);
+        GameObject temp_PlayerObj = GetPlayerObject();
 
         // 현재 파츠를 가져오기 위해 플레이어의 자식인 카테고리 오브젝트를 가져옴
         GameObject temp_CategoryObj = GetChildObject(temp_PlayerObj, category);
@@ -566,7 +644,7 @@ public class CustomizingManager_Choi : MonoBehaviour
 
     // 최초 실행시 모든 카테고리에 있는 오브젝트 중에
     // 매개변수로 받은 인덱스에 해당하는 파츠를 전부 활성화 하는 함수
-    private void ToggleAllObejcts(int[] indexs)
+    public void ToggleAllObejcts(int[] indexs)
     {
         //// 임시 변수 선언
         //string temp_Category = "";
@@ -628,7 +706,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         GameObject temp_CurrentObj;
 
         // temp_PlayerObj에 플레이어 오브젝트 할당
-        temp_PlayerObj = GetPlayerObject(photonViewID);
+        temp_PlayerObj = GetPlayerObject();
 
         // 카테고리와 인덱스로 PrefabName 호출
         temp_Name = GetDataDictionaryForPrefabName(category, index);
@@ -696,7 +774,7 @@ public class CustomizingManager_Choi : MonoBehaviour
         GameObject temp_PlayerObj;
         Vector3 temp_Pos;
         // temp_PlayerObj에 플레이어 오브젝트 할당
-        temp_PlayerObj = GetPlayerObject(photonViewID);
+        temp_PlayerObj = GetPlayerObject();
         // 휠이 categoryList의 index 3번 부터 시작하여 i=1로 설정
         for (int i = 3; i < categoryList.Length; i++)
         {

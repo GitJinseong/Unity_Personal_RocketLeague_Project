@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4372184423398356168}
   - component: {fileID: 4028133681936199285}
+  - component: {fileID: 6976424719576536272}
   m_Layer: 2
   m_Name: CarFrames
   m_TagString: Untagged
@@ -50,6 +51,28 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 3, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 3.5}
+--- !u!114 &6976424719576536272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4028133681936199282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4092576261759611588
 GameObject:
   m_ObjectHideFlags: 0

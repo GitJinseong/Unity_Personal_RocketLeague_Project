@@ -29,8 +29,15 @@ public class CustomizingSceneController_Choi : MonoBehaviour
     public Button[] categoryBtnNexts;
     public Button[] categoryBtnPrevs;
 
+    // ##################################################################################################
+    // ▶[라이프 사이클 메서드]
+    // ##################################################################################################
     void Start()
     {
+        // CustomizingManager에서 커스터마이징 씬을 동작하게 하기 위해
+        // 필요한 함수들을 호출하는 함수를 호출
+        RunForCustomizingSceneFuncs();
+
         // PlayerPrefab에 저장되어 있는 현재 인덱스를
         // 가져오는 함수 호출
         GetIndexsForPlayerPrefab();
@@ -71,6 +78,21 @@ public class CustomizingSceneController_Choi : MonoBehaviour
             categoryBtnNexts[i].onClick.AddListener(() => BtnNext(index));
             categoryBtnPrevs[i].onClick.AddListener(() => BtnPrevious(index));
         }
+    }
+
+    // 커스터마이징 씬에서 사용되는 함수들을 호출하는 함수
+    private void RunForCustomizingSceneFuncs()
+    {
+        // 오브젝트 풀링을 위한 오브젝트 생성
+        CustomizingManager_Choi.instance.CreateObjectPools();
+
+        // PlayerPrefab에 저장되어 있는 파츠별 Index 가져온 후
+        // 가져온 Index[]로 전부 토글하는 함수
+        CustomizingManager_Choi.instance.ToggleAllObejcts(
+            CustomizingManager_Choi.instance.GetAllDataForPlayerPrefabs());
+
+        // 플레이어의 현재 모든 파츠를 temp_IndexDictionary에 저장
+        CustomizingManager_Choi.instance.SaveAllPlayerPartsToTempIndexDictionary();
     }
 
     // ##################################################################################################

@@ -78,8 +78,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             {
                 blueSpawnPoint = blueCarSpawner[2];
             }
-
-            PhotonNetwork.Instantiate(blueCar.name, blueSpawnPoint.position, blueSpawnPoint.rotation);
+            // 블루 카 생성
+            //PhotonNetwork.Instantiate(blueCar.name, blueSpawnPoint.position, blueSpawnPoint.rotation);
+            CustomizingManager_Choi.instance.CreateObjectWithCustomizing(0);
         }
         else
         {
@@ -95,8 +96,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             {
                 orangeSpawnPoint = orangeCarSpawner[2];
             }
-
-            PhotonNetwork.Instantiate(orangeCar.name, orangeSpawnPoint.position, orangeSpawnPoint.rotation);
+            // 오렌지 카 생성
+            //PhotonNetwork.Instantiate(orangeCar.name, orangeSpawnPoint.position, orangeSpawnPoint.rotation);
+            CustomizingManager_Choi.instance.CreateObjectWithCustomizing(1);
         }
 
         playerCount = PhotonNetwork.PlayerList.Length;
