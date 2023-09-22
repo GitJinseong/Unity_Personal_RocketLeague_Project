@@ -12,6 +12,7 @@ TagManager:
   - Wall
   - Car_Blue
   - Car_Orange
+  - CustomPart
   layers:
   - Default
   - TransparentFX

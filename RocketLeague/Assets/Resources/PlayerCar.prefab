@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 247298284597026791}
+  - component: {fileID: 4135152842469883909}
   m_Layer: 2
   m_Name: Marks
   m_TagString: Untagged
@@ -31,6 +32,28 @@ Transform:
   m_Father: {fileID: 7458554323915163813}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4135152842469883909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731404311374929842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1626646101084974353
 GameObject:
   m_ObjectHideFlags: 0
@@ -405,6 +428,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2318973738937379024}
+  - component: {fileID: 438420042565659583}
   m_Layer: 2
   m_Name: Wheels_FL
   m_TagString: Untagged
@@ -427,6 +451,28 @@ Transform:
   m_Father: {fileID: 7373481542857719367}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &438420042565659583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4921694055663332313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4999789788529724144
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,6 +517,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5923902831654492448}
+  - component: {fileID: 317629201710769522}
   m_Layer: 2
   m_Name: Wheels_BL
   m_TagString: Untagged
@@ -493,6 +540,28 @@ Transform:
   m_Father: {fileID: 7373481542857719367}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &317629201710769522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5706902570806072620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &5790227163754223476
 GameObject:
   m_ObjectHideFlags: 0
@@ -647,6 +716,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3500629300884969512}
+  - component: {fileID: 6799021047545860359}
   m_Layer: 2
   m_Name: CarFrames
   m_TagString: Untagged
@@ -669,6 +739,28 @@ Transform:
   m_Father: {fileID: 7458554323915163813}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6799021047545860359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6233472022050071891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &7256790888631166162
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,6 +770,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 801544172703746871}
+  - component: {fileID: 2142640267678539657}
   m_Layer: 2
   m_Name: Wheels_BR
   m_TagString: Untagged
@@ -700,6 +793,28 @@ Transform:
   m_Father: {fileID: 7373481542857719367}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2142640267678539657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7256790888631166162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &7730265781180091193
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,6 +914,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6109777476904107167}
+  - component: {fileID: 3348756308222468941}
   m_Layer: 2
   m_Name: Wheels_FR
   m_TagString: Untagged
@@ -821,6 +937,28 @@ Transform:
   m_Father: {fileID: 7373481542857719367}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3348756308222468941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7981740209706582092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &8485136106730902735
 GameObject:
   m_ObjectHideFlags: 0
@@ -955,6 +1093,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1606960506538307608}
+  - component: {fileID: 7116464737337810831}
   m_Layer: 2
   m_Name: Flags
   m_TagString: Untagged
@@ -977,6 +1116,28 @@ Transform:
   m_Father: {fileID: 7458554323915163813}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7116464737337810831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9197858798888785681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1001 &5655031009808421422
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
@@ -25,15 +26,25 @@ public class LobbyManager : MonoBehaviourPunCallbacks
        // 게임 실행과 동시에 마스터 서버 접속 시도
     private void Start()
     {
-           // 접속에 필요한 정보 설정
-        PhotonNetwork.GameVersion = gameVersion;
-           // 설정한 정보로 마스터 서버 접속 시도
-        PhotonNetwork.ConnectUsingSettings();
+        // 서버에 접속된 상태일 경우
+        if (PhotonNetwork.IsConnected)
+        {
+            // 접속 정보 표시
+            connectionInfoText.text = "Online: connected to master server succed";
+        }
 
-           // 룸 접속 버튼 잠시 비활성화
-        joinButton.interactable = false;
-           // 접속 시도 중 임을 텍스트로 표시
-        connectionInfoText.text = "Connect to master server ...";
+        // 서버에 접속이 되지 않았을 경우
+        else
+        {
+               // 접속에 필요한 정보 설정
+            PhotonNetwork.GameVersion = gameVersion;
+               // 설정한 정보로 마스터 서버 접속 시도
+            PhotonNetwork.ConnectUsingSettings();
+               // 룸 접속 버튼 잠시 비활성화
+            joinButton.interactable = false;
+               // 접속 시도 중 임을 텍스트로 표시
+            connectionInfoText.text = "Connect to master server ...";
+        }
     }      // Start()
 
        // 마스터 서버 접속 성공시 자동 실행
@@ -170,6 +181,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         playButtons.SetActive(false);
         gameModeButtons.SetActive(true);
+    }
+
+    // 커스터마이징 버튼을 눌렀을 때 호출되는 함수
+    // "CustomizingScene"을 로드한다.
+    public void OnCustomizingButton()
+    {
+        // "CustomizingScene"을 로드
+        SceneManager.LoadScene("CustomizingScene");
     }
 
     public void BackButton()

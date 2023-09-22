@@ -68,6 +68,13 @@ MonoBehaviour:
   - ChangeAura
   - UpdateAura
   - UpdateScore
+  - CreateInstantiateForPhotonView
+  - SetParentForPhoton
+  - SetParentRPC
+  - AdjustWheelsPositionForDebug
+  - SetObjectNameForRPC
+  - SetParentForRPC
+  - SetObjectTagForRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

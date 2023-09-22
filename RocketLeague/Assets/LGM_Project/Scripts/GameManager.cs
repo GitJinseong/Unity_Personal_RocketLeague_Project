@@ -54,6 +54,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     void Start()
     {
+        // 내 포톤뷰 ActorNumber을 찾아서 저장하는 변수
+        int myPhotonActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+
         if (PhotonNetwork.IsMasterClient)
         {
                // 마스터 클라이언트 일시 축구공 프리팹을 불러와 축구공 오브젝트를 생성한다
@@ -78,9 +81,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             {
                 blueSpawnPoint = blueCarSpawner[2];
             }
-            // 블루 카 생성
+            // 블루 카 생성 & 포톤 ActorNumber를 매개변수로 보냄
             //PhotonNetwork.Instantiate(blueCar.name, blueSpawnPoint.position, blueSpawnPoint.rotation);
-            CustomizingManager_Choi.instance.CreateObjectWithCustomizing(0);
+            CustomizingManager_Choi.instance.CreateObjectWithCustomizing(0, myPhotonActorNumber, 
+                blueSpawnPoint.position, Quaternion.Euler(0f, -180f, 0f));
         }
         else
         {
@@ -96,9 +100,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             {
                 orangeSpawnPoint = orangeCarSpawner[2];
             }
-            // 오렌지 카 생성
+            // 오렌지 카 생성 & 포톤 ActorNumber를 매개변수로 보냄
             //PhotonNetwork.Instantiate(orangeCar.name, orangeSpawnPoint.position, orangeSpawnPoint.rotation);
-            CustomizingManager_Choi.instance.CreateObjectWithCustomizing(1);
+            CustomizingManager_Choi.instance.CreateObjectWithCustomizing(1, myPhotonActorNumber, 
+                orangeSpawnPoint.position, Quaternion.identity);
         }
 
         playerCount = PhotonNetwork.PlayerList.Length;

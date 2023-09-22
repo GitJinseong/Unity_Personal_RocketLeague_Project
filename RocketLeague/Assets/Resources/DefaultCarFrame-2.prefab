@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 972471434724489569}
   - component: {fileID: 4722396089183930764}
   - component: {fileID: 8552660764765992059}
-  - component: {fileID: -4994699228045312856}
+  - component: {fileID: 4775329547911753096}
   m_Layer: 2
   m_Name: DefaultCarFrame-2
-  m_TagString: Untagged
+  m_TagString: CustomPart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -88,7 +88,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-4994699228045312856
+--- !u!114 &4775329547911753096
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Main/Scenes/RumbleScene.unity
     guid: a16e20cbbe454b44692a1acac8effb44
+  - enabled: 1
+    path: Assets/Choi/Scenes/CustomizingScene.unity
+    guid: 7666c4a76b8acc14a988a1d25b1b2ad7
   m_configObjects: {}

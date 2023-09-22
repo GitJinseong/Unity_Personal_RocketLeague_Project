@@ -233,25 +233,38 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
     } // CreateInstantiate()
 
     // 포톤뷰 전용 오브젝트 인스턴스 생성 함수
-    private void CreateInstantiateForPhotonView(string category, string key, int index, GameObject parent, bool isActive)
+    private void CreateInstantiateForPhotonView(int myPlayerID, string category, string key, int index, GameObject parent, bool isActive)
     {
         // 프리팹 인스턴스 오브젝트 생성
         GameObject temp_Prefab = GetPrefab(category, key, index);
+
+        // 프리팹 이름 가져오기
+        string prefabName = dataDictionary[category][key][index];
+
+        //PhotonView photonView = transform.parent.GetComponent<PhotonView>();
 
         // 인스턴스 생성 성공시
         if (temp_Prefab != null)
         {
             // 오브젝트 생성 & 포지션 보정
-            GameObject temp_Obj = PhotonNetwork.Instantiate(temp_Prefab.name, AdjustChildPosition(parent, temp_Prefab),
+            GameObject temp_Obj = PhotonNetwork.Instantiate(prefabName, AdjustChildPosition(parent, temp_Prefab),
                 temp_Prefab.transform.rotation);
-            // 오브젝트 이름 설정
-            temp_Obj.name = temp_Prefab.name;
-            // 오브젝트 부모 설정
-            temp_Obj.transform.parent = parent.transform;
-            // 매개변수로 받은 isActive에 따라 활성화/비활성화 구분
-            temp_Obj.SetActive(isActive);
+            int temp_ObjID = temp_Obj.GetComponent<PhotonView>().ViewID;
+            int parentID = parent.GetComponent<PhotonView>().ViewID;
+            //// 오브젝트 이름 설정
+            //temp_Obj.name = temp_Prefab.name;
+            //// 오브젝트 부모 설정
+            //temp_Obj.transform.parent = parent.transform;
+            //// 매개변수로 받은 isActive에 따라 활성화/비활성화 구분
+            //temp_Obj.SetActive(isActive);
 
-            Debug.Log("CreateInstantiate(): ▶ 오브젝트 인스턴스 생성에 성공하였습니다.");
+            //Debug.Log("CreateInstantiate(): ▶ 오브젝트 인스턴스 생성에 성공하였습니다.");
+            // 자신을 포함한 모든 플레이어에게 부모를 상속받게하는 함수를 실행함
+            Debug.Log($"{photonView}, ID:{myPlayerID}");
+            string punVersion = PhotonNetwork.PunVersion;
+            Debug.Log("PUN 버전: " + punVersion);
+            //photonView.RPC("SetParentForPhoton", RpcTarget.All, myPlayerID, temp_Obj.name, prefabName, parent.name, temp_Obj.name, isActive);
+            photonView.RPC("SetParentForRPC", RpcTarget.AllBuffered, temp_ObjID, parentID);
         }
 
         // 인스턴스 생성 실패시
@@ -265,12 +278,12 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
         }
 
     } // CreateInstantiate()
-    // 모든 파츠 리스트를 순회하는 함수
-    // PlayerPrefab에 저장되어 있는 Index를 바탕으로 오브젝트를 생성하고
-    // 부위별 파츠를 오브젝트에 장착하는 함수
+    // 모든 파츠 리스트를 순회해서 PlayerPrefab에 저장되어 있는 Index를
+    // 바탕으로 오브젝트를 생성하고 부위별 파츠를 오브젝트에 장착하는 함수
     // *teamID: [0]은 블루 / [1]은 오렌지 팀이다.
     // 포톤뷰 전용
-    public void CreateObjectWithCustomizing(int teamID)
+    public void CreateObjectWithCustomizing(int teamID, int actorNumber,
+        Vector3 spawnPosition, Quaternion spawnRotation)
     {
         Debug.Log("호출");
         // 임시 변수 선언
@@ -284,13 +297,19 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
         int CarFrameIndex = 0;
         // Resources.Load<GameObject>(string)으로 프리팹을 검색 후 가져옴
         GameObject prefab = Resources.Load<GameObject>(prefabName);
-        // 매개변수로 받은 startPosition, Rotation 값으로 플레이어 오브젝트 생성
-        GameObject playerObj = PhotonNetwork.Instantiate(prefab.name, Vector3.zero,
+        // 매개변수로 받은 startPosition 값으로 플레이어 오브젝트 생성
+        GameObject playerObj = PhotonNetwork.Instantiate(prefab.name, spawnPosition,
            Quaternion.identity);
+        // playerObj의 ViewID를 찾음
+        int playerID = playerObj.GetComponent<PhotonView>().ViewID;
+
         // 임시로 카테고리를 저장할 오브젝트
         GameObject temp_CategoryObj;
-        // 오브젝트 이름 설정(BlueTeam/OrangeTeam)
-        playerObj.name = TeamTypes[teamID];
+        // RPC로 PlayerOBj 이름 변경(BlueTeam/OrangeTeam)
+        photonView.RPC("SetObjectNameForRPC", RpcTarget.AllBuffered, playerID, TeamTypes[teamID]);
+        // RPC로 PlayerObj 태그 변경(BlueCar/OrangeCar)
+        photonView.RPC("SetObjectTagForRPC", RpcTarget.AllBuffered, playerID, teamID);
+        //playerObj.name = TeamTypes[teamID];
         // categoryList[] 만큼 순회 
         for (int i = 0; i < categoryList.Length; i++)
         {
@@ -331,13 +350,23 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
             temp_CategoryObj = FindChildRescursive(playerObj.transform, temp_Category).gameObject;
             // 카테고리, 딕셔너리키, 인덱스, 카테고리 오브젝트를 사용하여 인스턴스를 생성한다.
             // 해당하는 카테고리 오브젝트의 자식으로 파츠가 생성된다.
-            CreateInstantiateForPhotonView(temp_Category, dictionaryKey, temp_Index, temp_CategoryObj, true);
+            CreateInstantiateForPhotonView(actorNumber, temp_Category, dictionaryKey, temp_Index, temp_CategoryObj, true);
         }
         // CarFrame에 맞게 휠의 포지션을 변경하는 함수 호출
         // 매개변수로 CarFrame의 변환된 인덱스 temp_CarFrameIndex를 넣는다.
         //AdjustWheelsPosition(CarFrameIndex);
-        // 위 함수의 디버그용으로 임시 함수호출
-        AdjustWheelsPositionForDebug(playerObj, CarFrameIndex);
+        // 위 함수의 포톤버전 함수호출
+        photonView.RPC("AdjustWheelsPositionForDebug", RpcTarget.AllBuffered, playerID, CarFrameIndex);
+
+        // 다른 오브젝트가 전부 생성되기 전에 로테이션을 변경할 경우
+        // 자신의 플레이 화면에 차량의 로테이션이 이상하게 변해 보이는
+        // 현상이 발생하여 코드를 아래로 내림
+        // PlayerObj의 자식인 Kart 오브젝트를 재귀 함수로 찾아서
+        // startRotation을 변경
+        GameObject kartObj = FindChildRescursive(playerObj.transform, "Kart").gameObject;
+        kartObj.transform.rotation = spawnRotation;
+        Debug.Log($"kartObj rotation: {kartObj.transform.rotation}");
+        Debug.Log($"spawnRotation rotation: {spawnRotation}");
     }
     #endregion
 
@@ -369,13 +398,10 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
     } // GetPlayerObject()
 
     // 플레이어 오브젝트를 가져오는 포톤 전용 함수
-    private GameObject GetPlayerObjectForPhoton()
+    private GameObject GetPlayerObjectForPhoton(int localPlayerID)
     {
         // 임시 변수 선언
         GameObject myPlayerObject = new GameObject();
-
-        //  로컬 플레이어 아이디를 가져옴
-        int localPlayerID = PhotonNetwork.LocalPlayer.ActorNumber;
 
         // "Player" 태그로 플레이어 오브젝트를 검색한 후 배열에 담음
         GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
@@ -395,6 +421,7 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
                 {
                     myPlayerObject = player;
                     Debug.Log($"GetPlayerObject(): 플레이어 오브젝트 {localPlayerID} 호출 완료 ▶ ");
+                    break;
                 }
 
             }
@@ -626,6 +653,45 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
         // 프리팹 반환
         return temp_Prefab;
     } //GetPrefab()
+
+    // 현재 씬에서 원하는 태그를 가진 모든 오브젝트를 검색해
+    // 그중에 findName과 ActorNumber가 일치하는 오브젝트를
+    // 찾아서 반환하는 포톤전용 함수
+    private GameObject FindAnyObjects(int actorNumber, string findName, string tag)
+    {
+        GameObject[] findObjects = GameObject.FindGameObjectsWithTag(tag);
+
+        GameObject findObject = new GameObject();
+        // 해당하는 오브젝트가 하나라도 있을 경우
+        if (findObjects != null)
+        {
+            // playerObjects 배열 길이 만큼 순회
+            foreach (GameObject obj in findObjects)
+            {
+                //  게임 오브젝트에 있는 포톤 뷰 아이디를 가져옴
+                PhotonView photonView = obj.GetComponent<PhotonView>();
+
+                // 찾은 오브젝트의 OwnerActorNr(ID)가 매개변수로 받은 actorNumber와
+                // 일치하는 경우
+                if (photonView.OwnerActorNr == actorNumber)
+                {
+                    findObject = obj;
+                    Debug.Log($"FindAnyObjects(): {actorNumber}의 {findName} 오브젝트 호출 완료");
+                    break;
+                }
+
+            }
+        }
+
+        // 없을 경우
+        else
+        {
+            Debug.Log($"FindAnyObjects(): {actorNumber}의 {findName} 오브젝트를 찾을 수 없습니다.");
+        }
+
+        return findObject;
+    }
+
     #endregion
 
     #region [오브젝트 관리 메서드]
@@ -809,9 +875,10 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
         }
     }
 
-    // AdjustWheelsPositionForDebug()의 디버그 버전 함수
-    // 임시로 사용후 삭제예정
-    public void AdjustWheelsPositionForDebug(GameObject playerObj, int index)
+    // AdjustWheelsPositionForDebug()의
+    // 포톤 버전 함수
+    [PunRPC]
+    public void AdjustWheelsPositionForDebug(int playerID, int index)
     {
         // 임시 변수 선언
         float temp_PosX = 0f;
@@ -820,6 +887,8 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
         string temp_Key = "";
         string temp_Category = "CarFrames";
         GameObject temp_CategoryObj;
+        // 매개변수로 받은 playerID로 playerObj를 찾음
+        GameObject playerObj = PhotonView.Find(playerID).gameObject;
         Vector3 temp_Pos;
         // 휠이 categoryList의 index 3번 부터 시작하여 i=1로 설정
         for (int i = 3; i < categoryList.Length; i++)
@@ -854,6 +923,43 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
                 $"Pos: {temp_CategoryObj.transform.localPosition}");
         }
     }
+
+    // RPC를 통해 부모 설정을 하는 함수
+    [PunRPC]
+    private void SetParentForRPC(int objectID, int parentID)
+    {
+        // objectId에 해당하는 오브젝트를 찾아서 parentId에 해당하는 오브젝트를 부모로 설정
+        GameObject childObject = PhotonView.Find(objectID).gameObject;
+        GameObject parentObject = PhotonView.Find(parentID).gameObject;
+
+        if (childObject != null && parentObject != null)
+        {
+            // childObject의 부모로 parentObject를 설정
+            childObject.transform.parent = parentObject.transform;
+        }
+    }
+
+    // RPC를 통해 포톤 ID를 받아서 오브젝트의 이름을 변경하는 함수
+    [PunRPC]
+    private void SetObjectNameForRPC(int objectID, string changeName)
+    {
+        // objectID로 오브젝트를 검색 후 targetObject에 추가
+        GameObject targetObject = PhotonView.Find(objectID).gameObject;
+        // targetObject의 이름을 변경
+        targetObject.name = changeName;
+    }
+
+    // RPC를 통해 포톤 ID를 받아서 오브젝트의 태그를 변경하는 함수
+    [PunRPC]
+    private void SetObjectTagForRPC(int objectID, int teamID)
+    {
+        // objectID로 오브젝트를 검색 후 targetObject에 추가
+        GameObject targetObject = PhotonView.Find(objectID).gameObject;
+        string[] tags = { "Car_Blue", "Car_Orange" };
+        // teamNum에 맞게 태그 변경
+        targetObject.tag = tags[teamID];
+    }
+
     #endregion
 
     #region [변수 관리 메서드]
