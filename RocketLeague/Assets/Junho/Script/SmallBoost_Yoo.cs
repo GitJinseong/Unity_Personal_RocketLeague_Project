@@ -16,6 +16,10 @@ public class SmallBoost_Yoo : MonoBehaviourPun
         gameObject.transform.localScale = Vector3.zero;
         boostCollider = GetComponent<Collider>();
         regenTime = 10f;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            DoScaleOff();
+        }
     }
 
     // Update is called once per frame
@@ -51,7 +55,7 @@ public class SmallBoost_Yoo : MonoBehaviourPun
     {
         //Debug.Log("여기들어옴?");
         // 자동차와 부딪힐 경우 부딪힌 자동차의 스크립트를 불러와서 부스터 게이지 증가함수를 발동시킴
-        if (collision.CompareTag("Car"))
+        if (collision.CompareTag("Car_Orange")||collision.CompareTag("Car_Blue"))
         {
             //Debug.Log("여기는 들어옴?");
             if (collision.gameObject.transform.parent.gameObject.GetComponentInParent<CarBooster_Yoo>() != null)

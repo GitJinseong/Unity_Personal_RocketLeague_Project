@@ -14,8 +14,8 @@ public class BoosterEffect_Yoo : MonoBehaviourPun
     {
         car = GetComponent<NewCar>();
         booster = GetComponent<CarBooster_Yoo>();
-        boostLevel1 = transform.GetChild(0).GetChild(0).GetChild(6).gameObject;
-        boostLevel2 = transform.GetChild(0).GetChild(0).GetChild(7).gameObject;
+        boostLevel1 = transform.GetChild(0).GetChild(0).Find("BoostLevel1").gameObject;
+        boostLevel2 = transform.GetChild(0).GetChild(0).Find("BoostLevel2").gameObject;
         Debug.Log(boostLevel1.gameObject.name);
         Debug.Log(boostLevel2.gameObject.name);
     }

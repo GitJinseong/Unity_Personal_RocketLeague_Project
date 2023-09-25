@@ -68,13 +68,40 @@ MonoBehaviour:
   - ChangeAura
   - UpdateAura
   - UpdateScore
-  - CreateInstantiateForPhotonView
-  - SetParentForPhoton
-  - SetParentRPC
+  - ChangeCheck
+  - UpdateGoalCheck
+  - PushColliderOn
+  - ApplyPushCollider
+  - ApplyPushColliderOff
+  - ApplyPushColliderOn
+  - PushColliderOff
+  - ApplyResetGame
+  - ResetGameMaster
+  - RespawnBall
+  - GameTimePassOnMaster
+  - ApplyGameTimePassOn
+  - TimePassMaster
+  - ApplyTimePass
+  - ApplyTimePassOff
+  - ApplyAddPlayerBlueCount
+  - ApplyAddPlayerOrangeCount
+  - MasterAddPlayerBlueCount
+  - MasterAddPlayerOrangeCount
+  - MasterSaveBlueCarObject
+  - MasterSaveOrangeCarObject
+  - CarRespawn
+  - SendMesageMaster
+  - MasterGameStartCheck
+  - ApplyGameStartCheck
+  - MasterStartCount
+  - ApplyStartCount
+  - ApplyStartCountEnd
+  - ApplyEnabledSet
+  - ApplyGameStartEnd
   - AdjustWheelsPositionForDebug
   - SetObjectNameForRPC
-  - SetParentForRPC
   - SetObjectTagForRPC
+  - SetParentForRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

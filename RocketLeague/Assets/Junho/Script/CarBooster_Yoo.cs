@@ -15,14 +15,19 @@ public class CarBooster_Yoo : MonoBehaviourPun
         // 포톤 관련 추가
         if (!photonView.IsMine)
         {
-            boostUI = transform.GetChild(0).GetChild(0).GetChild(8).GetComponentInChildren<BoostUI_Yoo>();
-            boostUI.gameObject.SetActive(false);
+            // 이 부분 굳이 필요 없음 스탠다드 씬 건드는 작업 내일 끝난 후 머지 받으면 바로 지울 예정
+            // 차마다 캔버스를 가질 필요가 없음, 게임매니저 속의 캔버스의 하위에 부스터 UI를 넣을 예정
+            //boostUI = transform.GetChild(0).GetChild(0).GetChild(8).GetComponentInChildren<BoostUI_Yoo>();
+            //boostUI.gameObject.SetActive(false);
             return;
         }
 
         boost = 33;
         useBoost = false;
-        boostUI = transform.GetChild(0).GetChild(0).GetChild(8).GetComponentInChildren<BoostUI_Yoo>();
+        // 이 아랫줄은 가져오는 위치를 지정해야함
+        //boostUI = transform.GetChild(0).GetChild(0).GetChild(8).GetComponentInChildren<BoostUI_Yoo>();
+
+        boostUI = FindFirstObjectByType<BoostUI_Yoo>();
     }
 
     private void FixedUpdate()

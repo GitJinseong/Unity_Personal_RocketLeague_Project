@@ -379,6 +379,7 @@ MonoBehaviour:
     m_Bits: 64
   currentSpeed: 0
   sphere: {fileID: 3928462306623203277}
+  outOfControl: 0
 --- !u!65 &3928462305623492221
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -411,7 +412,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3928462305986802184
 Transform:
   m_ObjectHideFlags: 0

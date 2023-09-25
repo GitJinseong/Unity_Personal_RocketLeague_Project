@@ -3,28 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class Ball_Ys : MonoBehaviourPunCallbacks,IPunObservable
+public class Ball_Ys : MonoBehaviourPunCallbacks, IPunObservable
 {
     Rigidbody rb;
     Vector3 networkPosition;
     Quaternion networkRotation;
     Vector3 velocity;
     Vector3 angularVelocity;
-    // Start is called before the first frame update
+
     private void Awake()
     {
         rb=GetComponent<Rigidbody>();
-
-    }
-    void Start()
-    {
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public void FreezeBall()
     {
         rb.velocity = Vector3.zero;
@@ -37,23 +28,29 @@ public class Ball_Ys : MonoBehaviourPunCallbacks,IPunObservable
         yield return new WaitForSeconds(3);
         rb.useGravity = true;
     }
-    private void OnCollisionEnter(Collision collision)
-    {
-      
-        rb.useGravity = true;        
 
-        
-        StopAllCoroutines();
+    private void OnCollisionEnter(Collision collision)   // 축구공에 콜라이더가 충돌하면 실행
+    {
+        if (PhotonNetwork.IsMasterClient)   // 마스터 클라이언트에서만 실행한다
+        {
+            // 차 태그가 달려있는 오브젝트가 축구공 콜라이더와 충돌했는지 체크
+            if (collision.gameObject.tag == ("Car_Blue") || collision.gameObject.tag == ("Car_Orange"))
+            {
+                if (GameManager.instance.timePassCheck == false)   // GameManager 에서 게임 시간이 멈춰있게 설정 되어있으면 실행
+                {
+                    // GameManager 의 게임 시간이 다시 흘러가게 하는 함수를 실행한다
+                    GameManager.instance.GameTimePassOn();
+                }
+                else   // GameManager 에서 게임 시간이 흘러가게 설정 되어있으면 실행
+                {
+                    rb.useGravity = true;
+
+                    StopAllCoroutines();
+                }
+            }
+        }
     }
 
-    private void FixedUpdate()
-    {
-        //if (!photonView.IsMine)
-        //{
-        //    rb.position = Vector3.MoveTowards(rb.position, networkPosition, Time.fixedDeltaTime);
-        //    rb.rotation = Quaternion.RotateTowards(rb.rotation, networkRotation, Time.fixedDeltaTime * 100.0f);
-        //}
-    }
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)

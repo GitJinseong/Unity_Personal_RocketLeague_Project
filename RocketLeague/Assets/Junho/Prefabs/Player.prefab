@@ -455,8 +455,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23b5aeeade32910408ac9ade3078479e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boostSpeed: 0
-  boostUI: {fileID: 0}
 --- !u!114 &8560750925306577561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,8 +541,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 561a2be5e84b7c446af13f20d8a1a59b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boostLevel1: {fileID: 0}
-  boostLevel2: {fileID: 0}
 --- !u!1 &8560750925364820828
 GameObject:
   m_ObjectHideFlags: 0

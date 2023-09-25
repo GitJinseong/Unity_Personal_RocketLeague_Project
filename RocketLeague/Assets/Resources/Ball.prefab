@@ -16,8 +16,7 @@ GameObject:
   - component: {fileID: 4782247926349038830}
   - component: {fileID: 4939698888015324735}
   - component: {fileID: -1347223072132702494}
-  - component: {fileID: 2201226135331251956}
-  - component: {fileID: 7932358433780342608}
+  - component: {fileID: 3506649227580902614}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Ball
@@ -188,19 +187,7 @@ MonoBehaviour:
     InterpolateOption: 0
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 0
---- !u!114 &2201226135331251956
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4782247926047387098}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b16d971ff886fb540a35f86db8457a7b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &7932358433780342608
+--- !u!114 &3506649227580902614
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -209,7 +196,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4782247926047387098}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb1a12882b01ad54797e46ed2983f0bb, type: 3}
+  m_Script: {fileID: 11500000, guid: 968698667111a7f4c83183541ff52912, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballRb: {fileID: 4782247926047387095}
+  ballRb: {fileID: 0}

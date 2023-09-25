@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -309,6 +310,28 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
         photonView.RPC("SetObjectNameForRPC", RpcTarget.AllBuffered, playerID, TeamTypes[teamID]);
         // RPC로 PlayerObj 태그 변경(BlueCar/OrangeCar)
         photonView.RPC("SetObjectTagForRPC", RpcTarget.AllBuffered, playerID, teamID);
+      
+        // PlayerObj의 자식 오브젝트 Collider를 찾고 뷰 아이디를 받아옴
+        int colliderID = FindChildRescursive(playerObj.transform, "Collider").gameObject.GetComponent<PhotonView>().ViewID;
+
+        // PlayerObj의 자식 오브젝트 Kart를 찾고 뷰 아이디를 받아옴
+        GameObject kart = FindChildRescursive(playerObj.transform, "Kart").gameObject;
+        int kartID = kart.GetComponent<PhotonView>().ViewID;
+
+        // Kart의 자식 오브젝트 KartNormal를 찾고 뷰 아이디를 받아옴
+        GameObject kartNormal = FindChildRescursive(kart.transform, "KartNormal").gameObject;
+        int kartNormalID = kartNormal.gameObject.GetComponent<PhotonView>().ViewID;
+
+        // kartNormal의 자식 오브젝트 Body를 찾고 뷰 아이디를 받아옴
+        int bodyID = FindChildRescursive(kartNormal.transform, "Body").gameObject.GetComponent<PhotonView>().ViewID;
+
+        // RPC로 Collider, Kart, KartNormal의 태그 변경(BlueCar/OrangeCar)
+        photonView.RPC("SetObjectTagForRPC", RpcTarget.AllBuffered, colliderID, teamID);
+        photonView.RPC("SetObjectTagForRPC", RpcTarget.AllBuffered, kartID, teamID);
+        photonView.RPC("SetObjectTagForRPC", RpcTarget.AllBuffered, kartNormalID, teamID);
+        photonView.RPC("SetObjectTagForRPC", RpcTarget.AllBuffered, bodyID, teamID);
+
+
         //playerObj.name = TeamTypes[teamID];
         // categoryList[] 만큼 순회 
         for (int i = 0; i < categoryList.Length; i++)
@@ -367,6 +390,10 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
         kartObj.transform.rotation = spawnRotation;
         Debug.Log($"kartObj rotation: {kartObj.transform.rotation}");
         Debug.Log($"spawnRotation rotation: {spawnRotation}");
+
+        // GameManager에 있는 SetRespawnObjectValues() 함수를 호출해서
+        // 리스폰에 관련된 정보를 저장함
+        GameManager.instance.SetRespawnObjectValues(playerObj);
     }
     #endregion
 

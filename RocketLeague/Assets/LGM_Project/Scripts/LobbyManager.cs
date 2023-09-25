@@ -196,4 +196,12 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         playButtons.SetActive(true);
         gameModeButtons.SetActive(false);
     }
+
+    // 게임을 종료하는 함수
+    // 종료 버튼을 눌렀을 때 호출된다.
+    public void ExitButton()
+    {
+        // 게임 종료
+        Application.Quit();
+    }
 }

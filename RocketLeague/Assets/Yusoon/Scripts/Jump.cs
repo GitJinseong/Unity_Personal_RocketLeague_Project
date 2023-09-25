@@ -5,8 +5,9 @@ using UnityEngine;
 public class Jump : MonoBehaviour
 {
     public Transform kartNormal;
+    public int jumpCount=0;
+    public NewCar car;
     Rigidbody rb;
-    int jumpCount=0;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,22 +17,22 @@ public class Jump : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            jumpCount+=1;
-            if(jumpCount<=2)
-            {
-            rb.AddForce(kartNormal.up*50f, ForceMode.Impulse);
-
-            }
-        }
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        if(collision.collider.CompareTag("Floor"))
+        if(car.isGrounded&&!Input.GetKeyDown(KeyCode.Space))
         {
             jumpCount=0;
         }
+
+        if(Input.GetMouseButtonDown(1))
+        {
+            car.isGrounded=false;
+          if(jumpCount<1)
+            {
+                rb.AddForce(kartNormal.up*40f, ForceMode.VelocityChange);
+                jumpCount+=1;
+            }
+
+           
+        }
     }
+   
 }

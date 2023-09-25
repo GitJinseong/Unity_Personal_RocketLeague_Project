@@ -207,7 +207,7 @@ Transform:
   m_Children:
   - {fileID: 499553825173496449}
   m_Father: {fileID: 1288784675466540740}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5219809783535401286
 MonoBehaviour:
@@ -223,6 +223,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   kartNormal: {fileID: 499553825173496449}
   kartModel: {fileID: 850578761821848690}
+  cameraCenter: {fileID: 4654866802952192802}
   acceleration: 65
   steering: 15
   gravity: 50
@@ -232,6 +233,7 @@ MonoBehaviour:
   fieldMask:
     serializedVersion: 2
     m_Bits: 64
+  isGrounded: 0
   currentSpeed: 0
   sphere: {fileID: 2144950358458623140}
   outOfControl: 0
@@ -357,6 +359,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6416741682455476207}
+  - {fileID: 4654866802952192802}
   - {fileID: 2157593257449269660}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -390,12 +393,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2527375480125864054}
   m_LocalRotation: {x: 0.052235868, y: -0, z: -0, w: 0.9986348}
-  m_LocalPosition: {x: 0, y: 5.92, z: -12.53}
+  m_LocalPosition: {x: 0, y: 8.35, z: -12.53}
   m_LocalScale: {x: 1, y: 1, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 850578761821848690}
-  m_RootOrder: 5
+  m_Father: {fileID: 4654866802952192802}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 5.989, y: 0, z: 0}
 --- !u!20 &5194951100511785341
 Camera:
@@ -605,7 +608,7 @@ GameObject:
   - component: {fileID: 6574116054356657649}
   m_Layer: 2
   m_Name: fenecc (1)
-  m_TagString: Car
+  m_TagString: Car_Orange
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -627,7 +630,6 @@ Transform:
   - {fileID: 3956249339793319988}
   - {fileID: 5823288550107613313}
   - {fileID: 5584835334962172399}
-  - {fileID: 6908823102950778789}
   - {fileID: 2737370698553012256}
   - {fileID: 8164839496112669582}
   - {fileID: 3538495100064954414}
@@ -885,6 +887,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kartNormal: {fileID: 499553825173496449}
+  jumpCount: 0
+  car: {fileID: 5219809783535401286}
 --- !u!114 &4500713803494320190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1126,6 +1130,38 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &9187717052166516779
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4654866802952192802}
+  m_Layer: 2
+  m_Name: CameraCenter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4654866802952192802
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9187717052166516779}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6908823102950778789}
+  m_Father: {fileID: 1288784675466540740}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &224685473491673496
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1141,7 +1177,7 @@ PrefabInstance:
     - target: {fileID: 8237480076770894358, guid: afd01d7beefc79549b90f897fe267fe8,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8237480076770894358, guid: afd01d7beefc79549b90f897fe267fe8,
         type: 3}
@@ -1226,7 +1262,7 @@ PrefabInstance:
     - target: {fileID: 2986415539190309358, guid: f83e514301998b14fb5c3920684843c8,
         type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2986415539190309358, guid: f83e514301998b14fb5c3920684843c8,
         type: 3}
@@ -1336,7 +1372,7 @@ PrefabInstance:
     - target: {fileID: 1087070399543704703, guid: 9373f37842479d545b505ff265f3604d,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1087070399543704703, guid: 9373f37842479d545b505ff265f3604d,
         type: 3}
