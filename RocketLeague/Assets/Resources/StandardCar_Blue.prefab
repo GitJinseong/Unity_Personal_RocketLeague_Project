@@ -213,6 +213,7 @@ Transform:
   - {fileID: 2109512803829730821}
   - {fileID: 2045189451809648701}
   - {fileID: 5937969303421228789}
+  - {fileID: 684582744827623280}
   m_Father: {fileID: 4132927733084552843}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -242,6 +243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   car: {fileID: 6680465158945332020}
+  carTransform: {fileID: 0}
 --- !u!114 &9123825842742593203
 MonoBehaviour:
   m_ObjectHideFlags: 0

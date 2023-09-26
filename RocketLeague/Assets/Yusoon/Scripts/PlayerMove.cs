@@ -4,15 +4,15 @@ using UnityEngine;
 using Unity.VisualScripting;
 using Rewired;
 
-public class PlayerMove :MonoBehaviour
+public class PlayerMove : MonoBehaviour
 {
-  
- 
+
+
     public float speed;
     public float jumpForce;
     public float maxSpeed;
     public int playerId = 0;
-  
+
     Rigidbody playerRigid;
     AudioSource playerStepSound;
     public Animator animator;
@@ -32,7 +32,7 @@ public class PlayerMove :MonoBehaviour
     private bool fallDamage;
     private bool isAttack = false;
     Vector3 direction;
-  
+
 
 
     // Start is called before the first frame update
@@ -41,12 +41,12 @@ public class PlayerMove :MonoBehaviour
         fire = false;
         playerRigid = GetComponent<Rigidbody>();
 
-        player=ReInput.players.GetPlayer(0);
+        player = ReInput.players.GetPlayer(0);
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         animator = GetComponent<Animator>();
-       
+
     }
 
 
@@ -54,11 +54,11 @@ public class PlayerMove :MonoBehaviour
 
     private void GetInput()
     {
-       
+
 
         //moveVector.x = player.GetAxis("Move Horizontal");
         //moveVector.z = player.GetAxis("Move Vertical");
-       
+
 
     }
 
@@ -67,7 +67,7 @@ public class PlayerMove :MonoBehaviour
         if (collision.gameObject.CompareTag("Floor"))
         {
             isGround = true;
-           
+
         }
     }
 
@@ -78,34 +78,34 @@ public class PlayerMove :MonoBehaviour
             isGround = false;
         }
     }
-   
+
     private void ProcessInput()
     {
 
         if (fire)
         {
-            if(isAttack==false)
+            if (isAttack == false)
             {
-                isAttack=true;
-         
-            
-            // Set vibration in all Joysticks assigned to the Player
-            int motorIndex = 0; // the first motor
-            float motorLevel = 0.05f; // full motor speed
-            float duration = 0.2f; // 2 seconds
-         
+                isAttack = true;
+
+
+                // Set vibration in all Joysticks assigned to the Player
+                int motorIndex = 0; // the first motor
+                float motorLevel = 0.05f; // full motor speed
+                float duration = 0.2f; // 2 seconds
+
 
             }
         }
-        
+
 
 
 
     }
     private void LateUpdate()
     {
-   
-        
+
+
 
         Vector3 desiredPosition = target.position + offset;
         Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, smoothSpeed);
@@ -115,7 +115,7 @@ public class PlayerMove :MonoBehaviour
     }
     private void LookAround()
     {
-       
+
 
         Vector2 mouseDelta = new Vector2(player.GetAxis("Camera Horizontal"), player.GetAxis("Camera Vertical"));
         mouseDelta *= 0.2f;
@@ -124,7 +124,7 @@ public class PlayerMove :MonoBehaviour
         if (x < 180f)
         {
             x = Mathf.Clamp(x, -1f, 40f);
-        } 
+        }
         else
         {
             x = Mathf.Clamp(x, 335f, 361f);
@@ -134,7 +134,7 @@ public class PlayerMove :MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
         LookAround();
         float moveHorizontal = player.GetAxis("Move Horizontal");
         float moveVertical = player.GetAxis("Move Vertical");
@@ -164,15 +164,15 @@ public class PlayerMove :MonoBehaviour
 
         isWalking = movement.magnitude != 0;
 
-        
 
 
 
 
-       
+
+
         if (isGround)
         {
-           
+
 
         }
         GetInput();
@@ -181,49 +181,49 @@ public class PlayerMove :MonoBehaviour
 
 
     private void OnTriggerEnter(Collider other)
-    {    
-      //PhotonView photonView_=other.gameObject.GetComponent<PhotonView>();
-
-      //  if (photonView_ != null)
-      //  {
-            
-      //  int viewId = photonView_.ViewID;
-      //      if (other.CompareTag("Player"))
-      //      {
-      //          photonView.RPC("HealthUpdate", RpcTarget.Others, viewId, 1f);
-      //          photonView.RPC("ParticlePlay", RpcTarget.AllBuffered, other.transform.position);
-                
-      //      }
-      //      else
-      //      {
-      //      photonView.RPC("AttackForce", RpcTarget.MasterClient, viewId,transform.position,other.transform.position);
-
-      //      }
-
-
-      //  }
-    }
- 
-
-  
-    private void HealthUpdate(int viewId_,float minusHp)
     {
-       
-        
-       
+        //PhotonView photonView_=other.gameObject.GetComponent<PhotonView>();
+
+        //  if (photonView_ != null)
+        //  {
+
+        //  int viewId = photonView_.ViewID;
+        //      if (other.CompareTag("Player"))
+        //      {
+        //          photonView.RPC("HealthUpdate", RpcTarget.Others, viewId, 1f);
+        //          photonView.RPC("ParticlePlay", RpcTarget.AllBuffered, other.transform.position);
+
+        //      }
+        //      else
+        //      {
+        //      photonView.RPC("AttackForce", RpcTarget.MasterClient, viewId,transform.position,other.transform.position);
+
+        //      }
+
+
+        //  }
     }
 
-  
-    private void AttackForce(int viewId_,Vector3 playerPosition_,Vector3 otherPosition)
+
+
+    private void HealthUpdate(int viewId_, float minusHp)
     {
-        
-      
 
-    
 
 
     }
-   
-    
+
+
+    private void AttackForce(int viewId_, Vector3 playerPosition_, Vector3 otherPosition)
+    {
+
+
+
+
+
+
+    }
+
+
 }
 

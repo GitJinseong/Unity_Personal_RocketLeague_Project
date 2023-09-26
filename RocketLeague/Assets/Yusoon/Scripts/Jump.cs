@@ -17,7 +17,9 @@ public class Jump : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(car.isGrounded&&!Input.GetKeyDown(KeyCode.Space))
+        if (GameManager.instance.gameStartCheck == false) { return; }
+
+        if (car.isGrounded&&!Input.GetKeyDown(KeyCode.Space))
         {
             jumpCount=0;
         }

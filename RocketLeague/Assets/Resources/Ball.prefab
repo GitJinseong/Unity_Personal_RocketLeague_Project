@@ -154,6 +154,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77c81be16169d3a4f8b07cc2b97ceb45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blueteamName: 
+  orangeteamName: 
+  teamNumber: 0
 --- !u!114 &-1347223072132702494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,7 +171,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PositionModel:
     SynchronizeEnabled: 1
-    TeleportEnabled: 1
+    TeleportEnabled: 0
     TeleportIfDistanceGreaterThan: 3
     InterpolateOption: 4
     InterpolateMoveTowardsSpeed: 1

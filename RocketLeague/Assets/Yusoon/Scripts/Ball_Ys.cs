@@ -10,6 +10,9 @@ public class Ball_Ys : MonoBehaviourPunCallbacks, IPunObservable
     Quaternion networkRotation;
     Vector3 velocity;
     Vector3 angularVelocity;
+    public string blueteamName;
+    public string orangeteamName;
+    public int teamNumber;
 
     private void Awake()
     {
@@ -47,6 +50,24 @@ public class Ball_Ys : MonoBehaviourPunCallbacks, IPunObservable
 
                     StopAllCoroutines();
                 }
+
+                PhotonView targetView=collision.gameObject.GetComponent<PhotonView>();
+                if(targetView != null) 
+                {
+                    if(targetView.Owner.ActorNumber%2==0)
+                    {
+                        //blueteamNameCheck
+                        blueteamName=targetView.Owner.NickName;
+                    }    
+                    else
+                    {
+                        orangeteamName=targetView.Owner.NickName;
+                    }
+                }
+
+               
+
+
             }
         }
     }

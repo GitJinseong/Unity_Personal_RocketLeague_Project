@@ -6,8 +6,9 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections.Concurrent;
+using Photon.Pun;
 
-public class CarItemManager : MonoBehaviour
+public class CarItemManager : MonoBehaviourPun
 {
     public GameObject magnetParticle;
     public GameObject PowerUpParticle;
@@ -47,49 +48,53 @@ public class CarItemManager : MonoBehaviour
     void Start()
     {
 
-        skillCoolTime=0;
+        skillCoolTime = 0;
         StartCoroutine(SkillCoolTimeRoutine());
-        if (myCollider.tag=="OrangeCar")
+        if (myCollider.tag == "OrangeCar")
         {
-            targetTag="BlueCar";
+            targetTag = "BlueCar";
 
         }
         else
         {
-            targetTag="OrangeCar";
+            targetTag = "OrangeCar";
 
         }
         DeActiveIcons();
-        lineRenderer=GetComponent<LineRenderer>();
-        lineRenderer.enabled=false;
+        lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.enabled = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
         linePoints[0] = transform.position;
-        linePoints[0].y=4;
+        linePoints[0].y = 4;
         lineRenderer.SetPosition(0, linePoints[0]);
-
-        currentCooltime=coolTimeMax- skillCoolTime;
-        cooltimeText.text = currentCooltime.ToString();
-        skillSliderbg.fillAmount = skillCoolTime/coolTimeMax;
-
-        newPosition =transform.position;
-        newPosition.y=2.4f;
-        Collider[] colliders = Physics.OverlapSphere(newPosition, radius);
-
-        if(magnetOn)
+        if (magnetOn)
         {
-            lineRenderer.enabled=true;
+            lineRenderer.enabled = true;
         }
         else
         {
-            lineRenderer.enabled=false;
+            lineRenderer.enabled = false;
 
         }
-        if (skillCoolTime==10)
+
+        if (!photonView.IsMine)
+        {
+            return;
+        }
+
+        newPosition = transform.position;
+        newPosition.y = 2.4f;
+        Collider[] colliders = Physics.OverlapSphere(newPosition, radius);
+        currentCooltime = coolTimeMax - skillCoolTime;
+        cooltimeText.text = currentCooltime.ToString();
+        skillSliderbg.fillAmount = skillCoolTime / coolTimeMax;
+
+
+        if (skillCoolTime == 10)
         {
             skillSlider.SetActive(false);
 
@@ -100,23 +105,22 @@ public class CarItemManager : MonoBehaviour
             skillActive = false;
 
         }
-        if(skillActive)
-        {    
-            if(randomIdx==POWER_UP)
+        if (skillActive)
+        {
+            if (randomIdx == POWER_UP)
             {
                 if (Input.GetKeyDown(KeyCode.R))
                 {
-
                     PowerUpParticle.SetActive(true);
-                StartCoroutine(SkillUseCoolTime(5));
+                    StartCoroutine(SkillUseCoolTime(5));
                 }
             }
-            }
+        }
         float nearestDistance = float.MaxValue;
         foreach (Collider col in colliders)
         {
-            if (myCollider.tag==col.tag) continue;
-            if (col.tag==targetTag)
+            if (myCollider.tag == col.tag) continue;
+            if (col.tag == targetTag)
             {
                 //Debug.LogFormat("내 태그 {0} 상대 태그 {1}", myCollider.tag, col.tag);
 
@@ -130,7 +134,7 @@ public class CarItemManager : MonoBehaviour
                 {
                     //Debug.LogFormat("내 태그 {0}, 가장 가까운 상대 태그 {1}", myCollider.tag, nearestCollider.tag);
                     Rigidbody rb = nearestCollider.GetComponent<Rigidbody>();
-                    Vector3 dir = (col.transform.position-transform.position).normalized;
+                    Vector3 dir = (col.transform.position - transform.position).normalized;
                     if (rb != null)
                     {
                         if (skillActive)
@@ -142,28 +146,29 @@ public class CarItemManager : MonoBehaviour
                                 switch (randomIdx)
 
                                 {
-                                   
+
 
                                     case KICK:
-                                        kickTransform.LookAt(col.transform.position);
-                                        kickAnimator.Play("KickAnimation");
-                                        rb.AddForce(dir*350, ForceMode.Impulse);
-                                        StartCoroutine(SkillUseCoolTime(1));
-                                        break;                                
+                                        //kickTransform.LookAt(col.transform.position);
+                                        //kickAnimator.Play("KickAnimation");
+                                        //rb.AddForce(dir * 30, ForceMode.VelocityChange);
+                                        //StartCoroutine(SkillUseCoolTime(1));
+                                        photonView.RPC("Kick", RpcTarget.All, rb, dir, col.transform.position);
+                                        break;
                                     case ENEMY_BOOST:
-                                        CarParent colParent=col.GetComponentInParent<CarParent>();
-                                        if(colParent != null)
+                                        CarParent colParent = col.GetComponentInParent<CarParent>();
+                                        if (colParent != null)
                                         {
-                                            NewCar newCar=colParent.GetComponentInChildren<NewCar>();
-                                            if(newCar != null)
+                                            NewCar newCar = colParent.GetComponentInChildren<NewCar>();
+                                            if (newCar != null)
                                             {
-                                                newCar.outOfControl=true;
-                                        StartCoroutine(SkillUseCoolTime(5));
+                                                newCar.outOfControl = true;
+                                                StartCoroutine(SkillUseCoolTime(5));
 
                                             }
                                         }
                                         break;
-                                
+
 
                                 }
 
@@ -180,64 +185,78 @@ public class CarItemManager : MonoBehaviour
 
         }
 
+        photonView.RPC("receiveInfo", RpcTarget.Others, linePoints, ballRigidBody, ballDir);
+
+
     }
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Ball"))
         {
-            ballRigidBody=other.GetComponent<Rigidbody>();
-            ballDir=(other.transform.position - transform.position).normalized;
-            if (ballRigidBody != null)
-            {
-            }
+            ballRigidBody = other.GetComponent<Rigidbody>();
+            ballDir = (other.transform.position - transform.position).normalized;
 
-                linePoints[1]=other.transform.position;
-                lineRenderer.SetPosition(1, linePoints[1]);
             if (magnetOn)
             {
-                
-                ballRigidBody.AddForce(-ballDir*30);
+                if(PhotonNetwork.IsMasterClient)
+                {
+                    ballRigidBody.AddForce(-ballDir * 30);
+                }
             }
-            
+
+            if (!photonView.IsMine)
+            {
+                linePoints[1] = other.transform.position;
+                lineRenderer.SetPosition(1, linePoints[1]);
+                return;
+            }
+
+            linePoints[1] = other.transform.position;
+            lineRenderer.SetPosition(1, linePoints[1]);
+
             if (skillActive)
             {
 
-                if (randomIdx==PUNCH)
+                if (randomIdx == PUNCH)
                 {
                     if (Input.GetKeyDown(KeyCode.R))
                     {
-                        if(isPunch==false)
+                        if (isPunch == false)
                         {
-                            isPunch=true;
-                        punchAnimator.Play("PunchAnimation");
-                        punchTransform.LookAt(other.transform.position);
-                        ballRigidBody.velocity=Vector3.zero;
-                        ballRigidBody.AddForce(ballDir*70, ForceMode.Impulse);
-                        StartCoroutine(SkillUseCoolTime(1));
+                            //    isPunch=true;
+                            //punchAnimator.Play("PunchAnimation");
+                            //punchTransform.LookAt(other.transform.position);
+                            //StartCoroutine(SkillUseCoolTime(1));
+                            //ballRigidBody.velocity = Vector3.zero;
+                            //ballRigidBody.AddForce(ballDir * 70, ForceMode.Impulse);
+
+                            photonView.RPC("BallPunch", RpcTarget.All, other.transform.position);
                         }
                     }
                 }
-                if (randomIdx==MAGNET)
+                if (randomIdx == MAGNET)
                 {
 
                     if (Input.GetKeyDown(KeyCode.R))
                     {
 
-                        if (magnetOn==false)
+                        if (magnetOn == false)
                         {
-                            magnetOn = true;
-                            magnetParticle.SetActive(true);
-                            StartCoroutine(SkillUseCoolTime(8));
+                            //magnetOn = true;
+                            //magnetParticle.SetActive(true);
+                            //StartCoroutine(SkillUseCoolTime(8));
+
+                            photonView.RPC("BallMargnet",RpcTarget.All);
                         }
 
                     }
                 }
-                if (randomIdx==ICE)
+                if (randomIdx == ICE)
                 {
                     if (Input.GetKeyDown(KeyCode.R))
                     {
                         Ball_Ys ball = other.GetComponent<Ball_Ys>();
-                        if (ball!=null)
+                        if (ball != null)
                         {
                             ball.FreezeBall();
                             StartCoroutine(SkillUseCoolTime(3));
@@ -252,52 +271,93 @@ public class CarItemManager : MonoBehaviour
     {
         if (other.CompareTag("Ball"))
         {
-            lineRenderer.enabled=false;
+            lineRenderer.enabled = false;
         }
     }
 
     private void DeActiveIcons()
     {
-        for (int i = 0; i<skillIcon.Length; i++)
+        for (int i = 0; i < skillIcon.Length; i++)
         {
             skillIcon[i].enabled = false;
         }
     }
+
     private IEnumerator SkillUseCoolTime(int second)
     {
         yield return new WaitForSeconds(second);
         DeActiveIcons();
         skillSlider.SetActive(true);
-        skillCoolTime=0;
-        if(magnetParticle!=null)
+        skillCoolTime = 0;
+        if (magnetParticle != null)
         {
-        magnetParticle.SetActive(false);
+            magnetParticle.SetActive(false);
 
         }
-        if(PowerUpParticle!=null)
+        if (PowerUpParticle != null)
         {
             PowerUpParticle.SetActive(false);
 
         }
-        isPunch=false;
-        magnetOn =false;
+        isPunch = false;
+        magnetOn = false;
         StartCoroutine(SkillCoolTimeRoutine());
 
     }
+
     private IEnumerator SkillCoolTimeRoutine()
     {
-        while (skillCoolTime<10)
+        while (skillCoolTime < 10)
         {
             yield return new WaitForSeconds(1);
-            skillCoolTime+=1;
+            skillCoolTime += 1;
         }
         randomIdx = Random.Range(0, 6);
-        
+
         skillIcon[randomIdx].enabled = true;
     }
 
+    [PunRPC]
+    void receiveInfo(Vector3[] linePts, Rigidbody ballRb, Vector3 ballDr)
+    {
+        linePoints = linePts;
+        ballRigidBody = ballRb;
+        ballDir = ballDr;
+    }
 
+    [PunRPC]
+    void BallPunch(Vector3 position)
+    {
+        isPunch = true;
+        punchAnimator.Play("PunchAnimation");
+        punchTransform.LookAt(position);
+        StartCoroutine(SkillUseCoolTime(1));
+        if (PhotonNetwork.IsMasterClient)
+        {
+            ballRigidBody.velocity = Vector3.zero;
+            ballRigidBody.AddForce(ballDir * 70, ForceMode.Impulse);
+        }
+    }
 
+    [PunRPC]
+    void BallMargnet()
+    {
+        magnetOn = true;
+        magnetParticle.SetActive(true);
+        StartCoroutine(SkillUseCoolTime(8));
+    }
+
+    [PunRPC]
+    void Kick(Rigidbody nearRb, Vector3 nearDir, Vector3 nearPosition)
+    {
+        kickTransform.LookAt(nearPosition);
+        kickAnimator.Play("KickAnimation");
+        StartCoroutine(SkillUseCoolTime(1));
+        if(PhotonNetwork.IsMasterClient)
+        {
+            nearRb.AddForce(nearDir * 30, ForceMode.VelocityChange);
+        }
+    }
 
     //void OnDrawGizmosSelected()
     //{

@@ -695,6 +695,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kartNormal: {fileID: 7382552690665201991}
+  jumpCount: 0
+  car: {fileID: 0}
 --- !u!114 &5337530771460046503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -990,6 +992,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   kartNormal: {fileID: 7382552690665201991}
   kartModel: {fileID: 7066928961794504648}
+  cameraCenter: {fileID: 0}
   acceleration: 65
   steering: 15
   gravity: 50
@@ -999,6 +1002,7 @@ MonoBehaviour:
   fieldMask:
     serializedVersion: 2
     m_Bits: 64
+  isGrounded: 0
   currentSpeed: 0
   sphere: {fileID: 7382552690451686402}
   outOfControl: 0
@@ -2377,6 +2381,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   car: {fileID: 7382552691123209651}
+  carTransform: {fileID: 0}
 --- !u!114 &3951574820921425532
 MonoBehaviour:
   m_ObjectHideFlags: 0

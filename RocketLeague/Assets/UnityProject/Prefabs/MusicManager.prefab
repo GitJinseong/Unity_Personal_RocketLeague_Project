@@ -301,6 +301,7 @@ GameObject:
   - component: {fileID: 1479805415718018741}
   - component: {fileID: 1479805415718018742}
   - component: {fileID: 1479805415718018743}
+  - component: {fileID: 5277620284244170945}
   m_Layer: 0
   m_Name: MusicUi
   m_TagString: Untagged
@@ -390,6 +391,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!225 &5277620284244170945
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1479805415718018737}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1479805415937927209
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,19 +450,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   musicClip:
-  - {fileID: 8300000, guid: 279b85a2227c99e42a20d96781991ff3, type: 3}
+  - {fileID: 8300000, guid: 88a69b99e5155904b9d67d5e6167ea01, type: 3}
   - {fileID: 8300000, guid: b003c74577a166a48ae9d78c77f08dd0, type: 3}
   - {fileID: 8300000, guid: 185fa54b817296547af2af7f8ac260c5, type: 3}
   - {fileID: 8300000, guid: 2b4fd089097f4f6458c31dfc561d1c2d, type: 3}
   - {fileID: 8300000, guid: 1acfbe5b234c0b74ab39dc5a13bb26fc, type: 3}
-  - {fileID: 8300000, guid: 88a69b99e5155904b9d67d5e6167ea01, type: 3}
+  - {fileID: 8300000, guid: 279b85a2227c99e42a20d96781991ff3, type: 3}
   musicImages:
-  - {fileID: 21300000, guid: 9cb3484e455cb7e40ab92c8cc45986ef, type: 3}
+  - {fileID: 21300000, guid: 2aa8b7bcd2444b84187e2e5eeafa56e1, type: 3}
   - {fileID: 21300000, guid: 37ad173ac68265a4a824cbf2d6968d67, type: 3}
   - {fileID: 21300000, guid: 452d489b765422b40947ee4b61d151be, type: 3}
   - {fileID: 21300000, guid: 325f88ad4168561409feff3ec87f4481, type: 3}
   - {fileID: 21300000, guid: c1cb94df7c984b84b81210f34f09d745, type: 3}
-  - {fileID: 21300000, guid: 2aa8b7bcd2444b84187e2e5eeafa56e1, type: 3}
+  - {fileID: 21300000, guid: 9cb3484e455cb7e40ab92c8cc45986ef, type: 3}
   albumCover: {fileID: 1479805414033562018}
   songName: {fileID: 1479805414964253513}
 --- !u!82 &1479805415937927208

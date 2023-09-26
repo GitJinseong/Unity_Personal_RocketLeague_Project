@@ -30,7 +30,8 @@ public class Shoot : MonoBehaviourPun
             //rb.AddForce(dir*car.currentSpeed*0.5f, ForceMode.Impulse);
 
             Vector3 dir = (collision.transform.position - position).normalized;
-            //Debug.Log(dir);
+           
+           
 
 
 

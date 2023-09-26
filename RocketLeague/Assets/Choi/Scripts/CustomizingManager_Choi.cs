@@ -282,25 +282,30 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
     // 모든 파츠 리스트를 순회해서 PlayerPrefab에 저장되어 있는 Index를
     // 바탕으로 오브젝트를 생성하고 부위별 파츠를 오브젝트에 장착하는 함수
     // *teamID: [0]은 블루 / [1]은 오렌지 팀이다.
+    // 매개변수로 받은 isRumbleMode 값으로 럼블 모드를 구분한다.
+    // 럼블 모드일 경우 럼블 모드 전용 자동차 생성
     // 포톤뷰 전용
     public void CreateObjectWithCustomizing(int teamID, int actorNumber,
-        Vector3 spawnPosition, Quaternion spawnRotation)
+        Vector3 spawnPosition, Quaternion spawnRotation, bool isRumbleMode)
     {
         Debug.Log("호출");
         // 임시 변수 선언
         string temp_CsvList = "";
         string temp_Category = "";
         int temp_Index = 0;
-        // prefabName으로 PlayerCar 설정
-        string prefabName = "PlayerCar";;
+
+        // prefabName 설정
+        // 럼블 모드일 경우 "PlayerRumbleCar" 아닐 경우 "PlayerCar" 설정
+        string prefabName = isRumbleMode == true ? "PlayerRumbleCar" : "PlayerCar";
+
         // 딕셔너리 키 값 넣기
         string dictionaryKey = DEFAULT_KEY;
         int CarFrameIndex = 0;
-        // Resources.Load<GameObject>(string)으로 프리팹을 검색 후 가져옴
-        GameObject prefab = Resources.Load<GameObject>(prefabName);
-        // 매개변수로 받은 startPosition 값으로 플레이어 오브젝트 생성
-        GameObject playerObj = PhotonNetwork.Instantiate(prefab.name, spawnPosition,
+
+        // 매개변수로 받은 startPosition 값으로 플레이어 오브젝트 생성;
+        GameObject playerObj = PhotonNetwork.Instantiate(prefabName, spawnPosition,
            Quaternion.identity);
+
         // playerObj의 ViewID를 찾음
         int playerID = playerObj.GetComponent<PhotonView>().ViewID;
 
@@ -331,7 +336,6 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
         photonView.RPC("SetObjectTagForRPC", RpcTarget.AllBuffered, kartNormalID, teamID);
         photonView.RPC("SetObjectTagForRPC", RpcTarget.AllBuffered, bodyID, teamID);
 
-
         //playerObj.name = TeamTypes[teamID];
         // categoryList[] 만큼 순회 
         for (int i = 0; i < categoryList.Length; i++)
@@ -361,10 +365,12 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
                     CarFrameIndex = temp_Index;
                 }
             }
+
             Debug.Log($"가져온 인덱스 {temp_Index}");
+            Debug.Log($"데이터 딕셔너리 개수: {dataDictionary.Count}");
+
             // 오브젝트 인스턴스 생성 함수 호출, 위에서 생성된 플레이어 오브젝트를 부모로 설정
             // 아래 호출 부분에서 딕셔너리 키값을 찾을수없다는 오류발생
-            Debug.Log($"데이터 딕셔너리 개수: {dataDictionary.Count}");
             foreach (var value in dataDictionary)
             {
                 Debug.Log(value.Key);
@@ -375,6 +381,7 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
             // 해당하는 카테고리 오브젝트의 자식으로 파츠가 생성된다.
             CreateInstantiateForPhotonView(actorNumber, temp_Category, dictionaryKey, temp_Index, temp_CategoryObj, true);
         }
+
         // CarFrame에 맞게 휠의 포지션을 변경하는 함수 호출
         // 매개변수로 CarFrame의 변환된 인덱스 temp_CarFrameIndex를 넣는다.
         //AdjustWheelsPosition(CarFrameIndex);
@@ -387,13 +394,14 @@ public class CustomizingManager_Choi : MonoBehaviourPunCallbacks
         // PlayerObj의 자식인 Kart 오브젝트를 재귀 함수로 찾아서
         // startRotation을 변경
         GameObject kartObj = FindChildRescursive(playerObj.transform, "Kart").gameObject;
+        //spawnRotation *= spawnRotation;
         kartObj.transform.rotation = spawnRotation;
         Debug.Log($"kartObj rotation: {kartObj.transform.rotation}");
         Debug.Log($"spawnRotation rotation: {spawnRotation}");
 
         // GameManager에 있는 SetRespawnObjectValues() 함수를 호출해서
         // 리스폰에 관련된 정보를 저장함
-        GameManager.instance.SetRespawnObjectValues(playerObj);
+        GameManager.instance.SetRespawnObjectValues(playerObj, teamID, kart.transform);
     }
     #endregion
 

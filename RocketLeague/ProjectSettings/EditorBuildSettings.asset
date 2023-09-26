@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Choi/Scenes/TitleScene.unity
+    guid: 8dcf73de1d7453b468dba8a06d888f4b
+  - enabled: 1
     path: Assets/Choi/Scenes/SampleScene.unity
     guid: 470180f2e09026743b7f86ae7ce701c8
   - enabled: 1

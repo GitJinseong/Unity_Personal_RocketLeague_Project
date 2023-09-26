@@ -5,7 +5,9 @@ using UnityEngine;
 
 public class CarBooster_Yoo : MonoBehaviourPun
 {
-    public float boost { get; private set; }
+    private float newBoost;
+    private float boost;
+    private float pastBoost;
 
     BoostUI_Yoo boostUI;
     public bool useBoost { get; private set; }
@@ -22,12 +24,12 @@ public class CarBooster_Yoo : MonoBehaviourPun
             return;
         }
 
-        boost = 33;
         useBoost = false;
         // 이 아랫줄은 가져오는 위치를 지정해야함
         //boostUI = transform.GetChild(0).GetChild(0).GetChild(8).GetComponentInChildren<BoostUI_Yoo>();
 
         boostUI = FindFirstObjectByType<BoostUI_Yoo>();
+        boost = 33;
     }
 
     private void FixedUpdate()
@@ -53,10 +55,15 @@ public class CarBooster_Yoo : MonoBehaviourPun
             return;
         }
 
-        //Debug.Log("현재 부스터 게이지: " +  boost);
-        boostUI.SetBoostGauge(boost);
+        pastBoost = boost;
+        boostUI.SetBoost(boost);
 
-        if(Input.GetMouseButton(0))
+        //Debug.Log("현재 부스터 게이지: " +  boost);
+        //boostUI.SetBoostGauge(boost);
+
+        if (GameManager.instance.gameStartCheck == false || GameManager.instance.isGameOver == true) { return; }
+
+        if (Input.GetMouseButton(0))
         {
             if(boost == 0)
             {
@@ -79,26 +86,71 @@ public class CarBooster_Yoo : MonoBehaviourPun
         {
             return;
         }
-        for (int i = 0; i < boostGauge; i ++)
+        else
         {
-            boost += 1;
-            if (boost > 100)
+            newBoost = pastBoost + boostGauge;
+
+            if(newBoost > 100)
             {
-                boost = 100;
+                newBoost = 100;
             }
         }
+
+        SetBoostGauge(newBoost);
     }
 
     // 부스터 게이지 사용 함수
     public void UseBoost()
     {
-        if(boost == 0)
+        if(boost <= 0)
         {
             useBoost = false;
+            boost = 0;
             return;
         }
 
+        newBoost -= 0.666f;
+        boost -= 0.666f;
+    }
 
-        boost -= 1;
+    public void SetBoostGauge(float gauge)
+    {
+        newBoost = gauge;
+        //boostImage.fillAmount = Mathf.Lerp((pastBoost/100)*0.65f, (boost/100)*0.65f, t);
+        StartCoroutine(BoostLerp());
+    }
+
+    IEnumerator BoostLerp()
+    {
+        float t;
+        float delta = 0;
+        float duration = 0.1f;
+
+        while (duration > delta)
+        {
+            t = delta / duration;
+
+            boost = Mathf.Lerp(pastBoost, newBoost, t);
+            //boostImage.fillAmount = 0.65f * (boost / 100);
+
+            //boostInt = (int)boost;
+            //boostString = boostInt.ToString();
+            //boostText.text = boostString;
+            delta += Time.deltaTime;
+            yield return null;
+        }
+        boost = newBoost;
+
+        yield break;
+    }
+
+    public void SetBoost(float nBoost)
+    {
+        boost = nBoost;
+    }
+
+    public void SetNewBoost(float nBoost)
+    {
+        newBoost = nBoost;
     }
 }

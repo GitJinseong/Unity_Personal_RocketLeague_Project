@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class TitleSceneController_Choi : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class TitleSceneController_Choi : MonoBehaviour
         StartCoroutine(DOActionTitleBg(actionTimesForTitleBg));
 
         // 회사 로고 액션 함수 호출
-        float[] actionTimesForCompanyLogo = {7f, 2f, 1f, 4f, 1f};
+        float[] actionTimesForCompanyLogo = {7f, 2f, 1f, 2f, 1f};
         StartCoroutine(DOActionCompanyLogo(actionTimesForCompanyLogo));
     }
 
@@ -51,5 +52,6 @@ public class TitleSceneController_Choi : MonoBehaviour
 
         yield return new WaitForSeconds(times[3]);
         // 씬 로드
+        SceneManager.LoadScene("SampleScene");
     }
 }

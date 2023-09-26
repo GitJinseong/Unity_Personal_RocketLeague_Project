@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PhotonServerSettings
   m_EditorClassIdentifier: 
   AppSettings:
-    AppIdRealtime: 8d697364-41e1-494e-8ff4-07fc10b80133
+    AppIdRealtime: 7104fd04-0de4-41b1-9e45-de5aede9e368
     AppIdFusion: 
     AppIdChat: 
     AppIdVoice: 
@@ -102,6 +102,22 @@ MonoBehaviour:
   - SetObjectNameForRPC
   - SetObjectTagForRPC
   - SetParentForRPC
+  - DeActiveGoalInfo
+  - GoalTextRpc
+  - ApplyExitLeftGameTime
+  - ApplyLeftGameTime
+  - ApplyOvertime
+  - BlueTeamWin
+  - MasterExitLeftGameTime
+  - MasterLeftGameTime
+  - MasterTimeOverCheck
+  - OrangeTeamWin
+  - BallMargnet
+  - BallPunch
+  - receiveInfo
+  - ApplyExitTimeover
+  - OvertimeGameOver
+  - Kick
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

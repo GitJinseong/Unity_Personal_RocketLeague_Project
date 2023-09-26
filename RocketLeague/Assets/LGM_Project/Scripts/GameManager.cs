@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using Unity.VisualScripting;
+using System;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -29,25 +30,39 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public GameObject ballAuraPf;   // 축구공 표식을 생성할 축구공 표식 프리팹
     public GameObject blueCar;   // 블루팀 RC 카 생성할 프리팹
     public GameObject orangeCar;   // 오렌지팀 RC 카 생성할 프리팹
+    public GameObject goalInfoBg;
+
+    public GameObject gameOverTexts;
+    public GameObject scoreBoard;
     public Transform ballSpawnTransform;   // 축구공을 생성할 구역
     public Transform[] blueCarSpawner = new Transform[4];   // 블루팀 RC 카를 생성할 구역
     public Transform[] orangeCarSpawner = new Transform[4];   // 오렌지팀 RC 카를 생성할 구역
     public TMP_Text blueScoreText;   // 블루팀 스코어 텍스트
     public TMP_Text orangeScoreText;   // 오렌지팀 스코어 텍스트
     public TMP_Text currentTimerText;   // 게임 시간 텍스트
-    public TMP_Text gameReadyText;
-    public TMP_Text gameStartCountText;
-    public Image gameReadyImage;
+    public TMP_Text gameReadyText;   // 게임에 접속한 플레이어 수 표시 텍스트
+    public TMP_Text gameStartCountText;   // 게임 시작 카운트 텍스트
+    public TMP_Text gameTimeInfoText;   //  특정 게임 남은 시간 표시 텍스트
+    public TMP_Text gameOverWinText;
+    public TMP_Text gameOverWinTeamText;
+    public TMP_Text gameOverWinTeamText_2;
+    public TMP_Text goalText;
+    public Image gameReadyImage;   // 게임에 접속한 플레이어 수 배경 이미지
+    public Image gameOverBackgroundImage;   // 게임 종료 시 회색 배경 이미지
 
     public int blueScore;   // 블루팀 골 스코어
     public int orangeScore;   // 오렌지팀 골 스코어
     public bool isGoaled = false;   // 현재 골 성공 상태인지 체크
     public bool timePassCheck = true;   // 게임 시간이 흐를수 있는 상태인지 체크
     public bool gameStartCheck = false;
+    public bool overtimeCheck = false;
+    public bool isGameOver = false;
 
     private GameObject ballOj;   // 축구공 오브젝트
     private GameObject playerCloneCar;   // RC 카 Empty 부모 오브젝트
     private Transform playerCar;   // RC 카 콜라이더와 리짓바디가 존재하는 자식 오브젝트
+    private Transform playerKart;
+    private CarBooster_Yoo playerBoost;
     private Rigidbody ballRb;   // 축구공 리짓바디
     private Rigidbody carRb;   // RC 카 리짓바디
     private Transform blueSpawnPoint;   // 플레이어가 RC 카를 생성할 블루팀 포인트 구역
@@ -58,16 +73,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private int secondTime = default;   // 표시할 초 시간
     private int playerOwnerNumber = default;   // photon 에서 부여한 유저 번호
     private int playerTeamCheck = default;   // 플레이어 팀 확인값
-    private int gameStartCount = default;
+    private int gameStartCount = default;   // 게임 시작 숫자 값
+    private int overTimeWinCheck = default;   // 연장전에서 마지막 골을 넣은 팀 체크
     private float checkTime = default;   // 1 초를 체크할 실수값
-    private bool fullPlayerCheck = false;
+    private bool fullPlayerCheck = false;   // 게임 시작이 가능한 인원이 모두 모였는지 체크
+    private string[] gameOverInfoText = new string[2];   // 게임 오버시 출력되는 문자열
+    private Transform kartNormal;
+    // 럼블 모드인지 구분하는 변수
+    public bool isRumbleMode = false;
 
     void Awake()
     {
            // 초기 변수값 설정
         playerCount = PhotonNetwork.PlayerList.Length;   // 포톤 서버에 접속한 플레이어 수만큼 플레이어 수로 지정해준다
 
-        totalTime = 300;
+        totalTime = 15;
         minuteTime = 0;
         secondTime = 0;
         checkTime = 0f;
@@ -112,22 +132,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 blueSpawnPoint = blueCarSpawner[2];
             }
 
-            playerTeamCheck = 2;   // 플레이어 팀 구분을 블루팀으로 저장해준다
+            //playerTeamCheck = 2;   // 플레이어 팀 구분을 블루팀으로 저장해준다
             //   // 해당 플레이어의 스폰 위치에 블루팀의 자동차를 생성하고 게임 오브젝트로 저장한다
             //playerCloneCar = PhotonNetwork.Instantiate(blueCar.name, blueSpawnPoint.position, blueSpawnPoint.rotation);
-            //   // 플레이어 RC 카 안에 Transform 값을 저장한다
+            //// 플레이어 RC 카 안에 Transform 값을 저장한다
             //playerCar = playerCloneCar.transform.Find("Collider").GetComponent<Transform>();
-            //   // 플레이어 RC 카 안에 Rigidbody 값을 저장한다
+            //// 플레이어 RC 카 안에 Rigidbody 값을 저장한다
             //carRb = playerCloneCar.transform.Find("Collider").GetComponent<Rigidbody>();
 
-
-
-
-
-            // 블루 카 생성 & 포톤 ActorNumber를 매개변수로 보냄
-            // 생성시 SetRespawnObjectValues()를 호출하게 함
             CustomizingManager_Choi.instance.CreateObjectWithCustomizing(0, myPhotonActorNumber, 
-                blueSpawnPoint.position, Quaternion.Euler(0f, -180f, 0f));
+                blueSpawnPoint.position, blueSpawnPoint.rotation, isRumbleMode);
         }
         else   // 플레이어 카운트 값을 2로 나누었을때 나머지가 0 이 안되는 순서의 플레이어인지 체크
         {
@@ -144,7 +158,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 orangeSpawnPoint = orangeCarSpawner[2];
             }
 
-            playerTeamCheck = 1;   // 플레이어 팀 구분을 오렌지팀으로 저장해준다
+            //playerTeamCheck = 1;   // 플레이어 팀 구분을 오렌지팀으로 저장해준다
             //   // 해당 플레이어의 스폰 위치에 오렌지팀의 자동차를 생성하고 게임 오브젝트로 저장한다
             //playerCloneCar = PhotonNetwork.Instantiate(orangeCar.name, orangeSpawnPoint.position, orangeSpawnPoint.rotation);
             //   // 플레이어 RC 카 안에 Transform 값을 저장한다
@@ -152,15 +166,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             //   // 플레이어 RC 카 안에 Rigidbody 값을 저장한다
             //carRb = playerCloneCar.transform.Find("Collider").GetComponent<Rigidbody>();
 
-
-
-
-
-
-            // 오렌지 카 생성 & 포톤 ActorNumber를 매개변수로 보냄
-            // 생성시 SetRespawnObjectValues()를 호출하게 함
             CustomizingManager_Choi.instance.CreateObjectWithCustomizing(1, myPhotonActorNumber, 
-                orangeSpawnPoint.position, Quaternion.identity);
+                orangeSpawnPoint.position, orangeSpawnPoint.rotation, isRumbleMode);
         }
 
         playerCount = PhotonNetwork.PlayerList.Length;   // 포톤 서버에 접속한 플레이어 수를 다시 체크해준다
@@ -183,12 +190,30 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     // 리스폰 관련 오브젝트 정보를 저장하는 함수
-    public void SetRespawnObjectValues(GameObject playerObj)
+    public void SetRespawnObjectValues(GameObject playerObj, int teamType, Transform kartTransform)
     {
+        // 팀을 구분해서 playerTeamCheck를 저장하는 변수
+        switch (teamType)
+        {
+            // 블루 팀일 경우
+            case 0:
+                playerTeamCheck = 2;
+                break;
+            // 오렌지 팀일 경우
+            case 1:
+                playerTeamCheck = 1;
+                break;
+        }
+
         // 플레이어 RC 카 안에 Rigidbody 값을 저장한다
         playerCar = playerObj.transform.Find("Collider").GetComponent<Transform>();
         // 플레이어 RC 카 안에 Rigidbody 값을 저장한다
         carRb = playerObj.transform.Find("Collider").GetComponent<Rigidbody>();
+        // playerKart에 매개변수로 받은 kartTransform 저장
+        playerKart = kartTransform;
+
+        kartNormal=playerKart.transform.Find("KartNormal").GetComponent<Transform>();
+        playerBoost = playerKart.gameObject.GetComponent<CarBooster_Yoo>();
     }
 
     [PunRPC]
@@ -271,6 +296,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         gameStartCountText.text = string.Format("{0}", gameStartCount);
     }
 
+    public void GoalTextUpdate(string playerName_)
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("GoalTextRpc", RpcTarget.All, playerName_);
+        }
+    }
+
+    [PunRPC]
+    void GoalTextRpc(string playerName_)
+    {
+        goalInfoBg.SetActive(true);
+        goalText.text=string.Format("{0} 점수 획득!", playerName_);
+        StartCoroutine(GoalTextRoutine());
+
+    }
     IEnumerator StartCountDelay()
     {
         while (gameStartCount > 0)
@@ -279,6 +320,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
             photonView.RPC("MasterStartCount", RpcTarget.MasterClient);
         }
+    }
+    IEnumerator GoalTextRoutine()
+    {
+        yield return new WaitForSeconds(2);
+        if(PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("DeActiveGoalInfo", RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    void DeActiveGoalInfo()
+    {
+        goalInfoBg.SetActive(false);
     }
 
     [PunRPC]
@@ -295,22 +350,214 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (checkTime >= 1f)   // 델타타임을 더한 checkTime 값이 1 보다 크거나 같으면 실행
         {
             checkTime = 0f;   // checkTime 을 초기화 시킨다
-            totalTime -= 1;   // 총 게임시간에서 1 초를 감소시킨다
-            minuteTime = totalTime / 60;   // 남은 게임 시간 중 분 타임을 나타낸다
-            secondTime = totalTime % 60;   // 남은 게임 시간 중 초 타임을 나타낸다
 
-               // 계산된 게임 시간을 모든 클라이언트에게 동기화 한다
-            photonView.RPC("ApplyTimePass", RpcTarget.AllBuffered, minuteTime, secondTime);
+            if (overtimeCheck == false)
+            {
+                totalTime -= 1;   // 총 게임시간에서 1 초를 감소시킨다
+                minuteTime = totalTime / 60;   // 남은 게임 시간 중 분 타임을 나타낸다
+                secondTime = totalTime % 60;   // 남은 게임 시간 중 초 타임을 나타낸다
+
+                if (totalTime == 60)
+                {
+                    photonView.RPC("MasterLeftGameTime", RpcTarget.MasterClient, 1);
+                    photonView.RPC("ApplyTimePass", RpcTarget.AllBuffered, minuteTime, secondTime, 1);
+                }
+                else if (totalTime == 30)
+                {
+                    photonView.RPC("MasterLeftGameTime", RpcTarget.MasterClient, 2);
+                    photonView.RPC("ApplyTimePass", RpcTarget.AllBuffered, minuteTime, secondTime, 1);
+                }
+                else if (totalTime <= 10 && totalTime > 0)
+                {
+                    photonView.RPC("MasterLeftGameTime", RpcTarget.MasterClient, 3);
+                    photonView.RPC("ApplyTimePass", RpcTarget.AllBuffered, minuteTime, secondTime, 1);
+                }
+                else if (totalTime <= 0)
+                {
+                    photonView.RPC("MasterTimeOverCheck", RpcTarget.MasterClient);
+                }
+                else
+                {
+                    // 계산된 게임 시간을 모든 클라이언트에게 동기화 한다
+                    photonView.RPC("ApplyTimePass", RpcTarget.AllBuffered, minuteTime, secondTime, 1);
+                }
+            }
+            else
+            {
+                totalTime += 1;
+                minuteTime = totalTime / 60;   // 남은 게임 시간 중 분 타임을 나타낸다
+                secondTime = totalTime % 60;   // 남은 게임 시간 중 초 타임을 나타낸다
+                photonView.RPC("ApplyTimePass", RpcTarget.AllBuffered, minuteTime, secondTime, 2);
+
+            }
         }
     }
 
     [PunRPC]
-    public void ApplyTimePass(int min, int sec)   // 모든 클라이언트의 게임 시간을 동기화 하는 함수
+    public void MasterLeftGameTime(int type)
+    {
+        if (type == 1)
+        {
+            gameTimeInfoText.gameObject.SetActive(true);
+            photonView.RPC("ApplyLeftGameTime", RpcTarget.AllBuffered, 1, true);
+
+            StartCoroutine(ExitLeftGameTime());
+        }
+        else if (type == 2)
+        {
+            gameTimeInfoText.gameObject.SetActive(true);
+            photonView.RPC("ApplyLeftGameTime", RpcTarget.AllBuffered, 2, true);
+
+            StartCoroutine(ExitLeftGameTime());
+        }
+        else if (type == 3)
+        {
+            gameTimeInfoText.gameObject.SetActive(true);
+            photonView.RPC("ApplyLeftGameTime", RpcTarget.AllBuffered, 3, true);
+        }
+    }
+
+    [PunRPC]
+    public void ApplyLeftGameTime(int type, bool state)
+    {
+        if (type == 1)
+        {
+            gameTimeInfoText.gameObject.SetActive(state);
+            gameTimeInfoText.text = string.Format("1 분 남았습니다!");
+        }
+        else if (type == 2)
+        {
+            gameTimeInfoText.gameObject.SetActive(state);
+            gameTimeInfoText.text = string.Format("30 초 남았습니다!");
+        }
+        else if (type == 3)
+        {
+            gameTimeInfoText.gameObject.SetActive(state);
+            gameTimeInfoText.text = string.Format("{0}", totalTime);
+        }
+    }
+
+    [PunRPC]
+    public void MasterExitLeftGameTime()
+    {
+        photonView.RPC("ApplyExitLeftGameTime", RpcTarget.AllBuffered, false);
+    }
+
+    [PunRPC]
+    public void ApplyExitLeftGameTime(bool state)
+    {
+        gameTimeInfoText.gameObject.SetActive(state);
+    }
+
+    IEnumerator ExitLeftGameTime()
+    {
+        yield return new WaitForSeconds(5f);
+
+        photonView.RPC("MasterExitLeftGameTime", RpcTarget.MasterClient);
+    }
+
+    [PunRPC]
+    public void MasterTimeOverCheck()   // 게임 스코어 값을 비교하여 결과를 출력하는 함수
+    {
+        if (orangeScore != blueScore)
+        {
+            if (orangeScore > blueScore)
+            {
+                photonView.RPC("OrangeTeamWin", RpcTarget.AllBuffered);
+            }
+            else
+            {
+                photonView.RPC("BlueTeamWin", RpcTarget.AllBuffered);
+            }
+        }
+        else
+        {
+            ballRb.velocity = Vector3.zero;
+            ballRb.angularVelocity = Vector3.zero;
+            ballOj.transform.position = ballSpawnTransform.transform.position;
+            photonView.RPC("ApplyOvertime", RpcTarget.AllBuffered);
+            photonView.RPC("CarRespawn", RpcTarget.AllBuffered);
+        }
+    }
+
+    [PunRPC]
+    public void ApplyOvertime()   // fix : 무승부일때 모든 클라이언트에게 실행되는 함수
+    {
+        overtimeCheck = true;
+        timePassCheck = false;
+        currentTimerText.text = string.Format("오버타임");
+        gameTimeInfoText.text = string.Format("시간 초과!");
+
+        StartCoroutine(ExitTimeover());
+    }
+
+    IEnumerator ExitTimeover()
+    {
+        yield return new WaitForSeconds(3f);
+
+        photonView.RPC("ApplyExitTimeover", RpcTarget.AllBuffered);
+    }
+
+    [PunRPC]
+    public void ApplyExitTimeover()
+    {
+        gameTimeInfoText.gameObject.SetActive(false);
+    }
+
+    [PunRPC]
+    public void OrangeTeamWin()
+    {
+        goalText.gameObject.SetActive(false);
+        gameTimeInfoText.gameObject.SetActive(false);
+        scoreBoard.gameObject.SetActive(false);
+        gameOverWinTeamText.gameObject.SetActive(true);
+        gameOverWinTeamText_2.gameObject.SetActive(true);
+        gameOverBackgroundImage.gameObject.SetActive(true);
+        gameOverWinTeamText.color = new Color(1f, 0.529f, 0f, 1f);
+        gameOverWinTeamText_2.color = new Color(1f, 0.529f, 0f, 1f);
+        gameOverWinTeamText_2.text = string.Format("오렌지");
+        isGameOver = true;
+
+        if (playerTeamCheck == 1)
+        {
+            gameOverWinText.gameObject.SetActive(true);
+        }
+    }
+
+    [PunRPC]
+    public void BlueTeamWin()
+    {
+        goalText.gameObject.SetActive(false);
+        gameTimeInfoText.gameObject.SetActive(false);
+        scoreBoard.gameObject.SetActive(false);
+        gameOverWinTeamText.gameObject.SetActive(true);
+        gameOverWinTeamText_2.gameObject.SetActive(true);
+        gameOverBackgroundImage.gameObject.SetActive(true);
+        gameOverWinTeamText.color = new Color(0f, 0.564f, 1f, 1f);
+        gameOverWinTeamText_2.color = new Color(0f, 0.564f, 1f, 1f);
+        gameOverWinTeamText_2.text = string.Format("블루");
+        isGameOver = true;
+
+        if (playerTeamCheck == 2)
+        {
+            gameOverWinText.gameObject.SetActive(true);
+        }
+    }
+
+    [PunRPC]
+    public void ApplyTimePass(int min, int sec, int type)   // 모든 클라이언트의 게임 시간을 동기화 하는 함수
     {
         minuteTime = min;
         secondTime = sec;
 
-        currentTimerText.text = string.Format("{0} : {1:00}", minuteTime, secondTime);
+        if (type == 1)
+        {
+            currentTimerText.text = string.Format("{0} : {1:00}", minuteTime, secondTime);
+        }
+        else
+        {
+            currentTimerText.text = string.Format("+ {0} : {1:00}", minuteTime, secondTime);
+        }
     }
 
     public void GameTimePassOn()   // 다시 게임 시간이 흘러가게 하는 함수
@@ -382,19 +629,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     [PunRPC]
-    public void CarRespawn()
+    public void CarRespawn()   // 라운드 종료시 RC 카들을 원위치로 이동시키는 함수
     {
         if (playerTeamCheck == 1)
         {
             playerCar.position = orangeSpawnPoint.position;
-            playerCar.rotation = orangeSpawnPoint.rotation;
+            playerKart.rotation = orangeSpawnPoint.rotation;
+            kartNormal.localEulerAngles=Vector3.zero;
+            playerBoost.SetBoost(33);
             carRb.velocity = Vector3.zero;
             carRb.angularVelocity = Vector3.zero;
         }
         else
         {
             playerCar.position = blueSpawnPoint.position;
-            playerCar.rotation = blueSpawnPoint.rotation;
+            playerKart.rotation = blueSpawnPoint.rotation;
+            kartNormal.localEulerAngles=Vector3.zero;
+
+            playerBoost.SetBoost(33);
             carRb.velocity = Vector3.zero;
             carRb.angularVelocity = Vector3.zero;
         }
@@ -427,6 +679,47 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (PhotonNetwork.IsMasterClient)   // 마스터 클라이언트인지 체크
         {
             photonView.RPC("AddOrangeScore", RpcTarget.MasterClient);   // 마스터 클라이언트에서 스코어 값이 증가하도록 해줌
+        }
+    }
+
+    public void OvertimeOrangeTeamWin()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("OvertimeGameOver", RpcTarget.AllBuffered, 1);
+            
+            StartCoroutine(OvertimeGameOverDelay());
+        }
+    }
+
+    public void OvertimeBlueTeamWin()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("OvertimeGameOver", RpcTarget.AllBuffered, 2);
+
+            StartCoroutine(OvertimeGameOverDelay());
+        }
+    }
+
+    [PunRPC]
+    public void OvertimeGameOver(int winner)
+    {
+        overTimeWinCheck = winner;
+        ballOj.SetActive(false);   // 축구공 오브젝트를 비활성화
+    }
+
+    IEnumerator OvertimeGameOverDelay()
+    {
+        yield return new WaitForSeconds(1f);
+
+        if (overTimeWinCheck == 1)
+        {
+            photonView.RPC("OrangeTeamWin", RpcTarget.AllBuffered);
+        }
+        else if (overTimeWinCheck == 2)
+        {
+            photonView.RPC("BlueTeamWin", RpcTarget.AllBuffered);
         }
     }
 
@@ -476,7 +769,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void UpdateGoalCheck(bool state)   // 모든 클라이언트가 isGoaled 값을 동기화 하는 함수
     {
         isGoaled = state;   // isGoaled 값을 모든 클라이언트가 동기화 함
-        Debug.Log(state);
     }
 
     // 주기적으로 자동 실행되는, 동기화 메서드

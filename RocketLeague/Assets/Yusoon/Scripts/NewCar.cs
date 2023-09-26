@@ -14,7 +14,7 @@ public class NewCar : MonoBehaviourPunCallbacks
     public float gravity;
     public LayerMask layerMask;
     public LayerMask fieldMask;
-
+    public Jump jumpClass;
      public bool isGrounded = false;
     
     bool drifting = false;
@@ -25,7 +25,9 @@ public class NewCar : MonoBehaviourPunCallbacks
     public Rigidbody sphere;
     public bool outOfControl = false;
     private bool isNotControl = false;
-    // ?¥í??? ???? ???
+    bool lookatBall = false;
+    Vector3 lastGroundedPosition;
+    // ?ï¿½ï¿½??? ???? ???
     #region
     private CarBooster_Yoo booster;
     private float normalAcceleration;
@@ -40,7 +42,7 @@ public class NewCar : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
-        // ?¥í??? ???? ???
+        // ?ï¿½ï¿½??? ???? ???
         #region
         booster = GetComponent<CarBooster_Yoo>();
         normalAcceleration = acceleration;
@@ -51,7 +53,7 @@ public class NewCar : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.instance.gameStartCheck == false) { return; }
+        if (GameManager.instance.isGameOver == true) { return; }
 
         if (photonView.IsMine == false)
         {
@@ -59,6 +61,7 @@ public class NewCar : MonoBehaviourPunCallbacks
         }
         Vector3 newposition = new Vector3(sphere.transform.position.x, sphere.transform.position.y-3.5f, sphere.transform.position.z);
         transform.position=newposition;
+
         float speedDir = Input.GetAxis("Vertical");
         if (outOfControl)
         {
@@ -67,11 +70,12 @@ public class NewCar : MonoBehaviourPunCallbacks
                 isNotControl = true;
                 StartCoroutine(ControlTimer());
             }
+        if (GameManager.instance.gameStartCheck == false) { return; }
             speedDir=1;
             acceleration= normalAcceleration * 3.5f;
         }
 
-        // ?¥í??? ???? ???
+        // ?ï¿½ï¿½??? ???? ???
         #region
         if (booster.useBoost == true)
         {
@@ -83,14 +87,14 @@ public class NewCar : MonoBehaviourPunCallbacks
                     timeAfterFirstBoost += Time.deltaTime;
                     //if(timeAfterFirstBoost <= useSecondBoostDelay)
                     //{
-                    //    Debug.Log("2?? ?¥í?????? ???? ?©£?" + (useSecondBoostDelay - timeAfterFirstBoost));
+                    //    Debug.Log("2?? ?ï¿½ï¿½?????? ???? ?ï¿½ï¿½?" + (useSecondBoostDelay - timeAfterFirstBoost));
                     //}
                 }
 
                 if (timeAfterFirstBoost >= useSecondBoostDelay)
                 {
                     useSecondBoost = true;
-                    //Debug.Log("2?? ?¥í??? ???");
+                    //Debug.Log("2?? ?ï¿½ï¿½??? ???");
                 }
             }
         }
@@ -122,6 +126,8 @@ public class NewCar : MonoBehaviourPunCallbacks
            
             float dir = Input.GetAxis("Horizontal");
             float amount = Mathf.Abs((Input.GetAxis("Horizontal")));
+            if (GameManager.instance.gameStartCheck == false) { return; }
+
             if (speedDir!= -1)
             {
                 Steer(dir, amount);
@@ -145,7 +151,7 @@ public class NewCar : MonoBehaviourPunCallbacks
 
 
         }
-
+        
 
         Vector3 rayDirection = -kartNormal.up; // Ray?? ????? ??? ???????? ????
 
@@ -159,21 +165,30 @@ public class NewCar : MonoBehaviourPunCallbacks
         isGrounded=Physics.Raycast(rayStartPoint, rayDirection, out hitNear, 4f, layerMask);
        // Debug.LogFormat("isGrounded : {0}", isGrounded);
         // Visualize the raycast
-        Debug.DrawRay(rayStartPoint, rayDirection * 4f, Color.green); // Ray?? ?©£??????.
+        Debug.DrawRay(rayStartPoint, rayDirection * 4f, Color.green); // Ray?? ?ï¿½ï¿½??????.
 
+
+        if(isGrounded)
+        {
         // Calculate the rotation to align kartNormal with the ground normal
         Vector3 targetNormal = hitNear.normal;
         Quaternion targetRotation = Quaternion.FromToRotation(kartNormal.up, targetNormal);
 
         // Smoothly adjust the kartNormal's rotation
+
         kartNormal.rotation = Quaternion.Slerp(kartNormal.rotation, targetRotation * kartNormal.rotation, Time.deltaTime * 8.0f);
+        }
+        else
+        {
+            lastGroundedPosition=transform.position;
+        }
 
 
 
         transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, new Vector3(0, transform.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
 
         cameraCenter.position=transform.position;
-        if (isGrounded)
+        if (isGrounded&&lookatBall==false)
         {
             cameraCenter.rotation = Quaternion.Lerp(cameraCenter.rotation, kartModel.rotation, Time.deltaTime * rotationLerpSpeed);
            // targetCameraRotation = cameraCenter.rotation; // ??? ??????? ???? ?????? ????????.
@@ -182,37 +197,78 @@ public class NewCar : MonoBehaviourPunCallbacks
 
         currentSpeed = Mathf.SmoothStep(currentSpeed, speed, Time.deltaTime * 12f); speed = 0f;
         currentRotate = Mathf.Lerp(currentRotate, rotate, Time.deltaTime * 6f); rotate = 0f;
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            if(lookatBall==false)
+            {
+                lookatBall = true;
+            }
+            else
+            {
 
+                lookatBall=false;
+
+            }
+           
+        }
+
+        if (lookatBall)
+        {
+            Ball_Ys ball = FindAnyObjectByType<Ball_Ys>();
+            if (ball != null)
+            {
+                //cameraCenter.LookAt(ball.transform);
+              Vector3 lookAtPosition = ball.transform.position;
+
+                cameraCenter.LookAt(lookAtPosition);
+
+                // ï¿½ï¿½ï¿½Ñµï¿½ X ï¿½ï¿½ È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+                Vector3 eulerAngles = cameraCenter.localEulerAngles;
+                eulerAngles.x = Mathf.Clamp(eulerAngles.x, -25f, 0); // -25 ï¿½Æ·ï¿½ï¿½ï¿½ È¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+                                                                     //cameraCenter.localRotation = Quaternion.Euler(eulerAngles);
+                cameraCenter.localEulerAngles = eulerAngles;
+            }
+        }
         if (isGrounded)
         {
 
 
-            kartModel.localEulerAngles = Vector3.Lerp(kartModel.localEulerAngles, new Vector3(0, 90+(Input.GetAxis("Horizontal") * 15), kartModel.localEulerAngles.z), .2f);
+            kartModel.localEulerAngles = Vector3.Lerp(kartModel.localEulerAngles, new Vector3(0, 90+(Input.GetAxis("Horizontal") * steering), kartModel.localEulerAngles.z), .2f);
 
 
         }
         else
         {
-            kartNormal.localEulerAngles = Vector3.Lerp(kartModel.localEulerAngles, new Vector3(0, 0, 90+(Input.GetAxis("Vertical") * 15)), .2f);
 
+            if(jumpClass.jumpCount>0)
+            {
+
+            kartNormal.localEulerAngles = Vector3.Lerp(kartNormal.localEulerAngles, new Vector3(kartNormal.localEulerAngles.x, kartNormal.localEulerAngles.y, kartNormal.localEulerAngles.z + (-Input.GetAxis("Vertical")*30)), .2f);
+
+            }
+          
         }
 
 
 
-
+         
 
     }
     private void FixedUpdate()
     {
         if (GameManager.instance.gameStartCheck == false) { return; }
+        if (GameManager.instance.isGameOver == true) { return; }
 
         if (photonView.IsMine == false)
         {
             return;
         }
-        sphere.AddForce(kartModel.transform.forward * currentSpeed, ForceMode.Acceleration);
+   
+        sphere.AddForce(kartNormal.transform.right * currentSpeed, ForceMode.Acceleration);
+            
+       
 
-        if(isGrounded)
+        if (isGrounded)
         {
         sphere.AddForce(-kartNormal.transform.up * gravity, ForceMode.Acceleration);
 
@@ -224,7 +280,7 @@ public class NewCar : MonoBehaviourPunCallbacks
         }
 
 
-        // ?¥í??? ???? ???
+        // ?ï¿½ï¿½??? ???? ???
         #region
         if (booster.useBoost == true && useSecondBoost == false)
         {
